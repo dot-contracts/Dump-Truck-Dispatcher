@@ -1,0 +1,64 @@
+﻿@using Abp.Timing
+@using Abp.Web.Security.AntiForgery
+@using DispatcherWeb.Timing
+@using DispatcherWeb.Web.Resources
+@inject ScriptPaths ScriptPaths
+@inject AppTimes AppTimes
+@inject IAbpAntiForgeryManager AbpAntiForgeryManager
+@inject IWebResourceManager WebResourceManager
+@{
+    Layout = null;
+    AbpAntiForgeryManager.SetCookie(Context);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <partial name="_MetaTags" />
+    <partial name="_CommonInlineStyles" />
+    <partial name="_ApplicationInsights" />
+    <partial name="_Favicons" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/vendors.bundle.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/app-layout-libs.min.css" asp-append-version="true" asp-add-nonce />
+    <link rel="stylesheet" href="@(ApplicationPath)metronic/dist/html/blue/assets/base/style.bundle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/common-styles.min.css" asp-append-version="true" />
+    <link rel="stylesheet" abp-href="/view-resources/Views/Account/_Layout.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", false)
+
+    <partial name="_AppPathScript" />
+</head>
+<body class="page-md login dispatch-driver d-md-flex align-items-md-center justify-content-md-center">
+    <div class="menu-toggler sidebar-toggler">
+    </div>
+    <div class="content">
+        <div class="dispatch-layout acknowledge-view">
+            <div class="logo">
+                <a href="~/">
+                    <img class="img-responsive" src="~/Common/Images/app-logo-on-light@(ScriptPaths.LogoPathSuffix).png" alt="" />
+                </a>
+            </div>
+            @RenderBody()
+        </div>
+        <div class="copyright">
+            @Clock.Now.Year © Dump Truck Dispatcher, Inc.
+        </div>
+    </div>
+    <script src="/view-resources/Areas/App/Views/_Bundles/app-layout-libs.min.js" asp-append-version="true" asp-add-nonce></script>
+    <script src="/view-resources/Areas/App/Views/_Bundles/scripts.bundle.min.js" asp-append-version="true"></script>
+
+    <!-- Dynamic scripts of ABP system (They are created on runtime and can not be bundled) -->
+    <script src="~/AbpServiceProxies/GetAll?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+    <script src="/Common/Scripts/abp.proxies.overrides.js" asp-append-version="true"></script>
+    <script src="~/AbpScripts/GetScripts?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+
+    <script src="/view-resources/Areas/App/Views/_Bundles/common-scripts.min.js" asp-append-version="true"></script>
+    <script src="~@ScriptPaths.JQuery_Validation_Localization" asp-append-version="true"></script>
+
+    <script src="/view-resources/Areas/App/Views/_Bundles/common-scripts.min.js" asp-append-version="true"></script>
+    <script src="/view-resources/Areas/App/Views/_Bundles/app-common-scripts.min.js" asp-append-version="true"></script>
+
+    @WebResourceManager.RenderScripts()
+
+    @await RenderSectionAsync("Scripts", false)
+</body>
+</html>

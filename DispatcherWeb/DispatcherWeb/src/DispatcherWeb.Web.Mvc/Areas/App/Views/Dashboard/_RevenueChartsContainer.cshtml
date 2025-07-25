@@ -1,0 +1,50 @@
+﻿@using DispatcherWeb.Dashboard.Dto
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="m-portlet m-portlet--full-height">
+            <div class="row align-items-center pt-4">
+                <div class="m-portlet__head-caption col-md-3">
+                </div>
+                <div class="m-portlet__head-tools col-md-5 justify-content-end text-center text-md-right mb-2">
+                    <div class="btn-group mr-4" data-toggle="buttons">
+                        <label class="btn m-btn--pill btn-secondary">
+                            <input type="radio" name="TicketType" autocomplete="off" value="@((int)TicketType.InternalTrucks)">
+                            Internal Trucks
+                        </label>
+                        <label class="btn m-btn--pill btn-secondary">
+                            <input type="radio" name="TicketType" autocomplete="off" value="@((int)TicketType.LeaseHaulers)">
+                            Lease Haulers
+                        </label>
+                        <label class="btn m-btn--pill btn-secondary active">
+                            <input type="radio" name="TicketType" autocomplete="off" checked="checked" value="@((int)TicketType.Both)">
+                            Both
+                        </label>
+                    </div>
+                </div>
+                <div class="m-portlet__head-tools col-md-4 text-center mb-2">
+                    <div class="ml-3 mr-3">
+                        <div class="form-group form-inline">
+                            <label for="RevenueChartsDateRange">Date Range:&nbsp;&nbsp;</label>
+                            <input class="form-control col-md-9 col-sm-12 col-sm-12" name="RevenueChartsDateRange" id="RevenueChartsDateRange" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="m-portlet__body">
+                <div id="revenueChartsLoading" class="revenue-chart-loading-container row align-items-center justify-content-center">
+                    <div class="m-blockui">
+                        <span>Loading...</span><span>
+                            <span class="m-loader m-loader--brand"></span>
+                        </span>
+                    </div>
+                </div>
+                <div id="revenueChartsContainer" class="row"></div>
+            </div>
+        </div>
+    </div>
+</div>

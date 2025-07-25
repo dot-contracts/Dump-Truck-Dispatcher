@@ -1,0 +1,35 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.OrderPayments.Dto
+@model AuthorizeOrderChargeDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Payment Information"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation heartland-iframe-form">
+        <input type="hidden" asp-for="OrderId" />
+        <input type="hidden" asp-for="CreditCardToken">
+        <input type="hidden" asp-for="NewCreditCardTempToken">
+        <div class="form-group">
+            <label class="control-label required-label">Amount to Authorize</label>
+            <input type="text" class="form-control" asp-for="AuthorizationAmount" required data-rule-number="true" data-rule-min="0.01" data-rule-max="@AppConsts.MaxHeartlandPaymentSize">
+        </div>
+        <div id="CardFields">
+            <div class="form-group">
+                <div class="iframeholder" id="credit-card"></div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Street Address</label>
+                <input type="text" class="form-control" asp-for="StreetAddress">
+            </div>
+            <div class="form-group">
+                <label class="control-label required-label">Zip Code</label>
+                <input type="text" class="form-control" required maxlength="9" asp-for="ZipCode">
+            </div>
+            <div class="form-group">
+                <input type="checkbox" class="minimal" asp-for="SaveCreditCardForFutureUse" id="SaveCreditCardForFutureUse">
+                <label for="SaveCreditCardForFutureUse" class="cbx">Save for future use</label>
+            </div>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

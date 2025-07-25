@@ -1,0 +1,20 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Web.Areas.App.Models.Quotes
+@model ViewQuoteDeliveriesViewModel
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("Deliveries")))
+
+<div class="modal-body  box-wrap">
+    <form id="ShowDeliveryForm" class="m-form m-form--fit m-form--label-align-right">
+        <input type="hidden" asp-for="QuoteLineId" />
+        <input type="hidden" asp-for="QuotedMaterialQuantity" />
+        <input type="hidden" asp-for="QuotedFreightQuantity" />
+    </form>
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-striped table-bordered table-hover dt-responsive" id="QuoteDeliveryTable"></table>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithClose.cshtml")

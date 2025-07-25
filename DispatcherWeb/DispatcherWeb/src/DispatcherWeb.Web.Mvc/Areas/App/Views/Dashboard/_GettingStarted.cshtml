@@ -1,0 +1,89 @@
+﻿@using DispatcherWeb.Configuration
+@using Abp.Configuration
+@using DispatcherWeb.Features
+@{
+    Layout = null;
+}
+
+        <div class="row align-items-stretch d-none">
+            <div class="col-sm-9 col-md-7 col-lg-4 col-12 d-flex align-items-stretch mb-4">
+                <div class="card">
+                    <div class="card-body getting-started">
+                        <div class="getting-started-title clearfix">
+                            <h5 class="card-title">@L("GettingStarted")</h5>
+                            <a href="#" id="HideGettingStartedBlock">@L("Hide")</a>
+                        </div>
+                        <div class="getting-started-step clearfix">
+                            <a href="https://www.youtube.com/playlist?list=PLWYp8tphzmiZ78JqiKYDwp6RtNzXauUc8?sub_confirmation=1">@L("CapitalClickHere")</a>@L("TrainingVideos")
+                        </div>
+                        <div class="getting-started-step clearfix">
+                            <label class="m-checkbox">
+                                <input type="checkbox" class="getting-started-checkbox" data-setting-name="@AppSettings.GettingStarted.UsersChecked" checked="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.GettingStarted.UsersChecked) ? "checked" : null)" />
+                                <span></span>
+                                1. @L("EnterYourUsers")
+                            </label>
+                            <a asp-action="Index" asp-controller="Users">@L("ClickHere")</a>
+                        </div>
+                        <div class="getting-started-step clearfix">
+                            <label class="m-checkbox">
+                                <input type="checkbox" class="getting-started-checkbox" data-setting-name="@AppSettings.GettingStarted.DriversChecked" checked="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.GettingStarted.DriversChecked) ? "checked" : null)" />
+                                <span></span>
+                                2. @L("EnterYourDrivers")
+                            </label>
+                            <a asp-action="Index" asp-controller="Drivers">@L("ClickHere")</a>
+                        </div>
+                        <div class="getting-started-step clearfix">
+                            <label class="m-checkbox">
+                                <input type="checkbox" class="getting-started-checkbox" data-setting-name="@AppSettings.GettingStarted.TrucksChecked" checked="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.GettingStarted.TrucksChecked) ? "checked" : null)" />
+                                <span></span>
+                                3. @L("EnterYourTrucks")
+                            </label>
+                            <a asp-action="Index" asp-controller="Trucks">@L("ClickHere")</a>
+                        </div>
+                        @if (await FeatureChecker.IsEnabledAsync(AppFeatures.PaidFunctionality))
+                        {
+                            <div class="getting-started-step clearfix">
+                                <label class="m-checkbox">
+                                    <input type="checkbox" class="getting-started-checkbox" data-setting-name="@AppSettings.GettingStarted.CustomersChecked" checked="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.GettingStarted.CustomersChecked) ? "checked" : null)" />
+                                    <span></span>
+                                    4. @L("EnterYourCustomers")
+                                </label>
+                                <a asp-action="Index" asp-controller="Customers">@L("ClickHere")</a>
+                            </div>
+                            <div class="getting-started-step clearfix">
+                                <label class="m-checkbox">
+                                    <input type="checkbox" class="getting-started-checkbox" data-setting-name="@AppSettings.GettingStarted.ServicesChecked" checked="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.GettingStarted.ServicesChecked) ? "checked" : null)" />
+                                    <span></span>
+                                    5. @L("EnterYourProductsAndServices")
+                                </label>
+                                <a asp-action="Index" asp-controller="Items">@L("ClickHere")</a>
+                            </div>
+                            <div class="getting-started-step clearfix">
+                                <label class="m-checkbox">
+                                    <input type="checkbox" class="getting-started-checkbox" data-setting-name="@AppSettings.GettingStarted.LocationsChecked" checked="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.GettingStarted.LocationsChecked) ? "checked" : null)" />
+                                    <span></span>
+                                    6. @L("EnterYourLocations")
+                                </label>
+                                <a asp-action="Index" asp-controller="Locations">@L("ClickHere")</a>
+                            </div>
+                            <div class="getting-started-step clearfix">
+                                <label class="m-checkbox">
+                                    <input type="checkbox" class="getting-started-checkbox" data-setting-name="@AppSettings.GettingStarted.LeaseHaulersChecked" checked="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.GettingStarted.LeaseHaulersChecked) ? "checked" : null)" />
+                                    <span></span>
+                                    7. @L("EnterYourLeaseHaulers")
+                                </label>
+                                <a asp-action="Index" asp-controller="LeaseHaulers">@L("ClickHere")</a>
+                            </div>
+                            <div class="getting-started-step clearfix">
+                                <label class="m-checkbox">
+                                    <input type="checkbox" class="getting-started-checkbox" data-setting-name="@AppSettings.GettingStarted.LogoChecked" checked="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.GettingStarted.LogoChecked) ? "checked" : null)" />
+                                    <span></span>
+                                    8. @L("AddYourLogo")
+                                </label>
+                                <a asp-action="Index" asp-controller="Settings">@L("ClickHere")</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>

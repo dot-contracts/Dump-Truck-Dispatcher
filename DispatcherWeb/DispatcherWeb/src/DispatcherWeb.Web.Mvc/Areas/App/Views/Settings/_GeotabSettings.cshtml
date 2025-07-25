@@ -1,0 +1,26 @@
+﻿@model DispatcherWeb.Configuration.Tenants.Dto.GpsIntegrationSettingsEditDto
+
+<div class="tab-pane" id="SettingsGeotabTab" abp-hidden="@(Model.Platform != GpsPlatform.Geotab)">
+    <div class="row">
+        <div class="col-sm-6">
+            <form id="GeotabSettingsForm" class="m-form">
+                <div class="form-group">
+                    <label for="Database">@L("Database")</label>
+                    <input id="Database" type="text" name="Database" autocomplete="off" class="form-control" value="@Model.Geotab.Database" maxlength="64">
+                </div>
+                <div class="form-group">
+                    <label for="User">@L("User")</label>
+                    <input id="User" type="text" name="User" autocomplete="off" class="form-control" value="@Model.Geotab.User" maxlength="64">
+                </div>
+                <div class="form-group">
+                    <label for="Password">@L("Password")</label>
+                    <input type="password" id="Password" name="Password" autocomplete="off" class="form-control" value="@Model.Geotab.Password" maxlength="64">
+                </div>
+                <div class="form-group">
+                    <label for="MapBaseUrl">@L("MapBaseUrl")</label>
+                    <input id="MapBaseUrl" type="text" name="MapBaseUrl" autocomplete="off" class="form-control" value="@Model.Geotab.MapBaseUrl" maxlength="64">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

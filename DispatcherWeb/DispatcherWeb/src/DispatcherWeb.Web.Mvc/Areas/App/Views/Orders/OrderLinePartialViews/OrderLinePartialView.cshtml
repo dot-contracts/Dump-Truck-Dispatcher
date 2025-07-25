@@ -1,0 +1,213 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Orders.Dto
+
+@model OrderLineEditDto
+
+<input type="hidden" asp-for="MaterialCostRate" />
+
+<div class="form-group">
+    <label>Load At</label>
+    <select class="form-control" asp-for="LoadAtId">
+        <option value="">@L("SelectALocation")</option>
+        @if (Model.LoadAtId.HasValue)
+        {
+            <option selected value="@Model.LoadAtId">@Model.LoadAtName</option>
+        }
+    </select>
+</div>
+<div class="form-group">
+    <label>Deliver To</label>
+    <select class="form-control" asp-for="DeliverToId">
+        <option value="">@L("SelectALocation")</option>
+        @if (Model.DeliverToId.HasValue)
+        {
+            <option selected value="@Model.DeliverToId">@Model.DeliverToName</option>
+        }
+    </select>
+</div>
+<div class="form-group">
+    <label class="required-label">Item</label>
+    <select class="form-control" asp-for="FreightItemId" required>
+        <option value="">Select an item</option>
+        @if (Model.FreightItemId > 0)
+        {
+            <option selected value="@Model.FreightItemId">@Model.FreightItemName</option>
+        }
+    </select>
+
+</div>
+<div abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.AllowSpecifyingTruckAndTrailerCategoriesOnQuotesAndOrders))">
+    <div class="form-group">
+        <label>@L("TruckTrailerCategory")</label>
+        <select class="form-control" name="VehicleCategories" id="VehicleCategories" multiple="multiple">
+            @if (Model.VehicleCategories != null)
+            {
+                foreach (var category in Model.VehicleCategories)
+                {
+                    <option value="@category.Id" selected>@category.Name</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label>@L("BedConstruction")</label>
+        <select class="form-control" asp-for="BedConstruction" asp-items="Html.GetEnumSelectListOrderedByName<BedConstructionEnum>()">
+            <option value="">&nbsp;</option>
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <label class="required-label" for="MaterialUomId">Material UOM</label>
+    <select class="form-control" asp-for="MaterialUomId">
+        <option value=""
+                data-placeholder-default="Select a UOM"
+                data-placeholder-no-items="No Prices defined for the selected Item"
+                data-placeholder-no-parent="Select an Item first">
+            Select Material UOM
+        </option>
+        @if (Model.MaterialUomId > 0)
+        {
+            <option selected value="@Model.MaterialUomId">@Model.MaterialUomName</option>
+        }
+    </select>
+</div>
+<div class="form-group">
+    <label class="required-label" for="FreightUomId">Freight UOM</label>
+    <select class="form-control" asp-for="FreightUomId" data-uombaseid="@((int?)Model.FreightUomBaseId)">
+        <option value=""
+                data-placeholder-default="Select a UOM"
+                data-placeholder-no-items="No Prices defined for the selected Item"
+                data-placeholder-no-parent="Select an Item first">
+            Select Freight UOM
+        </option>
+        @if (Model.FreightUomId > 0)
+        {
+            <option selected value="@Model.FreightUomId">@Model.FreightUomName</option>
+        }
+    </select>
+</div>
+<div class="form-group">
+    <label>Material Rate</label>
+    <input class="form-control" type="text" asp-for="MaterialPricePerUnit" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+</div>
+<div class="form-group">
+    <label>Freight Rate</label>
+    <input class="form-control" type="text" asp-for="FreightPricePerUnit" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+</div>
+@if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.AllowProductionPay) && await FeatureChecker.IsEnabledAsync(AppFeatures.DriverProductionPayFeature))
+{
+    <div class="form-group" abp-hidden>
+        <label asp-for="ProductionPay" class="m-checkbox">
+            <input type="checkbox" id="ProductionPay" name="ProductionPay" value="true" checked="@(Model.ProductionPay ? "checked" : null)">
+            @L("ProductionPay")
+            <span></span>
+        </label>
+    </div>
+
+    <div class="row" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.AllowDriverPayRateDifferentFromFreightRate))">
+        <div class="col-6 form-group">
+            <label>@L("FreightRateToPayDrivers")</label>
+            <input class="form-control" type="text" asp-for="FreightRateToPayDrivers" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+        <div class="col-6 form-group">
+            <div class="d-flex align-items-end h-100">
+                <label asp-for="LoadBased" class="m-checkbox">
+                    <input type="checkbox" id="LoadBased" name="LoadBased" value="true" checked="@(Model.LoadBased ? "checked" : null)">
+                    @L("LoadBased")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+    </div>
+}
+<div class="form-group">
+    <label>@L("LHRate")</label>
+    <input class="form-control" type="text" asp-for="LeaseHaulerRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+</div>
+<div class="form-group">
+    <label>Material Quantity</label>
+    <input class="form-control" type="text" asp-for="MaterialQuantity" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+</div>
+<div class="form-group">
+    <label>Freight Quantity</label>
+    <input class="form-control" type="text" asp-for="FreightQuantity" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+</div>
+<div class="form-group">
+    <label>Material</label>
+    <div class="input-group">
+        <input class="form-control" type="text" asp-for="MaterialPrice" disabled="@(Model.CanOverrideTotals && Model.IsMaterialPriceOverridden ? null : "disabled")" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength" required>
+        <span class="input-group-btn" abp-hidden="@(!Model.CanOverrideTotals)">
+            <button type="button" class="btn btn-default" id="UnlockMaterialTotalButton"><span class="fas fa-unlock"></span></button>
+        </span>
+    </div>
+</div>
+<div class="form-group">
+    <label>Freight</label>
+    <div class="input-group">
+        <input class="form-control" type="text" asp-for="FreightPrice" disabled="@(Model.CanOverrideTotals && Model.IsFreightPriceOverridden ? null : "disabled")" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength" required>
+        <span class="input-group-btn" abp-hidden="@(!Model.CanOverrideTotals)">
+            <button type="button" class="btn btn-default" id="UnlockFreightTotalButton"><span class="fas fa-unlock"></span></button>
+        </span>
+    </div>
+</div>
+<div class="form-group">
+    <label>Requested Number of Trucks</label>
+    <input class="form-control" type="text" asp-for="NumberOfTrucks" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+</div>
+@if (await SettingManager.DispatchViaAny())
+{
+    <div class="form-group">
+        <label asp-for="IsMultipleLoads" class="m-checkbox">
+            <input type="checkbox" id="IsMultipleLoads" name="IsMultipleLoads" value="true" @Html.Raw(!Model.IsMultipleLoads ? "" : "checked=\"checked\"")>
+            @L("RunUntilStopped")
+            <span></span>
+        </label>
+    </div>
+}
+<div class="form-group">
+    <label class="control-label">@L("TimeOnJob"):</label>
+    <div class="input-group">
+        <input type="text" class="form-control" asp-for="TimeOnJob">
+        <span class="input-group-btn" abp-hidden="@(!(Model.NumberOfTrucks > 0))">
+            <button type="button" class="btn btn-default" id="SetStaggeredTimeButton" title="@L("SetStaggeredTimes")"><span class="far fa-clock"></span></button>
+        </span>
+    </div>
+</div>
+<div class="form-group">
+    <label>@L("JobNumber")</label>
+    <input class="form-control" type="text" asp-for="JobNumber" maxlength="@EntityStringFieldLengths.OrderLine.JobNumber">
+</div>
+<div class="form-group">
+    <label>Note</label>
+    <textarea class="form-control" rows="5" asp-for="Note"></textarea>
+</div>
+<div class="form-group mb-1">
+    <label asp-for="RequiresCustomerNotification" class="m-checkbox">
+        <input type="checkbox" class="order-line-field" id="RequiresCustomerNotification" name="RequiresCustomerNotification" value="true" checked="@(Model.RequiresCustomerNotification ? "checked" : null)">
+        @L("RequiresNotification")
+        <span></span>
+    </label>
+</div>
+<div class="form-group" abp-hidden>
+    <label asp-for="CustomerNotificationContactName" class="required-label">@L("ContactName")</label>
+    <input class="form-control" type="text" asp-for="CustomerNotificationContactName" maxlength="@DispatcherWeb.Infrastructure.EntityStringFieldLengths.OrderLine.CustomerNotificationContactName">
+</div>
+<div class="form-group" abp-hidden>
+    <label asp-for="CustomerNotificationPhoneNumber" class="required-label">@L("PhoneNumber")</label>
+    <input class="form-control" type="text" asp-for="CustomerNotificationPhoneNumber" pattern="\+1\d{10}" placeholder="+1##########" maxlength="@DispatcherWeb.Infrastructure.EntityStringFieldLengths.OrderLine.CustomerNotificationPhoneNumber">
+</div>
+
+@{
+    var requiredTicketEntry = await SettingManager.GetRequiredTicketEntry();
+}
+<div class="form-group mb-1" abp-hidden="@(!requiredTicketEntry.IsRequireTicketInputVisible())">
+    <label asp-for="RequireTicket" class="m-checkbox">
+        <input type="checkbox" id="RequireTicket" name="RequireTicket" value="true" checked="@(Model.RequireTicket ? "checked" : null)">
+        @L("RequireTicket")
+        <span></span>
+    </label>
+</div>

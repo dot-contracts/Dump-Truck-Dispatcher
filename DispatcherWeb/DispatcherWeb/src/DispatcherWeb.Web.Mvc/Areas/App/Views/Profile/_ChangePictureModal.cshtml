@@ -1,0 +1,20 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+<partial name="~/Areas/App/Views/Common/Modals/_ModalHeader.cshtml" model="@(new ModalHeaderViewModel(L("ChangeProfilePicture")))" />
+
+<div class="modal-body">
+    <form id="ChangeProfilePictureModalForm" class="m-form" method="POST" action="@(ApplicationPath + "Profile/UploadProfilePicture")">
+        <div class="form-group fileUpload">
+            <div class="btn btn-primary browse_btn">
+                <span>@L("Browse")</span>
+                <input class="upload" type="file" name="ProfilePicture" />
+            </div>
+            <input id="FileNamePlaceholder" class="form-control file-upload" placeholder="No File Selected." disabled="disabled">
+        </div>
+        <div class="col-xs-12 mt-1 mb-4">
+            <span class="m-form__help">@L("ProfilePicture_Change_Info", AppConsts.MaxProfilePictureBytesUserFriendlyValue)</span>
+        </div>
+    </form>
+    <img class="col-12" id="ProfilePictureResize" src="" />
+</div>
+
+<partial name="~/Areas/App/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml" />

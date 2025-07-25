@@ -1,0 +1,96 @@
+﻿@using Abp.Extensions
+@using Abp.Configuration
+@using DispatcherWeb.Web.Areas.App.Startup
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Authorization
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.TruckDispatchList;
+    var hasRemoveDispatchesPermission = await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_Dispatches_ShowRemoveDispatchesButton);
+}
+
+@section Scripts
+{
+    <script src="~/lib/jquery-ui/jquery-sortable.js" asp-append-version="true"></script>
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/Dispatches/TruckDispatchList.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/Dispatches/TruckDispatchList.js" asp-append-version="true"></script>
+    </environment>
+
+}
+
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-8 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("TruckDispatchListHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+            </span>
+        </div>
+        <div class="col-4 col-md-6 text-right">
+            @if (hasRemoveDispatchesPermission)
+            {
+                <button id="RemoveDispatchesButton" class="btn btn-primary" title="@L("RemoveDispatchesHint")"> @L("RemoveDispatches")</button>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+
+            <div class="m-form m-form--label-align-right">
+                <form>
+                    <div class="row align-items-center m--margin-bottom-20">
+                        <div class="form-group col-lg-2 col-md-2 col-sm-6" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+                            <label class="control-label" for="OfficeIdFilter">@L("Office")</label>
+                            <select class="form-control filter" name="OfficeId" id="OfficeIdFilter">
+                                <option value="">Select an office</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-2 col-md-2 col-sm-6" abp-hidden="@(!((DispatchVia)await SettingManager.GetSettingValueAsync<int>(AppSettings.DispatchingAndMessaging.DispatchVia)).IsIn(DispatchVia.DriverApplication, DispatchVia.SimplifiedSms))">
+                            <label class="control-label" for="DispatchListViewFilter">@L("View")</label>
+                            <select class="form-control filter" name="DispatchListView" id="DispatchListViewFilter" asp-items="@Html.GetEnumSelectList(typeof(DispatchListViewEnum))"></select>
+                        </div>
+                        <div class="form-group col-lg-2 col-md-2 col-sm-6">
+                            <label class="control-label" for="DateFilter">@L("Date")</label>
+                            <input type="text" class="form-control  m-input filter filter-date" autocomplete="off" name="Date" id="DateFilter">
+                        </div>
+                        <div class="form-group col-lg-2 col-md-2 col-sm-6" abp-hidden="@(!await FeatureChecker.IsEnabledAsync(AppFeatures.AllowLeaseHaulersFeature))">
+                            <label class="control-label" for="HasLeaseHaulerIdFilter">@L("LeaseHaulerInternal")</label>
+                            <select class="form-control filter" name="HasLeaseHaulerId" id="HasLeaseHaulerIdFilter">
+                                <option value="">All</option>
+                                <option value="false">Internal</option>
+                                <option value="true">Lease Haulers</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-2 col-md-2 col-sm-6">
+                            <label class="control-label" for="TruckIdFilter">@L("Truck")</label>
+                            <select class="form-control filter" name="TruckId" id="TruckIdFilter">
+                                <option value="">Select a truck</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-2 col-md-2 col-sm-6">
+                            <label class="control-label" for="DriverIdFilter">@L("Driver")</label>
+                            <select class="form-control filter" name="DriverId" id="DriverIdFilter">
+                                <option value="">Select a driver</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="DispatchList"></div>
+
+        </div>
+    </div>
+</div>
+

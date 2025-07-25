@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props"></Import>
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net9.0</TargetFrameworks>
+    <RootNamespace>DispatcherWeb</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'false'">
+    <PackageReference Include="Dtd.Abp" Version="$(DtdAbpVersion)" />
+    <PackageReference Include="Dtd.Abp.Zero.Common" Version="$(DtdAbpVersion)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'true'">
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp\Abp.csproj" />
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp.Zero.Common\Abp.Zero.Common.csproj" />
+  </ItemGroup>
+</Project>

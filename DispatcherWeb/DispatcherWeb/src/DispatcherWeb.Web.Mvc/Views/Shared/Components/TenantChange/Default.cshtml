@@ -1,0 +1,25 @@
+﻿@using DispatcherWeb.Web.Resources
+@using DispatcherWeb.Web.Views.Shared.Components.TenantChange
+@model TenantChangeViewModel
+@inject IWebResourceManager WebResourceManager
+@{
+    WebResourceManager.AddScript(ApplicationPath + "view-resources/Views/Shared/Components/TenantChange/Default.js");
+}
+<div class="tenant-change-component d-flex justify-content-between">
+    <div>
+        <span class="current-tenant-title">@L("CurrentTenant"): </span>
+
+        @if (Model.Tenant != null)
+        {
+            <span title="@Model.Tenant.Name" class="current-tenancy-name">
+                <strong>@Model.Tenant.TenancyName</strong>
+            </span>
+        }
+        else
+        {
+            <span>@L("NotSelected")</span>
+        }
+    </div>
+
+    <a href="#">@L("Change")</a>
+</div>

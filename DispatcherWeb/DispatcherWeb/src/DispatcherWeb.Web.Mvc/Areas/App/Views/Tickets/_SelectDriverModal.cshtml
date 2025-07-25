@@ -1,0 +1,18 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Select a new driver"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+
+        <div class="form-group">
+            <label class="required-label" for="DriverId">@L("Driver")</label>
+            <select class="form-control" id="DriverId" name="DriverId" required></select>
+        </div>
+    </form>
+
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-button" data-dismiss="modal">Cancel</button>
+    <button type="button" class="btn btn-primary save-button"><i class="fa fa-save"></i> <span>@L("Select")</span></button>
+</div>

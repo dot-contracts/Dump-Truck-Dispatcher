@@ -1,0 +1,48 @@
+﻿@using DispatcherWeb.Designations
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure.Extensions;
+@using DispatcherWeb.Quotes.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@inject IDesignationAppService DesignationAppService
+@model QuoteLineEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit item" : "Add new item"))
+@{
+    var separateItems = await FeatureChecker.IsEnabledAsync(AppFeatures.SeparateMaterialAndFreightItems);
+}
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="QuoteId" />
+        <input type="hidden" asp-for="CustomerPricingTierId" />
+        <input type="hidden" asp-for="CustomerIsCod" />
+        <input type="hidden" asp-for="UseZoneBasedRates" />
+        <input type="hidden" asp-for="IsPricePerUnitOverridden" />
+        <input type="hidden" asp-for="IsFreightRateOverridden" />
+        <input type="hidden" asp-for="IsFreightRateToPayDriversOverridden" />
+        <input type="hidden" asp-for="IsLeaseHaulerRateOverridden" />
+
+        <div class="row">
+            <div class="col-12 col-lg-6-for-modal-lg">
+                <div class="form-group designation-select">
+                    <label class="required-label">@L("Designation")</label>
+                    <select class="form-control" required asp-for="Designation" asp-items="await DesignationAppService.GetDesignationSelectListItemsAsync(Model.Designation).ToSelectListItemsAsync()">
+                        <option value="">Select a designation</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        @if (separateItems)
+        {
+            @await Html.PartialAsync("QuoteLinePartialViews/SeparateItemsQuoteLinePartialView")
+        }
+        else
+        {
+            @await Html.PartialAsync("QuoteLinePartialViews/QuoteLinePartialView")
+        }
+
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

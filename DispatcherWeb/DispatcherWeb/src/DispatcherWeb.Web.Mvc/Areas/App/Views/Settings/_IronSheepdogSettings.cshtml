@@ -1,0 +1,37 @@
+﻿@using DispatcherWeb.Features
+@model DispatcherWeb.Configuration.Tenants.Dto.IronSheepdogSettingsEditDto
+
+
+<div class="tab-pane" id="SettingsIronSheepdogTab">
+    <div class="row">
+        <div class="col-sm-6">
+            <h5>@L("IronSheepdog")</h5>
+            <form id="IronSheepdogSettingsForm" class="m-form margin-top-20">
+                <div class="form-group">
+                    <label for="AllowImportingIronSheepdogEarnings" class="m-checkbox col-lg-12">
+                        <input id="AllowImportingIronSheepdogEarnings" type="checkbox" name="AllowImportingIronSheepdogEarnings" value="true" checked=@(Model.AllowImportingIronSheepdogEarnings ? "checked" : null)>
+                        @L("AllowImportingIronSheepdogEarnings")
+                        <span></span>
+                    </label>
+                </div>
+                <div class="form-group" abp-hidden="@(!Model.AllowImportingIronSheepdogEarnings)">
+                    <label for="IronSheepdogCustomerId" class="required-label">@L("SelectIronSheepdogCustomer")</label>
+                    <select class="form-control" id="IronSheepdogCustomerId" name="IronSheepdogCustomerId">
+                        <option value="">@L("SelectIronSheepdogCustomer")</option>
+                        @if (Model.IronSheepdogCustomerId > 0)
+                        {
+                            <option value="@Model.IronSheepdogCustomerId" selected>@Model.IronSheepdogCustomerName</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group" abp-hidden="@(!await FeatureChecker.IsEnabledAsync(AppFeatures.DriverProductionPayFeature))">
+                    <label for="UseIronSheepdogEarningsForProductionPay" class="m-checkbox col-lg-12">
+                        <input id="UseIronSheepdogEarningsForProductionPay" type="checkbox" name="UseForProductionPay" value="true" checked=@(Model.UseForProductionPay ? "checked" : null)>
+                        @L("UseForProductionPay")
+                        <span></span>
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

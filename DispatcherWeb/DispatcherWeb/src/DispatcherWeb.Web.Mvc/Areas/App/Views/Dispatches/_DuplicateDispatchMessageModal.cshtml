@@ -1,0 +1,24 @@
+﻿@using DispatcherWeb.Dispatching
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Dispatching.Dto
+@model DuplicateDispatchInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("DuplicateDispatchMessageModal_Title")))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="DispatchId" />
+
+        <div class="form-group m-form__group row">
+            <label class="required-label col-form-label col-sm-9">How many dispatches to create?</label>
+            <div class="col-sm-3">
+                <input class="form-control" type="number" name="NumberOfDispatches" id="NumberOfDispatches" value="1" data-rule-number="true" data-rule-min="1" data-rule-max="@DispatchingAppService.MaxNumberOfDispatches" required />
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" class="btn btn-primary save-button"><i class="fa fa-save"></i> <span>@L("Send")</span></button>
+</div>

@@ -1,0 +1,87 @@
+﻿@using DispatcherWeb.HostEmails.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Authorization.Roles;
+@using DispatcherWeb.Authorization.Roles.Dto;
+@using DispatcherWeb.Infrastructure.Extensions
+@inject IRoleAppService RoleAppService
+@model HostEmailViewDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("View Message"))
+@{
+    var staticRoleNames = (await RoleAppService.GetStaticRoleNamesSelectListAsync(new GetStaticRoleNamesSelectListInput
+    {
+        MultiTenancySide = Abp.MultiTenancy.MultiTenancySides.Tenant,
+    })).ToSelectListItems();
+}
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label>Subject</label>
+            <input class="form-control" type="text" asp-for="Subject" readonly="readonly">
+        </div>
+        <div class="form-group">
+            <label>Body</label>
+            <textarea type="text" class="form-control" rows="5" asp-for="Body" readonly="readonly"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Editions</label>
+            <select class="form-control" asp-for="Editions" multiple="multiple" disabled>
+                @foreach(var option in Model.Editions)
+                {
+                    <option selected value="@option.Id">@option.Name</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" asp-for="ActiveFilter" disabled>
+                <option value="">All</option>
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Tenants</label>
+            <select class="form-control" asp-for="Tenants" multiple="multiple" disabled>
+                @foreach (var option in Model.Tenants)
+                {
+                    <option selected value="@option.Id">@option.Name</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Type</label>
+            <select class="form-control" asp-for="Type" asp-items="Html.GetEnumSelectList<HostEmailType>()" disabled>
+                <option>Select a type</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Roles</label>
+            <select class="form-control" asp-for="Roles" multiple="multiple" asp-items="staticRoleNames" disabled>
+                @foreach (var option in Model.Roles)
+                {
+                    <option selected value="@option.Id">@option.Name</option>
+                }
+            </select>
+        </div>
+
+    </form>
+    <div class="box-border-top clearfix">
+        <div class="grid-caption pull-left">
+            <label>@L("Receivers")</label>
+        </div>
+        <div class="box-actions pull-right">
+            <button type="button" class="btn btn-default" id="ReloadHostEmailReceiversButton"><i class="fa fa-sync-alt"></i>Reload</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="display table table-striped table-bordered table-hover dt-responsive" id="HostEmailReceiversTable"></table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-button" data-dismiss="modal">Close</button>
+</div>

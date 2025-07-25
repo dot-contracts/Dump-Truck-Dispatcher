@@ -1,0 +1,44 @@
+﻿@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.VehicleCategories.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+
+@model VehicleCategoryEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? $"Edit  Vehicle Category: {Model.Name}" : "Add Vehicle Category"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation" autocomplete="off">
+        <input type="hidden" asp-for="Id" />
+        <div class="row">
+            <div class="col-xl-12 form-group">
+                <label class="required-label" for="Name">@L("Name")</label>
+                <input class="form-control" type="text" asp-for="Name" autocomplete="off" maxlength="@EntityStringFieldLengths.VehicleCategory.Name" required>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 form-group">
+                <label class="required-label" for="AssetType">@L("AssetType")</label>
+                <select class="form-control" asp-for="AssetType" required asp-items="Html.GetEnumSelectList<AssetType>()">
+                    <option value="">Select an asset type</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 form-group">
+                <label class="m-checkbox">
+                    <span></span>
+                    <input id="IsPowered" type="checkbox" name="IsPowered" value="true" checked="@(Model.IsPowered? "checked" : null)">
+                    @L("IsPowered")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 form-group">
+                <label class="required-label" for="SortOrder">@L("SortOrder")</label>
+                <input class="form-control" type="number" step="1" asp-for="SortOrder" autocomplete="off" required>
+            </div>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

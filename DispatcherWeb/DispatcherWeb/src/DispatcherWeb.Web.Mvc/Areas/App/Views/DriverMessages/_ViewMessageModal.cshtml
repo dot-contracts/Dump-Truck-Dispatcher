@@ -1,0 +1,22 @@
+﻿@using DispatcherWeb.DriverMessages.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model DriverMessageViewDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("View Message"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <div class="form-group">
+            <label>Subject</label>
+            <input class="form-control" type="text" asp-for="Subject" readonly="readonly">
+        </div>
+        <div class="form-group">
+            <label>Body</label>
+            <textarea type="text" class="form-control" rows="5" asp-for="Body" readonly="readonly"></textarea>
+        </div>
+
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-button" data-dismiss="modal">Close</button>
+</div>

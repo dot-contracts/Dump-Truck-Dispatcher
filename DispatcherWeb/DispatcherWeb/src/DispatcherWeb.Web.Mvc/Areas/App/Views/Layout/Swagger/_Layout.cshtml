@@ -1,0 +1,17 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DispatcherWeb API V1 | Swagger UI</title>
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/swagger-ui.min.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- begin::Body -->
+    @RenderBody()
+    <!-- end:: Body -->
+    <script src="/view-resources/Areas/App/Views/_Bundles/swagger-ui-libs.min.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", false)
+</body>
+</html>
+
+

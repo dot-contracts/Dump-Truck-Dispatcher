@@ -1,0 +1,146 @@
+﻿@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.LeaseHaulerRequests.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model LeaseHaulerRequestEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel((Model.Id > 0 ? "Edit " : "Add ") + "Lease Hauler"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="SuppressLeaseHaulerDispatcherNotification" />
+
+        <div class="form-group">
+            <label class="control-label required-label" asp-for="Date">Request Date</label>
+            <input class="form-control" asp-for="Date" type="text" required autocomplete="off" disabled="@(Model.Date.HasValue || Model.Id != 0 ? "disabled" : null)">
+        </div>
+        @if (await SettingManager.UseShifts())
+        {
+            <div class="form-group">
+                <label class="control-label required-label" asp-for="Shift">@L("Shift")</label>
+                <select class="form-control" id="Shift" asp-for="Shift" asp-items="@(await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id))" required>
+                    <option value="">&nbsp;</option>
+                </select>
+            </div>
+        }
+
+        <div class="form-group" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+            <label class="control-label required-label">@L("Office")</label>
+            <select class="form-control" asp-for="OfficeId" required>
+                <option value="">Select an office</option>
+                @if (Model.OfficeId > 0)
+                {
+                    <option selected value="@Model.OfficeId">@Model.OfficeName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="control-label required-label" asp-for="LeaseHaulerId">Lease hauler</label>
+            <select class="form-control" asp-for="LeaseHaulerId" required>
+                <option value="">Select a Lease hauler</option>
+                @if (Model.LeaseHaulerId != 0)
+                {
+                    <option selected value="@Model.LeaseHaulerId">@Model.LeaseHaulerName</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group" abp-hidden="@(Model.Id == 0)">
+            <label>Number Available</label>
+            <input class="form-control" type="text" asp-for="Available" data-rule-number="true" data-rule-digits="true" data-rule-min="0" data-rule-max="1000">
+        </div>
+
+        <div class="form-group">
+            <label>Number Approved</label>
+            <input class="form-control" type="text" asp-for="Approved" data-rule-number="true" data-rule-digits="true" data-rule-min="0" data-rule-max="1000">
+        </div>
+        @if (Model.Id != 0)
+        {
+            <div class="form-group">
+                <label>@L("Comments")</label>
+                <textarea type="text" class="form-control" rows="3" asp-for="Comments" maxlength="@EntityStringFieldLengths.LeaseHaulerRequest.Comments" disabled="disabled"></textarea>
+            </div>
+        }
+
+        <div id="truckSelectionBlock" abp-hidden>
+            <br />
+            <label>If you have the truck and driver information, you can add it below.</label>
+
+
+            <div class="form-group m-form__group row align-items-center d-none d-sm-flex pb-0">
+                <div class="col-sm-5">
+                    <label class="col-xs-12 control-label">@L("Truck"):</label>
+                </div>
+                <div class="col-sm-5">
+                    <label class="col-xs-12 control-label">@L("Driver"):</label>
+                </div>
+            </div>
+
+            <div id="truckSelectionRowTemplate">
+                <div class="form-group m-form__group row align-items-center truck-selection-row" abp-hidden>
+                    <div class="col-sm-5">
+                        <label class="col-xs-12 d-sm-none control-label">@L("Truck"):</label>
+                        <div class="col-xs-12">
+                            <select class="form-control lease-hauler-truck-select" name="Trucks[]">
+                                <option value="">Select an option</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="col-xs-12 d-sm-none control-label">@L("Driver"):</label>
+                        <div class="col-xs-12">
+                            <select class="form-control lease-hauler-driver-select" name="Drivers[]">
+                                <option value="">Select an option</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="m--padding-10 d-sm-none"></div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-default delete-truck-selection-row-button"><i class="fa fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="truckSelectionBlockTrucks">
+                @for (int i = 0; i < (Math.Max(Model.Approved ?? 0, Model.AvailableTrucks?.Count ?? 0)); i++)
+                {
+                    var truck = Model.AvailableTrucks?.Count > i && Model.AvailableTrucks[i].TruckId.HasValue ? Model.AvailableTrucks[i] : null;
+                    <div class="form-group m-form__group row align-items-center truck-selection-row">
+                        <div class="col-sm-5">
+                            <label class="col-xs-12 d-sm-none control-label">@L("Truck"):</label>
+                            <div class="col-xs-12">
+                                <select class="form-control lease-hauler-truck-select" name="Trucks[]" data-truck-isinuse="@(truck?.IsTruckInUse ?? false)" data-truck-originalid="@(truck?.TruckId ?? 0)">
+                                    <option value="">Select an option</option>
+                                    @if (truck != null)
+                                    {
+                                        <option selected value="@truck.TruckId">@truck.TruckCode</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-5">
+                            <label class="col-xs-12 d-sm-none control-label">@L("Driver"):</label>
+                            <div class="col-xs-12">
+                                <select class="form-control lease-hauler-driver-select" name="Drivers[]" data-driver-isinuse="@(truck?.IsDriverInUse ?? false)" data-driver-originalid="@(truck?.DriverId ?? 0)">
+                                    <option value="">Select an option</option>
+                                    @if (Model.AvailableTrucks?.Count > i && Model.AvailableTrucks[i].DriverId.HasValue)
+                                    {
+                                        <option selected value="@Model.AvailableTrucks[i].DriverId">@Model.AvailableTrucks[i].DriverName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="m--padding-10 d-sm-none"></div>
+                        <div class="col-sm-2">
+                            <button type="button" class="btn btn-default delete-truck-selection-row-button"><i class="fa fa-trash"></i></button>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

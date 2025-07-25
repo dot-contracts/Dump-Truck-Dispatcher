@@ -1,0 +1,34 @@
+﻿@using Abp.Timing
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <partial name="_MetaTags" />
+    <partial name="_CommonInlineStyles" />
+    <partial name="_ApplicationInsights" />
+    <partial name="_Favicons" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/vendors.bundle.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="@(ApplicationPath)metronic/dist/html/blue/assets/base/style.bundle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/common-styles.min.css" asp-append-version="true" />
+    <partial name="_AppPathScript" />
+</head>
+<body class="m--skin- m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-dark m-aside-left--offcanvas m-footer--push m-aside--offcanvas-default">
+    <div class="m-grid m-grid--hor m-grid--root m-page">
+        <div class="m-grid__item m-grid__item--fluid m-grid m-error-5">
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="/view-resources/Areas/App/Views/_Bundles/account-layout-libs.min.js" asp-append-version="true"></script>
+
+    <script type="text/javascript" asp-add-nonce>
+        abp.localization.defaultSourceName = '@LocalizationSourceName';
+    </script>
+
+    <!-- Dynamic scripts of ABP system (They are created on runtime and can not be bundled) -->
+    <script src="@(ApplicationPath)AbpScripts/GetScripts?v=@(Clock.Now.Ticks)" type="text/javascript"></script>
+</body>
+
+</html>

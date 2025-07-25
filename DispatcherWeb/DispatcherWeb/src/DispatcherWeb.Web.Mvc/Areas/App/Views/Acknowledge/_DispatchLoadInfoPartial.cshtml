@@ -1,0 +1,81 @@
+﻿@using DispatcherWeb.Dispatching.Dto
+@using DispatcherWeb.Infrastructure.Extensions
+@model DispatchLoadInfoDto
+
+@{
+    bool useShifts = await SettingManager.UseShifts(Model.TenantId);
+}
+
+<div class="row form-group">
+    <div class="col-4">
+        <label class="col-form-label">@(L("Date") + (useShifts ? "/" + L("Shift") : "")):</label>
+    </div>
+    <input type="hidden" value="@Model.Date.ToString("d")" id="DeliveryDate" />
+    <div class="col-8 margin-top-10">
+        @Model.Date.ToString("d") @(useShifts ? await SettingManager.GetShiftName(Model.Shift, Model.TenantId) : "")
+    </div>
+</div>
+<div class="row form-group">
+    <div class="col-4">
+        <label class="col-form-label">@L("Customer"):</label>
+    </div>
+    <div class="col-8 margin-top-10">
+        @Model.CustomerName
+    </div>
+</div>
+<div class="row form-group">
+    <div class="col-4">
+        <label class="col-form-label">@L("RunUntilStopped"):</label>
+    </div>
+    <div class="col-8 margin-top-10">
+        @(Model.IsMultipleLoads ? "Yes" : "No")
+    </div>
+</div>
+<div class="row form-group">
+    <div class="col-4">
+        <label class="col-form-label">Load at:</label>
+    </div>
+    <div class="col-8 margin-top-10">
+        @Model.PickupAt
+    </div>
+</div>
+<div class="row form-group">
+    <div class="col-4">
+        <label class="col-form-label">Material Quantity:</label>
+    </div>
+    <div class="col-8 margin-top-10">
+        @Model.MaterialQuantity @Model.MaterialUomName
+    </div>
+</div>
+<div class="row form-group">
+    <div class="col-4">
+        <label class="col-form-label">Freight Quantity:</label>
+    </div>
+    <div class="col-8 margin-top-10">
+        @Model.FreightQuantity @Model.FreightUomName
+    </div>
+</div>
+<div class="row form-group ">
+    <div class="col-4">
+        <label class="col-form-label">@L("Item"):</label>
+    </div>
+    <div class="col-8 margin-top-10">
+        @Model.Item
+    </div>
+</div>
+<div class="row form-group">
+    <div class="col-4">
+        <label class="col-form-label">Charge To:</label>
+    </div>
+    <div class="col-8 margin-top-10">
+        @Model.ChargeTo
+    </div>
+</div>
+<div class="row form-group">
+    <div class="col-4">
+        <label class="col-form-label">Note:</label>
+    </div>
+    <div class="col-8 margin-top-10">
+        @Model.Note
+    </div>
+</div>

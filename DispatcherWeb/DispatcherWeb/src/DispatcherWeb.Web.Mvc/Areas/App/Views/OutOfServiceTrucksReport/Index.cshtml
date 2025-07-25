@@ -1,0 +1,18 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    Layout = "../Shared/Reports/_ReportLayout";
+
+    ViewBag.CurrentPageName = AppPageNames.Tenant.OutOfSeriveTrucks;
+}
+@section Scripts{
+    <script src="~/view-resources/Areas/app/Views/OutOfServiceTrucksReport/Index.js" asp-append-version="true"></script>
+}
+
+@section H1{
+    @L("OutOfServiceTrucksReportHeader")
+}
+
+@section Description{
+    @L("OutOfServiceTrucksReportDescription")
+}
+

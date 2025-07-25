@@ -1,0 +1,49 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model DispatcherWeb.Orders.Dto.SetOrderDateInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Select new date"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderId" />
+        <input type="hidden" asp-for="OrderLineId" />
+        <div class="form-group">
+            <label class="required-label" asp-for="Date">Date</label>
+            <input class="form-control" type="text" asp-for="Date" required>
+        </div>
+        @if(await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts))
+        {
+            <div class="form-group">
+                <label class="control-label required-label" for="Shift">@L("Shift")</label>
+                <select class="form-control" id="Shift" name="Shift" asp-items="@(await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id))" required></select>
+            </div>
+        }
+        <div class="form-group">
+            <label for="KeepTrucks" class="m-checkbox">
+                <input id="KeepTrucks" type="checkbox" name="KeepTrucks" value="true">
+                @L("KeepTrucks") @Html.QuestionMarkIcon(L("OnlyInternalTrucksWillBeCopied"), await FeatureChecker.IsEnabledAsync(AppFeatures.AllowLeaseHaulersFeature))
+                <span></span>
+            </label>
+        </div>
+        @if(Model.OrderLineId.HasValue)
+        {
+            <div class="form-group">
+                <div class="m-radio-list">
+                    <label class="m-radio">
+                        <input type="radio" name="ChangeType" value="0" checked="checked"> Change date for entire order
+                        <span></span>
+                    </label>
+                    <label class="m-radio">
+                        <input type="radio" name="ChangeType" value="1"> Change date for only this line item
+                        <span></span>
+                    </label>
+                </div>
+            </div>
+        }
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

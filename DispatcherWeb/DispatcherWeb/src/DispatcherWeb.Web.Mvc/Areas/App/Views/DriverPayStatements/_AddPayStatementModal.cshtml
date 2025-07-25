@@ -1,0 +1,36 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.PayStatements.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Features
+@model AddPayStatementInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("AddDriverPayStatement")))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <div class="form-group">
+            <label class="control-label" for="DateRange">@L("DateRange")</label>
+            <input class="form-control m-input" id="DateRange" name="DateRange" type="text" autocomplete="off" required>
+        </div>
+        @if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.AllowProductionPay) && await FeatureChecker.IsEnabledAsync(AppFeatures.DriverProductionPayFeature))
+        {
+            <div class="form-group">
+                <label class="m-checkbox">
+                    <input type="checkbox" asp-for="IncludeProductionPay" checked>@L("IncludeProductionPay")<span></span>
+                </label>
+            </div>
+        }
+        <div class="form-group">
+            <label class="m-checkbox">
+                <input type="checkbox" asp-for="IncludeHourly" checked>@L("IncludeHourly")<span></span>
+            </label>
+        </div>
+        @*<div class="form-group">
+                <label class="m-checkbox">
+                    <input type="checkbox" asp-for="IncludeSalary">@L("IncludeSalary")<span></span>
+                </label>
+            </div>*@
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

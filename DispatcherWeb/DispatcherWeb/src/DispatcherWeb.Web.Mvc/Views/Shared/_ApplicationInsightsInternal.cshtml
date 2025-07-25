@@ -1,0 +1,35 @@
+﻿﻿@using System
+@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
+
+<script type="text/javascript" asp-add-nonce>
+    @Html.Raw(JavaScriptSnippet.ScriptBody)
+
+    var userId = null;
+    var tenantId = null;
+    @if (AbpSession.UserId.HasValue)
+    {
+        <text>
+            userId = '@AbpSession.UserId';
+        </text>
+    }
+    @{
+        var tenantId = await AbpSession.GetTenantIdOrNullAsync();
+    }
+    @if (tenantId.HasValue)
+    {
+        <text>
+            tenantId = '@tenantId';
+        </text>
+    }
+
+    if (typeof appInsights !== 'undefined') {
+        appInsights.setAuthenticatedUserContext(userId);
+        appInsights.addTelemetryInitializer(function (envelope) {
+            if (envelope.data) {
+                envelope.data.UserId = userId;
+                envelope.data.TenantId = tenantId;
+            }
+        });
+    }
+</script>
+

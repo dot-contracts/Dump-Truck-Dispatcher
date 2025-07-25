@@ -1,0 +1,65 @@
+﻿@using DispatcherWeb.Features;
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    Layout = "../Shared/Reports/_ReportLayout";
+    ViewBag.CurrentPageName = AppPageNames.Tenant.VehicleWorkOrderCost;
+}
+@section Scripts {
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/VehicleWorkOrderCostReport/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/VehicleWorkOrderCostReport/Index.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+@section H1 {
+    Vehicle Work Order Cost Report
+}
+
+<form id="CreateReportForm" novalidate>
+    <div class="row">
+        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+            <label class="control-label" for="IssueDateFilter">@L("IssueDateRange")</label>
+            <input class="form-control filter" name="IssueDateFilter" id="IssueDateFilter" type="text" autocomplete="off">
+        </div>
+        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+            <label class="control-label" for="StartDateFilter">@L("StartDateRange")</label>
+            <input class="form-control filter" name="StartDateFilter" id="StartDateFilter" type="text" autocomplete="off">
+        </div>
+        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+            <label class="control-label" for="CompletionDateFilter">@L("CompletionDateRange")</label>
+            <input class="form-control filter" name="CompletionDateFilter" id="CompletionDateFilter" type="text" autocomplete="off">
+        </div>
+        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+            <label class="control-label" for="TruckFilter">@L("Vehicle")</label>
+            <select class="form-control filter" name="TruckId" id="TruckFilter" data-display-name="TruckCode">
+                <option value="">Select a truck</option>
+            </select>
+        </div>
+    </div>
+    <div class="row m--margin-bottom-10">
+        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+            <label class="control-label" for="AssignedToFilter">@L("AssignedTo")</label>
+            <select class="form-control filter" name="AssignedToId" id="AssignedToFilter" data-display-name="AssignedToName">
+                <option value="">Select Assigned To</option>
+            </select>
+        </div>
+        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+            <label class="control-label" for="StatusFilter">@L("Status")</label>
+            <select class="form-control filter" name="Status" id="StatusFilter" for="StatusFilter" asp-items="@Html.GetEnumSelectListWithDefaults<DispatcherWeb.WorkOrderStatus>()">
+                <option value="">Select a status</option>
+            </select>
+        </div>
+        @if (await FeatureChecker.IsEnabledAsync(AppFeatures.AllowMultiOfficeFeature))
+        {
+            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                <label for="OfficeIdsFilter">@L("Office")</label>
+                <select class="dropdown form-control filter" name="OfficeIds" id="OfficeIdsFilter" multiple="multiple">
+                    <option value="">Select an office</option>
+                </select>
+            </div>
+        }
+    </div>
+</form>

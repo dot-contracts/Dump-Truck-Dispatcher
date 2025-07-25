@@ -1,0 +1,399 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Trucks
+@using DispatcherWeb.Trucks.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model TruckEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Truck: " + Model.TruckCode : "Create new truck"))
+@{
+    var gpsPlatformIsDtdTracker = (GpsPlatform)await SettingManager.GetSettingValueAsync<int>(AppSettings.GpsIntegration.Platform) == GpsPlatform.DtdTracker;
+    var enableDriverAppGps = await FeatureChecker.IsEnabledAsync(AppFeatures.AllowGpsTracking)
+        && await SettingManager.GetSettingValueAsync<bool>(AppSettings.GpsIntegration.DtdTracker.EnableDriverAppGps)
+        && gpsPlatformIsDtdTracker;
+}
+
+<div class="modal-body">
+
+    <form role="form" novalidate class="form-validation" id="DriverdetailsForm">
+        <div class="m-portlet__body">
+            <ul class="nav nav-tabs  m-tabs-line" role="tablist">
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#GeneralTab" role="tab">@L("General")</a>
+                </li>
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#MaintenanceTab" role="tab">@L("Maintenance")</a>
+                </li>
+                @if (Model.Id > 0)
+                {
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#ServiceTab" role="tab">@L("Service")</a>
+                    </li>
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#FilesTab" role="tab">@L("Files")</a>
+                    </li>
+                }
+                @if (await FeatureChecker.IsEnabledAsync(AppFeatures.GpsIntegrationFeature) && gpsPlatformIsDtdTracker)
+                {
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#GpsConfigurationTab" role="tab">@L("GpsConfiguration")</a>
+                    </li>
+                }
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#NotesTab" role="tab">@L("Notes")</a>
+                </li>
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#DeviceTab" role="tab">@L("Device")</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="GeneralTab" role="tabpanel">
+
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="VehicleCategoryIsPowered" value="@Model.VehicleCategoryIsPowered?.ToLowerCaseString()" />
+                    <input type="hidden" asp-for="VehicleCategoryAssetType" value="@((int?)Model.VehicleCategoryAssetType)" />
+                    <div class="form-group">
+                        <label class="required-label">@L("TruckCode")</label>
+                        <input class="form-control" type="text" asp-for="TruckCode" required maxlength="@Truck.MaxTruckCodeLength">
+                    </div>
+                    <div class="form-group" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+                        <label class="required-label">@L("Office")</label>
+                        <select class="form-control" required asp-for="OfficeId" disabled="@(Model.IsSingleOffice ? "disabled" : null)">
+                            <option value="">Select an option</option>
+                            @if (Model.OfficeId > 0)
+                            {
+                                <option value="@Model.OfficeId">@Model.OfficeName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="required-label">@L("Category")</label>
+                        <select class="form-control" required asp-for="VehicleCategoryId">
+                            <option value="">Select an option</option>
+                            @if (Model.VehicleCategoryId > 0)
+                            {
+                                <option value="@Model.VehicleCategoryId" selected>@Model.VehicleCategoryName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>@L("DefaultDriver")</label>
+                        <select class="form-control" asp-for="DefaultDriverId" disabled="@(Model.VehicleCategoryIsPowered != true)">
+                            <option value="">Select an option</option>
+                            @if (Model.DefaultDriverId.HasValue)
+                            {
+                                <option value="@Model.DefaultDriverId">@Model.DefaultDriverName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group" abp-hidden="@(!Model.CanPullTrailer)">
+                        <label>@L("CurrentTrailer")</label>
+                        <select class="form-control" asp-for="CurrentTrailerId">
+                            <option value="">Select an option</option>
+                            @if (Model.CurrentTrailerId.HasValue)
+                            {
+                                <option value="@Model.CurrentTrailerId">@Model.CurrentTrailerCode</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="m-form__group form-group">
+                        <label for="IsActive" class="m-checkbox">
+                            <input id="IsActive" type="checkbox" name="IsActive" value="true" checked="@(Model.IsActive ? "checked" : null)" />
+                            @L("Active")
+                            <span></span>
+                        </label>
+                    </div>
+                    <div class="form-group" abp-hidden="@(Model.IsActive)">
+                        <label class="required-label">@L("InactivationDate")</label>
+                        <input class="form-control datepicker" type="text" asp-for="InactivationDate" required="@(Model.IsActive ? null : "required")">
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="m-form__group form-group">
+                                <label for="IsOutOfService" class="m-checkbox">
+                                    <input id="IsOutOfService" type="checkbox" name="IsOutOfService" value="true" checked="@(Model.IsOutOfService ? "checked" : null)" data-initial-value="@Model.IsOutOfService.ToLowerCaseString()" />
+                                    @L("OutOfService")
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="m-form__group form-group">
+                                <label for="AlwaysShowOnSchedule" class="m-checkbox">
+                                    <input id="AlwaysShowOnSchedule" type="checkbox" name="AlwaysShowOnSchedule" value="true" checked="@(Model.AlwaysShowOnSchedule ? "checked" : null)" />
+                                    @L("AlwaysShowOnSchedule")?
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" abp-hidden="@(!Model.IsOutOfService)">
+                        <label class="required-label">@L("Reason")</label>
+                        <textarea class="form-control" rows="2" asp-for="Reason" data-rule-maxlength="500"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="m-form__group form-group" abp-hidden="@(Model.VehicleCategoryIsPowered != true)">
+                                <label for="IsApportioned" class="m-checkbox">
+                                    <input id="IsApportioned" type="checkbox" name="IsApportioned" value="true" checked="@(Model.IsApportioned ? "checked" : null)" />
+                                    @L("Apportioned")?
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="m-form__group form-group" abp-hidden="@(Model.VehicleCategoryIsPowered != true)">
+                                <label for="CanPullTrailer" class="m-checkbox">
+                                    <input id="CanPullTrailer" type="checkbox" name="CanPullTrailer" value="true" checked="@(Model.CanPullTrailer ? "checked" : null)" />
+                                    @L("CanPullTrailer")
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>@L("Year")</label>
+                        <input class="form-control" type="text" asp-for="Year" data-rule-number="true" data-rule-digits="true" data-rule-min="1900" data-rule-max="2100">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("Make")</label>
+                        <input class="form-control" type="text" asp-for="Make" maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("Model")</label>
+                        <input class="form-control" type="text" asp-for="Model" maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label class="required-label">@L("InServiceDate")</label>
+                        <input class="form-control datepicker" type="text" asp-for="InServiceDate" required="required">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("VIN")</label>
+                        <input class="form-control" type="text" asp-for="Vin" maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("Plate")</label>
+                        <input class="form-control" type="text" asp-for="Plate" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("PlateExpiration")</label>
+                        <input class="form-control datepicker" type="text" asp-for="PlateExpiration">
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Ave Load(Tons)</label>
+                                <input class="form-control" type="text" asp-for="CargoCapacity" data-rule-number="true" data-rule-min="0" data-rule-max="100000">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Ave Load(cyds)</label>
+                                <input class="form-control" type="text" asp-for="CargoCapacityCyds" data-rule-number="true" data-rule-min="0" data-rule-max="100000">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>@L("InsurancePolicyNumber")</label>
+                        <input class="form-control" type="text" asp-for="InsurancePolicyNumber" name="InsurancePolicyNumber" maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("InsuranceValidUntil")</label>
+                        <input class="form-control datepicker" type="text" asp-for="InsuranceValidUntil" name="InsuranceValidUntil">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("PurchaseDate")</label>
+                        <input class="form-control datepicker" type="text" asp-for="PurchaseDate">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("PurchasePrice")</label>
+                        <input class="form-control" type="text" asp-for="PurchasePrice" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("SoldDate")</label>
+                        <input class="form-control datepicker" type="text" asp-for="SoldDate">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("SoldPrice")</label>
+                        <input class="form-control" type="text" asp-for="SoldPrice" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+                    </div>
+                    @if (await FeatureChecker.IsEnabledAsync(AppFeatures.AllowImportingTruxEarnings))
+                    {
+                        <div class="form-group">
+                            <label>@L("TruxTruckId")</label>
+                            <input class="form-control" type="text" asp-for="TruxTruckId" maxlength="@EntityStringFieldLengths.Truck.TruxTruckId">
+                        </div>
+                    }
+
+                </div>
+
+                <div class="tab-pane" id="MaintenanceTab" role="tabpanel">
+                    <div class="form-group" abp-hidden="@(Model.VehicleCategoryAssetType != AssetType.DumpTruck && Model.VehicleCategoryAssetType != AssetType.Trailer)">
+                        <label class="required-label">@L("BedConstruction")</label>
+                        <select class="form-control" required asp-for="BedConstruction" asp-items="Html.GetEnumSelectListOrderedByName<BedConstructionEnum>()">
+                            <option value="">Select Bed Construction</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>@L("FuelType")</label>
+                        <select class="form-control" asp-for="FuelType" asp-items="@Html.GetEnumSelectListWithDefaults<FuelType>()">
+                            <option value="">Select Fuel Type</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>@L("FuelCapacity")</label>
+                        <input class="form-control" type="text" asp-for="FuelCapacity" data-rule-number="true" data-rule-digits="true" data-rule-min="0" data-rule-max="10000">
+                    </div>
+
+                    <div class="form-group">
+                        <label>@L("SteerTires")</label>
+                        <input class="form-control" type="text" asp-for="SteerTires" maxlength="@EntityStringFieldLengths.Truck.SteerTires">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("DriveAxleTires")</label>
+                        <input class="form-control" type="text" asp-for="DriveAxleTires" maxlength="@EntityStringFieldLengths.Truck.DriveAxleTires">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("DropAxleTires")</label>
+                        <input class="form-control" type="text" asp-for="DropAxleTires" maxlength="@EntityStringFieldLengths.Truck.DropAxleTires">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("TrailerTires")</label>
+                        <input class="form-control" type="text" asp-for="TrailerTires" maxlength="@EntityStringFieldLengths.Truck.TrailerTires">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("Transmission")</label>
+                        <input class="form-control" type="text" asp-for="Transmission" maxlength="@EntityStringFieldLengths.Truck.Transmission">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("Engine")</label>
+                        <input class="form-control" type="text" asp-for="Engine" maxlength="@EntityStringFieldLengths.Truck.Engine">
+                    </div>
+                    <div class="form-group">
+                        <label>@L("RearEnd")</label>
+                        <input class="form-control" type="text" asp-for="RearEnd" maxlength="@EntityStringFieldLengths.Truck.RearEnd">
+                    </div>
+                </div>
+
+                @if (Model.Id > 0)
+                {
+                    <div class="tab-pane" id="ServiceTab" role="tabpanel">
+                        <div class="form-group">
+                            <label class="required-label">@L("CurrentMileage")</label>
+                            <input class="form-control" type="number" asp-for="CurrentMileage" required data-rule-min="0" data-rule-max="1000000000">
+                        </div>
+                        <div class="form-group">
+                            <label class="required-label">@L("CurrentHours")</label>
+                            <input class="form-control" type="number" asp-for="CurrentHours" required data-rule-min="0" data-rule-max="1000000000">
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="button" id="SaveCurrentMileageAndHours">@L("SaveCurrentMileage")</button>
+                        </div>
+                        @if (await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_PreventiveMaintenanceSchedule_Edit))
+                        {
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="AddServiceReminder">@L("AddServiceReminder")</button>
+                            </div>
+                        }
+
+                        <h4>@L("PreventiveMaintenanceDue")</h4>
+                        <table class="table table-striped table-bordered table-hover dt-responsive" id="PreventiveMaintenanceTable"></table>
+
+                        <h4>@L("ServiceHistory")</h4>
+                        <table class="table table-striped table-bordered table-hover dt-responsive" id="MaintenanceHistoryTable"></table>
+                    </div>
+                    <div class="tab-pane" id="FilesTab" role="tabpanel">
+                        <div class="form-group">
+                            <label>@L("ImagesFiles")</label>
+                            <div>
+                                <div class="btn btn-primary fileinput-button">
+                                    <i class="fa fa-plus"></i>
+                                    <span> Select a file... </span>
+                                    <input id="File" type="file" data-url="@Url.Action("UploadFile")" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-striped table-bordered table-hover dt-responsive" id="FilesTable">
+                            <thead>
+                                <tr>
+                                    <th>@L("Title")</th>
+                                    <th>@L("Description")</th>
+                                    <th>@L("Type")</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var file in Model.Files)
+                                {
+                                    @await Html.PartialAsync("_FileRow", file)
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                }
+
+                @if (await FeatureChecker.IsEnabledAsync(AppFeatures.GpsIntegrationFeature) && gpsPlatformIsDtdTracker)
+                {
+                    <div class="tab-pane" id="GpsConfigurationTab" role="tabpanel">
+                        <div class="form-group" abp-hidden="@(!enableDriverAppGps)">
+                            <label for="EnableDriverAppGps" class="m-checkbox col-lg-12" abp-hidden="@(!await FeatureChecker.IsEnabledAsync(AppFeatures.AllowGpsTracking))">
+                                <input id="EnableDriverAppGps" type="checkbox" name="EnableDriverAppGps" value="true" checked=@(Model.EnableDriverAppGps ? "checked" : null)>
+                                @L("EnableDriverAppGps") <i class="fa fa-info-circle text-primary tooltip-icon" title="@L("EnableDriverAppGpsHint")"></i>
+                                <span></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>@L("DeviceType")</label>
+                            <select class="form-control" asp-for="DtdTrackerDeviceTypeId">
+                                <option value="">Select an option</option>
+                                @if (Model.DtdTrackerDeviceTypeId.HasValue)
+                                {
+                                    <option value="@Model.DtdTrackerDeviceTypeId">@Model.DtdTrackerDeviceTypeName</option>
+                                }
+                            </select>
+                        </div>
+                        <input type="hidden" asp-for="DtdTrackerDeviceTypeName" />
+                        <div class="form-group">
+                            <label>@L("ServerAddress")</label>
+                            <input class="form-control" type="text" asp-for="DtdTrackerServerAddress" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>@L("UniqueId")</label>
+                            <input class="form-control" type="text" asp-for="DtdTrackerUniqueId" maxlength="@EntityStringFieldLengths.Truck.DtdTrackerUniqueId">
+                        </div>
+                        <div class="form-group">
+                            <label>@L("Password")</label>
+                            <input class="form-control" type="text" asp-for="DtdTrackerPassword">
+                        </div>
+                    </div>
+                }
+
+                <div class="tab-pane" id="NotesTab" role="tabpanel">
+                    <div class="form-group">
+                        <label>@L("Notes")</label>
+                        <textarea class="form-control" rows="15" asp-for="Notes" maxlength="@EntityStringFieldLengths.Truck.Notes"></textarea>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="DeviceTab" role="tabpanel">
+                    @foreach (var deviceType in Enum.GetValues(typeof(DeviceTypeEnum)).Cast<DeviceTypeEnum>())
+                    {
+                        var mobileDeviceModel = Model.MobileDevices.FirstOrDefault(d => d.DeviceType == deviceType)
+                            ?? new MobileDeviceEditDto(deviceType);
+                        <partial name="_DevicePanel" model="mobileDeviceModel" />
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

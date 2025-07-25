@@ -1,0 +1,124 @@
+﻿@using DispatcherWeb.Authorization
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Trucks
+@using DispatcherWeb.LeaseHaulers.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model LeaseHaulerTruckEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Truck: " + Model.TruckCode : "Create new truck"))
+
+@{
+    var hideFeaturesUnavailableForLeaseHaulerPortalUsers =
+        !await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_LeaseHaulers_Edit)
+        && await PermissionChecker.IsGrantedAsync(AppPermissions.LeaseHaulerPortal);
+}
+
+<div class="modal-body">
+
+    <form role="form" novalidate class="form-validation">
+        <div class="m-portlet__body">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="LeaseHaulerId" />
+            <input type="hidden" asp-for="VehicleCategoryIsPowered" value="@Model.VehicleCategoryIsPowered?.ToLowerCaseString()" />
+            <input type="hidden" asp-for="VehicleCategoryAssetType" value="@((int?)Model.VehicleCategoryAssetType)" />
+            <input type="hidden" asp-for="HaulingCompanyTruckId" />
+            @if (hideFeaturesUnavailableForLeaseHaulerPortalUsers)
+            {
+                <input type="hidden" asp-for="AlwaysShowOnSchedule" value="@Model.AlwaysShowOnSchedule" />
+            }
+            <div class="form-group">
+                <label class="required-label">@L("TruckCode")</label>
+                <input class="form-control" type="text" asp-for="TruckCode" required maxlength="@Truck.MaxTruckCodeLength">
+            </div>
+            <div class="form-group">
+                <label class="required-label">@L("Category")</label>
+                <select class="form-control" required asp-for="VehicleCategoryId">
+                    <option value="">Select an option</option>
+                    @if (Model.VehicleCategoryId > 0)
+                    {
+                        <option value="@Model.VehicleCategoryId">@Model.VehicleCategoryName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>@L("DefaultDriver")</label>
+                <select class="form-control" asp-for="DefaultDriverId" disabled="@(Model.VehicleCategoryIsPowered != true)">
+                    <option value="">Select an option</option>
+                    @if (Model.DefaultDriverId.HasValue)
+                    {
+                        <option value="@Model.DefaultDriverId">@Model.DefaultDriverName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group" abp-hidden="@(!Model.CanPullTrailer)">
+                <label>@L("CurrentTrailer")</label>
+                <select class="form-control" asp-for="CurrentTrailerId">
+                    <option value="">Select an option</option>
+                    @if (Model.CurrentTrailerId.HasValue)
+                    {
+                        <option value="@Model.CurrentTrailerId">@Model.CurrentTrailerCode</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>@L("LicensePlate")</label>
+                <input class="form-control" type="text" asp-for="LicensePlate" maxlength="@EntityStringFieldLengths.Truck.Plate">
+            </div>
+            <div class="form-group" abp-hidden="@(Model.VehicleCategoryAssetType != AssetType.DumpTruck && Model.VehicleCategoryAssetType != AssetType.Trailer)">
+                <label class="required-label">@L("BedConstruction")</label>
+                <select class="form-control" required asp-for="BedConstruction" asp-items="Html.GetEnumSelectListOrderedByName<BedConstructionEnum>()">
+                </select>
+            </div>
+            @if (!hideFeaturesUnavailableForLeaseHaulerPortalUsers)
+            {
+                <div class="m-form__group form-group">
+                    <label for="AlwaysShowOnSchedule" class="m-checkbox">
+                        <input id="AlwaysShowOnSchedule" type="checkbox" name="AlwaysShowOnSchedule" value="true" checked="@(Model.AlwaysShowOnSchedule ? "checked" : null)" />
+                        @L("AlwaysShowOnSchedule")?
+                        <span></span>
+                    </label>
+                </div>
+            }
+            <div class="form-group" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature() || !Model.AlwaysShowOnSchedule)">
+                <label class="required-label">@L("Office")</label>
+                <select class="form-control" asp-for="OfficeId">
+                    <option value="">Select an option</option>
+                    @if (Model.OfficeId > 0)
+                    {
+                        <option value="@Model.OfficeId">@Model.OfficeName</option>
+                    }
+                </select>
+            </div>
+            <div class="m-form__group form-group">
+                <label for="IsActive" class="m-checkbox">
+                    <input id="IsActive" type="checkbox" name="IsActive" value="true" checked="@(Model.IsActive ? "checked" : null)" />
+                    @L("Active")
+                    <span></span>
+                </label>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="m-form__group form-group" abp-hidden="@(Model.VehicleCategoryIsPowered != true)">
+                        <label for="IsApportioned" class="m-checkbox">
+                            <input id="IsApportioned" type="checkbox" name="IsApportioned" value="true" checked="@(Model.IsApportioned ? "checked" : null)" />
+                            @L("Apportioned")?
+                            <span></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="m-form__group form-group" abp-hidden="@(Model.VehicleCategoryIsPowered != true)">
+                        <label for="CanPullTrailer" class="m-checkbox">
+                            <input id="CanPullTrailer" type="checkbox" name="CanPullTrailer" value="true" checked="@(Model.CanPullTrailer ? "checked" : null)" />
+                            @L("CanPullTrailer")
+                            <span></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

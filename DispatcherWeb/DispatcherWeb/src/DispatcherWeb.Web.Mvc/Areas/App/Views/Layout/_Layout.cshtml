@@ -1,0 +1,131 @@
+﻿@using System.Globalization
+@using Abp.AspNetCore.Mvc.Caching
+@using Abp.CachedUniqueKeys
+@using Abp.Configuration
+@using Abp.MultiTenancy
+@using Abp.Web.Mvc.Alerts
+@using DispatcherWeb.Features
+@using DispatcherWeb.Web.Resources
+@using Abp.Web.Security.AntiForgery
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Timing
+@using DispatcherWeb.Url
+@using DispatcherWeb.Web.Session
+@using CultureHelper = DispatcherWeb.Localization.CultureHelper
+@inject ScriptPaths ScriptPaths
+@inject AppTimes AppTimes
+@inject IAbpAntiForgeryManager AbpAntiForgeryManager
+@inject IWebUrlService WebUrlService
+@inject IPerRequestSessionCache SessionCache
+@inject IAlertManager AlertManager
+@inject ICachedUniqueKeyPerUser CachedUniqueKeyPerUser
+@inject IGetScriptsResponsePerUserConfiguration GetScriptsResponsePerUserConfiguration
+@{
+    AbpAntiForgeryManager.SetCookie(Context);
+
+    var isChatEnabled = await AbpSession.GetMultiTenancySideAsync() == MultiTenancySides.Host || await FeatureChecker.IsEnabledAsync(AppFeatures.ChatFeature);
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head prefix="og: http://ogp.me/ns#">
+    <partial name="_MetaTags" />
+    <partial name="_CommonInlineStyles" />
+    <partial name="_ApplicationInsights" />
+    <partial name="_Favicons" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/vendors.bundle.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/app-layout-libs.min.css" asp-append-version="true" asp-add-nonce />
+    @await RenderSectionAsync("ThemeStyles", false)
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/common-styles.min.css" asp-append-version="true" />
+    <link rel="stylesheet" abp-href="/Common/Scripts/Datatables/datatables.css" asp-append-version="true" />
+    <link rel="stylesheet" abp-href="/Common/Styles/metronic-customize.css" asp-append-version="true" />
+
+    @if (isChatEnabled)
+    {
+        <link rel="stylesheet" abp-href="/view-resources/Areas/App/Views/Layout/_ChatBar.css" asp-append-version="true" />
+    }
+    <link rel="stylesheet" abp-href="/view-resources/Areas/App/Views/Layout/_Layout.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", false)
+    @{ var loginInfo = await SessionCache.GetCurrentLoginInformationsAsync(); }
+    @if (loginInfo.Tenant?.CustomCssId != null)
+    {
+        <!-- id parameter is used to prevent caching -->
+        <link id="TenantCustomCss" rel="stylesheet" href="@Url.Action("GetCustomCss", "TenantCustomization", new { area = string.Empty, id = loginInfo.Tenant.CustomCssId.Value })" asp-append-version="true" />
+    }
+    <partial name="_AppPathScript" />
+</head>
+<!-- END HEAD -->
+<!-- begin::Body -->
+<body class="m-page--fluid m--skin-light2
+      m-content--skin-light2
+      m-header--fixed
+      m-header--fixed-mobile
+      m-aside-left--fixed
+      @(Context.Request.Cookies.ContainsKey("sidebar_toggle_state") && Context.Request.Cookies["sidebar_toggle_state"] == "on" ? "m-aside-left--minimize m-brand--minimize":"")
+      m-aside-left--enabled
+      m-aside-left--skin-light
+      m-aside-left--offcanvas">
+    <!-- begin:: Page -->
+    <div class="m-grid m-grid--hor m-grid--root m-page">
+        @RenderBody()
+    </div>
+    <!-- end:: Page -->
+    <!-- begin::Chat Bar -->
+    @if (isChatEnabled)
+    {
+        @await Html.PartialAsync("~/Areas/App/Views/Layout/_ChatBar.cshtml")
+    }
+    <!-- end::Chat Bar -->
+    <!-- begin::Scroll Top -->
+    <div class="m-scroll-top m-scroll-top--skin-top d-print-none" data-toggle="m-scroll-top" data-scroll-offset="500" data-scroll-speed="300">
+        <i class="fa fa-arrow-up" aria-label="@L("Collapse")"></i>
+    </div>
+    <!-- end::Scroll Top -->
+    <!--begin::Base Scripts -->
+    <script src="/view-resources/Areas/App/Views/_Bundles/app-layout-libs.min.js" asp-append-version="true" asp-add-nonce></script>
+    <script src="/view-resources/Areas/App/Views/_Bundles/scripts.bundle.min.js" asp-append-version="true"></script>
+    <!-- Dynamic scripts of ABP system (They are created on runtime and can not be bundled) -->
+    <script src="@(ApplicationPath)AbpServiceProxies/GetAll?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+    <script src="/Common/Scripts/abp.proxies.overrides.js" asp-append-version="true"></script>
+    <script src="@(ApplicationPath)AbpScripts/GetScripts?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+    <script type="text/javascript" asp-add-nonce>
+        abp.localization.currentCulture = $.extend({}, abp.localization.currentCulture, { displayNameEnglish: '@CultureInfo.CurrentUICulture.EnglishName' });
+        moment.locale('@(CultureHelper.UsingLunarCalendar ? "en": CultureInfo.CurrentUICulture.Name )'); //Localizing moment.js
+    </script>
+    <script src="/view-resources/Areas/App/Views/_Bundles/common-scripts.min.js" asp-append-version="true"></script>
+    <script src="/view-resources/Areas/App/Views/_Bundles/app-common-scripts.min.js" asp-append-version="true"></script>
+    <script abp-src="/view-resources/Areas/App/Views/Layout/_Header.js" asp-append-version="true"></script>
+
+    @if (isChatEnabled)
+    {
+        <script src="@(ApplicationPath)view-resources/Areas/App/Views/Layout/_ChatBar.js" asp-append-version="true"></script>
+        <script src="@(ApplicationPath)Common/Scripts/Chat/chat.signalr.js" asp-append-version="true"></script>
+    }
+    @if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.UserManagement.SessionTimeOut.IsEnabled) && AbpSession.UserId.HasValue)
+    {
+        <script src="@(ApplicationPath)view-resources/Areas/App/Views/_Bundles/InactivityController.min.js" asp-append-version="true"></script>
+    }
+    <script src="~@ScriptPaths.JQuery_Validation_Localization" asp-append-version="true"></script>
+    <script src="~@ScriptPaths.JQuery_Timeago_Localization" asp-append-version="true"></script>
+    <script src="~@ScriptPaths.Select2_Localization" asp-append-version="true"></script>
+
+    @*<script src='//fw-cdn.com/11175362/3892341.js' chat='true'></script>
+    <script asp-add-nonce>
+        window.fwcrm.on("user:created", function () {
+            window.fcWidget.setExternalId(abp.session.userId);
+            window.fcWidget.user.setFirstName(abp.session.userName);
+            window.fcWidget.user.setEmail(abp.session.userEmail);
+        });
+    </script>*@
+
+    <partial name="_GoogleMapsScript" />
+
+    <!--end::Base Scripts -->
+    <!--begin::Page Snippets -->
+    @await RenderSectionAsync("Scripts", false)
+    <script type="text/javascript" asp-add-nonce>
+        app.supportsTenancyNameInUrl = @(WebUrlService.SupportsTenancyNameInUrl.ToString().ToLower());
+    </script>
+    <!--end::Page Snippets -->
+</body>
+<!-- end::Body -->
+</html>

@@ -1,0 +1,58 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.HaulZones;
+}
+
+@section Scripts {
+    <script abp-src="/view-resources/Areas/app/Views/HaulZones/Index.js" asp-append-version="true"></script>
+    <script abp-src="/view-resources/Areas/app/Views/HaulZones/_CreateOrEditModal.js" asp-append-version="true"></script>
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-8 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("HaulZones")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("HaulZonesHeaderInfo")
+            </span>
+        </div>
+        <div class="col-4 col-md-6 text-right">
+            <button id="CreateNewHaulZoneButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("AddNew")</button>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form>
+                <div class="m-form m-form--label-align-right">
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-xl-4 mb-3">
+                            <label for="NameFilter">@L("Name")</label>
+                            <input class="form-control m-input filter" id="NameFilter" name="Name" placeholder="@L("SearchWithThreeDot")" type="text">
+                        </div>
+                        <div class="col-xl-4 mb-3">
+                            <div class="form-group">
+                                <label for="StatusFilter">@L("Status")</label>
+                                <select class="dropdown form-control filter" name="Status" id="StatusFilter" asp-items="Html.GetEnumSelectList(FilterActiveStatus.Active)"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-xl-12 text-right">
+                            <button type="submit" id="SearchButton" class="btn btn-primary"><i class="fa fa-search"></i> @L("Search")</button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default"><i class="fa fa-times"></i> @L("Clear")</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="HaulZonesTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

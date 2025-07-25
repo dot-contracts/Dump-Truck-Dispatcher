@@ -1,0 +1,16 @@
+﻿@using DispatcherWeb.Invoices.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model GetCustomerTicketsInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("SelectTicketsToAddToInvoice")))
+
+<div class="modal-body box-wrap">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="table-responsive">
+                <table class="display table table-striped table-bordered table-hover dt-responsive" id="CustomerTicketsTable"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

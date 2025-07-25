@@ -1,0 +1,9 @@
+﻿@using Abp.Localization
+@using DispatcherWeb
+@using DispatcherWeb.Runtime.Session
+@using DispatcherWeb.Web.Utils
+@inherits DispatcherWeb.Web.Views.DispatcherWebRazorPage<TModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, NetEscapades.AspNetCore.SecurityHeaders.TagHelpers
+@addTagHelper *, DispatcherWeb.Web.Mvc
+@inject IExtendedAbpSession Session

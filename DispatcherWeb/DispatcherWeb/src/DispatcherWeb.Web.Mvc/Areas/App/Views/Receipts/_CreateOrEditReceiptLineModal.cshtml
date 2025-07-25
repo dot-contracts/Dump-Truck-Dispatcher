@@ -1,0 +1,142 @@
+﻿@using DispatcherWeb.Designations;
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Receipts.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@inject IDesignationAppService DesignationAppService
+@model ReceiptLineEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit line" : "Add new line"))
+@{
+    var separateItems = await FeatureChecker.IsEnabledAsync(AppFeatures.SeparateMaterialAndFreightItems);
+}
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation order-line-form">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ReceiptId" />
+        <input type="hidden" asp-for="IsMaterialRateOverridden" />
+        <input type="hidden" asp-for="IsFreightRateOverridden" />
+        <input type="hidden" asp-for="IsMaterialAmountOverridden" />
+        <input type="hidden" asp-for="IsFreightAmountOverridden" />
+        <div class="form-group">
+            <label>Line #</label>
+            <input class="form-control" type="text" asp-for="LineNumber" readonly>
+        </div>
+        <div class="form-group">
+            <label class="required-label">Designation</label>
+            <select class="form-control" required asp-for="Designation" asp-items="await DesignationAppService.GetDesignationSelectListItemsAsync(Model.Designation).ToSelectListItemsAsync()">
+                <option value="">Select a designation</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Load At</label>
+            <select class="form-control" asp-for="LoadAtId">
+                <option value="">@L("SelectALocation")</option>
+                @if (Model.LoadAtId.HasValue)
+                {
+                    <option selected value="@Model.LoadAtId">@Model.LoadAtName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Deliver To</label>
+            <select class="form-control" asp-for="DeliverToId">
+                <option value="">@L("SelectALocation")</option>
+                @if (Model.DeliverToId.HasValue)
+                {
+                    <option selected value="@Model.DeliverToId">@Model.DeliverToName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label">@(separateItems ? "Freight Item" : "Item")</label>
+            <select class="form-control" asp-for="FreightItemId" required>
+                <option value="">Select an item</option>
+                @if (Model.FreightItemId > 0)
+                {
+                    <option selected value="@Model.FreightItemId">@Model.FreightItemName</option>
+                }
+            </select>
+        </div>
+        @if (separateItems)
+        {
+            <div class="form-group">
+                <label class="required-label">Material Item</label>
+                <select class="form-control" asp-for="MaterialItemId" required>
+                    <option value="">Select an item</option>
+                    @if (Model.MaterialItemId > 0)
+                    {
+                        <option selected value="@Model.MaterialItemId">@Model.MaterialItemName</option>
+                    }
+                </select>
+            </div>
+        }
+        <div class="form-group">
+            <label class="required-label" for="MaterialUomId">Material UOM</label>
+            <select class="form-control" asp-for="MaterialUomId">
+                <option value=""
+                        data-placeholder-default="Select a UOM"
+                        data-placeholder-no-items="No Prices defined for the selected Item"
+                        data-placeholder-no-parent="Select an Item first">
+                    Select Material UOM
+                </option>
+                @if (Model.MaterialUomId != 0)
+                {
+                    <option selected value="@Model.MaterialUomId">@Model.MaterialUomName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label" for="FreightUomId">Freight UOM</label>
+            <select class="form-control" asp-for="FreightUomId">
+                <option value=""
+                        data-placeholder-default="Select a UOM"
+                        data-placeholder-no-items="No Prices defined for the selected Item"
+                        data-placeholder-no-parent="Select an Item first">
+                    Select Freight UOM
+                </option>
+                @if (Model.FreightUomId != 0)
+                {
+                    <option selected value="@Model.FreightUomId">@Model.FreightUomName</option>
+                }
+            </select>
+        </div>
+        @{
+            string disabledMaterial = !Model.Designation.HasMaterial() ? "disabled" : null;
+            string disabledFreight = Model.Designation.MaterialOnly() ? "disabled" : null;
+            string readonlyTotals = Model.CanOverrideTotals ? null : "readonly";
+        }
+        <div class="form-group">
+            <label>Material Rate</label>
+            <input class="form-control" type="text" asp-for="MaterialRate" disabled="@disabledMaterial" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+        <div class="form-group">
+            <label>Freight Rate</label>
+            <input class="form-control" type="text" asp-for="FreightRate" disabled="@disabledFreight" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+        <div class="form-group">
+            <label for="MaterialQuantity" class="required-label">Material Quantity</label>
+            <input class="form-control" type="text" asp-for="MaterialQuantity" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+        </div>
+        <div class="form-group">
+            <label for="FreightQuantity" class="required-label">Freight Quantity</label>
+            <input class="form-control" type="text" asp-for="FreightQuantity" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+        </div>
+
+        <div class="form-group">
+            <label>Material</label>
+            <input class="form-control" type="text" asp-for="MaterialAmount" readonly="@readonlyTotals" disabled="@disabledMaterial" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength" required>
+        </div>
+        <div class="form-group">
+            <label>Freight</label>
+            <input class="form-control" type="text" asp-for="FreightAmount" readonly="@readonlyTotals" disabled="@disabledFreight" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength" required>
+        </div>
+        <div class="form-group">
+            <label>@L("JobNumber")</label>
+            <input class="form-control" type="text" asp-for="JobNumber" maxlength="@EntityStringFieldLengths.OrderLine.JobNumber">
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

@@ -1,0 +1,90 @@
+﻿@using DispatcherWeb.Features
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.Items;
+}
+
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/Items/_CreateOrEditItemModal.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/Items/_CreateOrEditItemPriceModal.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/Items/_CreateOrEditRateModal.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/Common/Modals/_MergeModal.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/Items/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/Items/_CreateOrEditItemModal.min.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/Items/_CreateOrEditItemPriceModal.min.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/Items/_CreateOrEditRateModal.min.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/Common/Modals/_MergeModal.min.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/Items/Index.min.js" asp-append-version="true"></script>
+    </environment>
+
+}
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("ProductsOrServices")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("ProductsAndServices_Description")
+            </span>
+        </div>
+        <div class="mr-auto-btn col-sm-12 col-md-6 text-center text-md-right">
+            @if (await FeatureChecker.IsEnabledAsync(AppFeatures.FulcrumIntegration) && await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_Items_SyncWithFulcrum))
+            {
+                <button type="button" id="SyncWithFulcrumButton" class="btn btn-primary"><i class="fas fa-sync"></i>@L("SyncWithFulcrum")</button>
+            }
+            @if (await FeatureChecker.IsEnabledAsync(AppFeatures.QuickbooksImportFeature) && await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_Imports_Items))
+            {
+                <a asp-controller="Imports" asp-action="Items" class="btn btn-primary"> @L("Import")</a>
+            }
+            <button id="ExportItemsToCsvButton" class="btn btn-primary"> Export</button>
+                <button id="CreateNewItemButton" class="btn btn-primary">
+                    <i class="fa fa-plus"></i> @L("AddNew")
+                </button>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right">
+                <div id="ItemsFormFilter">
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-xl-3 form-group">
+                            <label for="NameFilter">@L("Name")</label>
+                            <input class="form-control m-input filter" id="NameFilter" name="Name" placeholder="@L("SearchWithThreeDot")" type="text">
+                        </div>
+                        <div class="col-xl-3 form-group">
+                            <label for="StatusFilter">@L("Status")</label>
+                            <select class="form-control edited filter" name="Status" id="StatusFilter" asp-items="Html.GetEnumSelectList<FilterActiveStatus>()"></select>
+                        </div>
+                        <div class="col-xl-3 form-group">
+                            <label for="TypeFilter">@L("Type")</label>
+                            <select class="form-control edited filter" name="Type" id="TypeFilter" asp-items="Html.GetEnumSelectList<ItemType>()">
+                                <option value="">@L("All")</option>
+                            </select>
+                        </div>
+                        <div class="col-xl-3 text-center text-sm-right margin-top-20 form-group action-buttons-wrapper">
+                            <button type="submit" id="SearchButton" class="btn btn-primary">
+                                <i class="fa fa-search"></i> @L("Search")
+                            </button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                <i class="fa fa-times"></i> @L("Clear")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive" id="ItemsTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

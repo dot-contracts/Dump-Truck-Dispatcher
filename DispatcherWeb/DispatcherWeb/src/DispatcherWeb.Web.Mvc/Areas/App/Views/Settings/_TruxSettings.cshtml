@@ -1,0 +1,37 @@
+﻿@using DispatcherWeb.Features
+@model DispatcherWeb.Configuration.Tenants.Dto.TruxSettingsEditDto
+
+
+<div class="tab-pane" id="SettingsTruxTab">
+    <div class="row">
+        <div class="col-sm-6">
+            <h5>@L("Trux")</h5>
+            <form id="TruxSettingsForm" class="m-form">
+                <div class="form-group">
+                    <label for="AllowImportingTruxEarnings" class="m-checkbox col-lg-12">
+                        <input id="AllowImportingTruxEarnings" type="checkbox" name="AllowImportingTruxEarnings" value="true" checked=@(Model.AllowImportingTruxEarnings ? "checked" : null)>
+                        @L("AllowImportingTruxEarnings")
+                        <span></span>
+                    </label>
+                </div>
+                <div class="form-group" abp-hidden="@(!Model.AllowImportingTruxEarnings)">
+                    <label for="TruxCustomerId" class="required-label">@L("SelectTruxCustomer")</label>
+                    <select class="form-control" id="TruxCustomerId" name="TruxCustomerId">
+                        <option value="">@L("SelectTruxCustomer")</option>
+                        @if (Model.TruxCustomerId > 0)
+                        {
+                            <option value="@Model.TruxCustomerId" selected>@Model.TruxCustomerName</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group" abp-hidden="@(!await FeatureChecker.IsEnabledAsync(AppFeatures.DriverProductionPayFeature))">
+                    <label for="UseTruxEarningsForProductionPay" class="m-checkbox col-lg-12">
+                        <input id="UseTruxEarningsForProductionPay" type="checkbox" name="UseForProductionPay" value="true" checked=@(Model.UseForProductionPay ? "checked" : null)>
+                        @L("UseForProductionPay")
+                        <span></span>
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

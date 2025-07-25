@@ -1,0 +1,86 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.EmployeeTime.Dto
+@model EmployeeTimeIndexDto
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.TimeEntry;
+}
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/EmployeeTime/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/EmployeeTime/Index.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-6 col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("TimeEntry")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("TimeEntryHeaderInfo")
+            </span>
+        </div>
+        <div class="mr-auto-btn col-6 col-sm-12 col-md-6 text-right">
+            <button id="ExportToCsvButton" class="btn btn-primary"> Export</button>
+            <button id="AddBulkTimeButton" class="btn btn-primary"><i class="fa fa-th"></i> @L("AddBulkTime")</button>
+            @if (await IsGrantedAsync(AppPermissions.Pages_TimeEntry_EditAll) || await IsGrantedAsync(AppPermissions.Pages_TimeEntry_EditPersonal))
+            {
+                <button id="CreateNewEmployeeTimeButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("AddNew")</button>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right">
+                <div class="row">
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="DateFilter">@L("StartDateRange")</label>
+                        <input class="form-control filter" id="DateFilter" name="StartDateRange" type="text" autocomplete="off">
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="TimeClassificationIdFilter">@L("TimeClassification")</label>
+                        <select class="form-control filter" name="TimeClassificationId" id="TimeClassificationIdFilter" data-display-name="TimeClassificationName">
+                            <option value="">Select a time classification</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="EmployeeIdFilter">@L("Employee")</label>
+                        <select class="form-control filter" name="EmployeeId" id="EmployeeIdFilter" data-display-name="EmployeeName" disabled="@(Model.LockToCurrentUser ? "disabled" : null)">
+                            <option value="">Select an employee</option>
+                            @if (Model.LockToCurrentUser)
+                            {
+                                <option value="@Model.UserId" selected>@Model.UserFullName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row m--margin-bottom-10 text-right justify-content-end">
+                    <div class="col-md-6 ">
+                    </div>
+                    <div class="col-md-3 col-12 text-center text-md-right">
+                        <button type="submit" id="SearchButton" class="btn btn-primary">
+                            <i class="fa fa-search"></i> @L("Search")
+                        </button>
+                        <button type="button" id="ClearSearchButton" class="btn btn-default">
+                            <i class="fa fa-times"></i> @L("Clear")
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="EmployeeTimeTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,111 @@
+﻿@using DispatcherWeb.Features
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.Locations;
+}
+
+@section Styles
+{
+}
+
+@section Scripts{
+    <script src="~/view-resources/Areas/App/Views/Locations/_CreateOrEditLocationModal.js" asp-append-version="true"></script>
+    <script src="~/view-resources/Areas/app/Views/Locations/_CreateOrEditLocationContactModal.js" asp-append-version="true"></script>
+    <script src="~/view-resources/Areas/app/Views/Common/Modals/_MergeModal.js" asp-append-version="true"></script>
+    <script src="~/view-resources/Areas/app/Views/Locations/Index.js" asp-append-version="true"></script>
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("Locations")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("LocationsHeaderInfo")
+            </span>
+        </div>
+        <div class="col-sm-12 col-md-6 text-right">
+            @if (await FeatureChecker.IsEnabledAsync(AppFeatures.QuickbooksImportFeature) && await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_Imports_Vendors))
+            {
+                <a asp-controller="Imports" asp-action="Vendors" class="btn btn-primary"> @L("Import")</a>
+            }
+            <button id="ExportLocationsToCsvButton" class="btn btn-primary"> Export</button>
+            <button id="CreateNewLocationButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("AddNew")</button>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="m-form m-form--label-align-right">
+                <form role="form" id="LocationsFormFilter">
+                    <div>
+                        <div class="row m--margin-bottom-20">
+                            <div class="col-xl-6">
+                                <label for="NameFilter">@L("Name")</label>
+                                <input class="form-control m-input filter" id="NameFilter" name="Name" placeholder="@L("SearchWithThreeDot")" type="text">
+                            </div>
+                        </div>
+                        <div id="AdvacedAuditFiltersArea" abp-hidden>
+                            <div class="row">
+                                <div class="col-xl-3 m--margin-bottom-10">
+                                    <label for="CategoryIdFilter">@L("Category")</label>
+                                    <select class="form-control filter" name="CategoryId" id="CategoryIdFilter">
+                                        <option value="">Select a category</option>
+                                    </select>
+                                </div>
+                                <div class="col-xl-3 m--margin-bottom-10">
+                                    <label for="CityFilter">@L("City")</label>
+                                    <input class="form-control m-input filter" id="CityFilter" name="City" placeholder="@L("SearchWithThreeDot")" type="text">
+                                </div>
+                                <div class="col-xl-3 m--margin-bottom-10">
+                                    <label for="StateFilter">@L("State")</label>
+                                    <input class="form-control m-input filter" id="StateFilter" name="State" placeholder="@L("SearchWithThreeDot")" type="text">
+                                </div>
+                                <div class="col-xl-3 m--margin-bottom-10">
+                                    <label for="StatusFilter">@L("Status")</label>
+                                    <select class="form-control edited filter" name="Status" id="StatusFilter" asp-items="Html.GetEnumSelectList<FilterActiveStatus>()"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row m--margin-bottom-10">
+                            <div class="col-lg-12 margin-bottom-10">
+                                <span id="ShowAdvancedFiltersSpan" class="clickable-item text-muted"><i class="fa fa-angle-down"></i> Show Advanced Filters</span>
+                                <span id="HideAdvancedFiltersSpan" class="clickable-item text-muted" abp-hidden><i class="fa fa-angle-up"></i> Hide Advanced Filters</span>
+                            </div>
+                            <div class="col-sm-12 col-md-6 col-lg-6 text-center text-md-left margin-bottom-5">
+                                @*<button type="button" id="MapViewButton" class="btn btn-primary">
+                                    <i class="fa fa-map-marker"></i> <span>@L("MapView")</span>
+                                </button>*@
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-lg-6 text-center text-md-right ">
+                                <button type="submit" id="SearchButton" class="btn btn-primary">
+                                    <i class="fa fa-search"></i> @L("Search")
+                                </button>
+                                <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                    <i class="fa fa-times"></i> @L("Clear")
+                                </button>
+                            </div>
+                        </div>
+                        <div class="m-separator m-separator--md m-separator--dashed"></div>
+                    </div>
+                </form>
+
+            </div>
+
+            <div id="MapParentDiv" abp-hidden>
+                <div id="mainMap" class="google-map-container"></div>
+            </div>
+
+            <div id="TableParentDiv">
+                <div class="row align-items-center">
+                    <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="LocationsTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

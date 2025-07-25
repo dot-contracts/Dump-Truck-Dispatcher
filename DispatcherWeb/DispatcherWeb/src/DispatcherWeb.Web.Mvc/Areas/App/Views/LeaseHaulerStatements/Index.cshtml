@@ -1,0 +1,64 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.LeaseHaulerStatements;
+}
+
+@section Scripts
+{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/LeaseHaulerStatements/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/LeaseHaulerStatements/Index.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-8 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("LeaseHaulerStatements")</span>
+            </h3>
+            <span class="m-section__sub">
+            </span>
+        </div>
+        <div class="col-4 col-md-6 text-right">
+            <button id="AddLeaseHaulerStatementButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("AddLeaseHaulerStatement")</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form>
+                <div class="m-form m-form--label-align-right">
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-xl-4 mb-3">
+                            <label class="control-label" for="DateRangeFilter">@L("StatementDate")</label>
+                            <input class="form-control m-input filter" id="DateRangeFilter" name="DateRangeFilter" type="text" autocomplete="off">
+                        </div>
+                        <div class="col-xl-4 mb-3">
+                            <label for="StatementIdFilter">@L("StatementId")</label>
+                            <input class="form-control m-input filter no-numeric-spinner" id="StatementIdFilter" name="StatementId" placeholder="@L("StatementId")" type="number" step="1" pattern="\d+">
+                        </div>
+                    </div>
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-xl-12 text-right">
+                            <button type="submit" id="SearchButton" class="btn btn-primary"><i class="fa fa-search"></i> @L("Search")</button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default"><i class="fa fa-times"></i> @L("Clear")</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="LeaseHaulerStatementsTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

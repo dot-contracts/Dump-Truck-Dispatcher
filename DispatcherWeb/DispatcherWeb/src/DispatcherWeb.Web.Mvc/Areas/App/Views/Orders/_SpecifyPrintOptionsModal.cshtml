@@ -1,0 +1,18 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Print options"))
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <div class="form-group">
+            <input type="radio" checked name="PrintOrderPricesOption" class="minimal" id="ShowPrices" />
+            <label for="ShowPrices">Show prices</label>
+        </div>
+        <div class="form-group">
+            <input type="radio" name="PrintOrderPricesOption" class="minimal" id="HidePrices" />
+            <label for="HidePrices">Hide prices</label>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" class="btn btn-primary save-button"><i class="fa fa-print"></i> <span>@L("Print")</span></button>
+</div>

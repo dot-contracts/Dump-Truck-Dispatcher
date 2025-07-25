@@ -1,0 +1,18 @@
+﻿@model DispatcherWeb.Configuration.Tenants.Dto.GpsIntegrationSettingsEditDto
+
+<div class="tab-pane" id="SettingsIntelliShiftTab" abp-hidden="@(Model.Platform != GpsPlatform.IntelliShift)">
+    <div class="row">
+        <div class="col-sm-6">
+            <form id="IntelliShiftSettingsForm" class="m-form">
+                <div class="form-group">
+                    <label for="User">@L("User")</label>
+                    <input id="User" type="text" name="User" autocomplete="off" class="form-control" value="@Model.IntelliShift.User" maxlength="64">
+                </div>
+                <div class="form-group">
+                    <label for="Password">@L("Password")</label>
+                    <input type="password" id="Password" name="Password" autocomplete="off" class="form-control" value="@Model.IntelliShift.Password" maxlength="64">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

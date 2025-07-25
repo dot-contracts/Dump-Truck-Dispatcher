@@ -1,0 +1,23 @@
+﻿@using DispatcherWeb.Dashboard.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model List<DashboardSettingDto>
+
+@await Html.PartialAsync("~/Areas/App/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("SelectTheItemsToDisplayOnTheDashboard")))
+
+<div class="modal-body">
+    @foreach (var setting in Model)
+    {
+        <div>
+            <label class="m-checkbox">
+                <input type="checkbox" class="dashboard-setting-checkbox" value="true" name="@setting.SettingName" checked="@(setting.IsEnabled ? "checked" : null)">
+                @setting.SettingLabel
+                <span></span>
+            </label>
+        </div>
+    }
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" class="btn btn-primary save-button"><i class="fa fa-save"></i> <span>@L("Save")</span></button>
+</div>

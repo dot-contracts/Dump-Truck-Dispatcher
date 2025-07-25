@@ -1,0 +1,80 @@
+﻿@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.LeaseHaulers.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model LeaseHaulerDriverEditDto
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Driver: " + Model.FullName : "Create new driver"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation" name="DriverInformationsForm">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="LeaseHaulerId" />
+        <input type="hidden" asp-for="HaulingCompanyDriverId" />
+        <div class="form-group">
+            <label class="required-label">@L("FirstName")</label>
+            <input class="form-control" type="text" asp-for="FirstName" required>
+        </div>
+        <div class="form-group">
+            <label class="required-label">@L("LastName")</label>
+            <input class="form-control" type="text" asp-for="LastName" required>
+        </div>
+        <div class="form-group">
+            <label class="m-checkbox">
+                <input type="checkbox" asp-for="DriverIsActive" value="true">@L("Active")<span></span>
+            </label>
+        </div>
+        <div class="form-group">
+            <label asp-for="EmailAddress">@L("EmailAddress")</label>
+            <input class="form-control" type="text" asp-for="EmailAddress" maxlength="256" autocomplete="new-password">
+        </div>
+        <div class="form-group">
+            <label asp-for="CellPhoneNumber">@L("CellPhoneNumber")</label>
+            <input class="form-control" type="text" asp-for="CellPhoneNumber" placeholder="Cell Phone Number (format: +15554321)" maxlength="15">
+        </div>
+        <div class="form-group">
+            <label class="control-label" asp-for="OrderNotifyPreferredFormat">@L("PreferredFormat")</label>
+            <select class="form-control" data-style="selectpicker-default" asp-for="OrderNotifyPreferredFormat" asp-items="Html.GetEnumSelectListWithDefaults<OrderNotifyPreferredFormat>()"></select>
+        </div>
+        @if (await SettingManager.DispatchViaDriverApplication())
+        {
+            <div class="form-group" abp-hidden="@(!Model.EnableForDriverApplication && string.IsNullOrEmpty(Model.EmailAddress))">
+                <label class="m-checkbox">
+                    <input type="checkbox" asp-for="EnableForDriverApplication">@L("EnableForDriverApplicationQuestion")<span></span>
+                </label>
+            </div>
+            <div id="UserDetails" abp-hidden="@(!Model.EnableForDriverApplication)">
+                <div class="m-checkbox-list">
+                    <label for="SetRandomPassword" class="m-checkbox">
+                        <input asp-for="SetRandomPassword" type="checkbox" value="true" />@L("SetRandomPassword")<span></span>
+                    </label>
+                </div>
+
+                <div class="form-group user-password" abp-hidden="@Model.SetRandomPassword">
+                    <label for="Password">@L("Password")</label>
+                    <input asp-for="Password" type="password" class="form-control" maxlength="@DispatcherWeb.Authorization.Users.User.MaxPlainPasswordLength" autocomplete="new-password">
+                </div>
+
+                <div class="form-group user-password" abp-hidden="@Model.SetRandomPassword">
+                    <label for="PasswordRepeat">@L("PasswordRepeat")</label>
+                    <input asp-for="PasswordRepeat" type="password" class="form-control" maxlength="@DispatcherWeb.Authorization.Users.User.MaxPlainPasswordLength" equalto="#Password" autocomplete="new-password">
+                </div>
+
+                <div class="m-checkbox-list">
+                    <label for="ShouldChangePasswordOnNextLogin" class="m-checkbox">
+                        <input asp-for="ShouldChangePasswordOnNextLogin" type="checkbox" value="true">
+                        @L("ShouldChangePasswordOnNextLogin")
+                        <span></span>
+                    </label>
+                    <label for="SendActivationEmail" class="m-checkbox">
+                        <input asp-for="SendActivationEmail" type="checkbox" value="true">
+                        @L("SendActivationEmail")
+                        <span></span>
+                    </label>
+                </div>
+            </div>
+        }
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

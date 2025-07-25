@@ -1,0 +1,28 @@
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.LeaseHaulerAvailableTrucks;
+    ViewBag.PageTitle = AppPageTitles.GetDetailName(AppPageTitles.LeaseHaulerRequests.AvailableTrucks, "Link has expired");
+    Layout = "_AnonymousLayout";
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-12">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("AvailableTrucksHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("AvailableTrucksHeaderInfo")
+            </span>
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="custom-alerts alert alert-warning">
+                @L("RequestHasExpired")
+            </div>
+        </div>
+    </div>
+</div>

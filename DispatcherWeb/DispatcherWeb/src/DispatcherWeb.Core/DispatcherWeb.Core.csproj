@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props"></Import>
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AssemblyName>DispatcherWeb.Core</AssemblyName>
+    <PackageId>DispatcherWeb.Core</PackageId>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <UserSecretsId>MyCompanyName-DispatcherWeb-894FDFC1-6482-4A56-926A-3C46C9FE0329</UserSecretsId>
+    <RootNamespace>DispatcherWeb</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\DispatcherWeb\*.xml;Emailing\EmailTemplates\default.html" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Enums.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Localization\Abp\Abp.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\Abp\Abp.xml" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'false'">
+    <PackageReference Include="Dtd.Abp.HangFire.AspNetCore" Version="$(DtdAbpVersion)" />
+    <PackageReference Include="Dtd.Abp.MailKit" Version="$(DtdAbpVersion)" />
+    <PackageReference Include="Dtd.Abp.RedisCache" Version="$(DtdAbpVersion)" />
+    <PackageReference Include="Dtd.Abp.ZeroCore.IdentityServer4.vNext.EntityFrameworkCore" Version="$(DtdAbpVersion)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'true'">
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp.HangFire.AspNetCore\Abp.HangFire.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp.MailKit\Abp.MailKit.csproj" />
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp.RedisCache\Abp.RedisCache.csproj" />
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp.ZeroCore.IdentityServer4.vNext.EntityFrameworkCore\Abp.ZeroCore.IdentityServer4.vNext.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.4.0" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.19.0" />
+    <PackageReference Include="FirebaseAdmin" Version="3.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
+    <PackageReference Include="Castle.Windsor.MsDependencyInjection" Version="4.1.0" />
+    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
+    <PackageReference Include="Stripe.net" Version="39.88.0" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.4" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="WebPush" Version="1.0.12" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DispatcherWeb.Core.Shared\DispatcherWeb.Core.Shared.csproj" />
+  </ItemGroup>
+</Project>

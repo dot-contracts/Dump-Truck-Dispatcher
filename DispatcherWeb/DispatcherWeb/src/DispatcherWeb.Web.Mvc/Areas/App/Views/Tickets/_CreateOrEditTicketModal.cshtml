@@ -1,0 +1,254 @@
+﻿@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Tickets.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure
+@model TicketEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Ticket: " + Model.TicketNumber : "Create new Ticket"))
+
+@{
+    var separateItems = await FeatureChecker.IsEnabledAsync(AppFeatures.SeparateMaterialAndFreightItems);
+    var visibility = Model.VisibleTicketControls;
+}
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="OrderLineId" />
+        <input type="hidden" asp-for="OrderDate" />
+        <input type="hidden" asp-for="OrderLineIsProductionPay" />
+        <input type="hidden" asp-for="ReceiptLineId" />
+        <input type="hidden" asp-for="ReadOnly" />
+        <input type="hidden" asp-for="CannotEditReason" />
+
+        <div class="form-group">
+            <label class="required-label" asp-for="TicketDateTime">@L("Date")</label>
+            <input class="form-control" type="text" asp-for="TicketDateTime" required>
+        </div>
+        @if (await SettingManager.UseShifts())
+        {
+            <div class="form-group">
+                <label class="control-label required-label">@L("Shift"):</label>
+                <select class="form-control" asp-for="Shift" asp-items="@(await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id))" required disabled="@(Model.OrderLineId.HasValue ? "disabled" : null)">
+                    <option value=""></option>
+                </select>
+            </div>
+        }
+        <div class="form-group">
+            <label class="required-label" asp-for="CustomerId">@L("Customer")</label>
+            <select class="form-control" asp-for="CustomerId" required>
+                <option value="">Select a customer</option>
+                @if (Model.CustomerId != 0)
+                {
+                    <option selected value="@Model.CustomerId">@Model.CustomerName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>@L("LoadAt")</label>
+            <select class="form-control" asp-for="LoadAtId">
+                <option value="">@L("SelectALocation")</option>
+                @if (Model.LoadAtId.HasValue)
+                {
+                    <option selected value="@Model.LoadAtId">@Model.LoadAtName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>@L("DeliverTo")</label>
+            <select class="form-control" asp-for="DeliverToId">
+                <option value="">@L("SelectALocation")</option>
+                @if (Model.DeliverToId.HasValue)
+                {
+                    <option selected value="@Model.DeliverToId">@Model.DeliverToName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group" abp-hidden="@(!visibility.FreightItem)">
+            <label class="required-label" asp-for="FreightItemId">@L(separateItems ? "FreightItem" : "Item")</label>
+            <select class="form-control" asp-for="FreightItemId" required>
+                <option value="">Select an item</option>
+                @if (Model.FreightItemId != 0)
+                {
+                    <option selected value="@Model.FreightItemId">@Model.FreightItemName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group" abp-hidden="@(!visibility.MaterialItem)">
+            <label class="required-label" asp-for="MaterialItemId">@L("MaterialItem")</label>
+            <select class="form-control" asp-for="MaterialItemId">
+                <option value="">Select an item</option>
+                @if (Model.MaterialItemId != 0)
+                {
+                    <option selected value="@Model.MaterialItemId">@Model.MaterialItemName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="TicketNumber">@L("TicketNumber")</label>
+            <input class="form-control" type="text" asp-for="TicketNumber" required maxlength="@EntityStringFieldLengths.Ticket.TicketNumber">
+        </div>
+        <div class="form-group" abp-hidden="@(!visibility.FreightQuantity)">
+            <label class="required-label" asp-for="FreightQuantity">@L(visibility.MaterialQuantity ? "FreightQuantity" : "Quantity")</label>
+            <input class="form-control" type="text" asp-for="FreightQuantity"
+                   required="required"
+                   data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+        </div>
+        <div class="form-group" abp-hidden="@(!visibility.MaterialQuantity)">
+            <label class="required-label" asp-for="MaterialQuantity">@L(visibility.FreightQuantity ? "MaterialQuantity" : "Quantity")</label>
+            <input class="form-control" type="text" asp-for="MaterialQuantity"
+                   required="required"
+                   data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+        </div>
+        <div class="form-group" abp-hidden="@(!visibility.FreightUom)">
+            <label class="required-label" asp-for="FreightUomId">@L("FreightUom")</label>
+            <select class="form-control" asp-for="FreightUomId"
+                    required="required" disabled="@(Model.OrderLineId.HasValue ? "disabled" : null)">
+                <option value="">Select a UOM</option>
+                @if (Model.FreightUomId != 0)
+                {
+                    <option selected value="@Model.FreightUomId">@Model.FreightUomName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group" abp-hidden="@(!visibility.MaterialUom)">
+            <label class="required-label" asp-for="MaterialUomId">@L("MaterialUom")</label>
+            <select class="form-control" asp-for="MaterialUomId"
+                    required="required" disabled="@(Model.OrderLineId.HasValue ? "disabled" : null)">
+                <option value="">Select a UOM</option>
+                @if (Model.MaterialUomId != 0)
+                {
+                    <option selected value="@Model.MaterialUomId">@Model.MaterialUomName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group" abp-hidden="@(!await IsGrantedAsync(AppPermissions.Pages_LeaseHauler))">
+            <label asp-for="CarrierId">@L("Carrier")</label>
+            <select class="form-control" asp-for="CarrierId">
+                <option value="">Select a Carrier</option>
+                @if (Model.CarrierId != 0)
+                {
+                    <option selected value="@Model.CarrierId">@Model.CarrierName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="TruckCode">@L("Truck")</label>
+            <input class="form-control" type="text" asp-for="TruckCode">
+        </div>
+        <div class="form-group">
+            <label asp-for="TrailerId">@L("Trailer")</label>
+            <select class="form-control" asp-for="TrailerId">
+                <option value="">Select a Trailer</option>
+                @if (Model.TrailerId > 0)
+                {
+                    <option selected value="@Model.TrailerId">@Model.TrailerTruckCode</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="DriverId" class="required-label">@L("Driver")</label>
+            <select class="form-control" asp-for="DriverId">
+                <option value="">Select a Driver</option>
+                @if (Model.DriverId > 0)
+                {
+                    <option selected value="@Model.DriverId">@Model.DriverName</option>
+                }
+            </select>
+        </div>
+        @if (await SettingManager.AllowLoadCountOnHourlyJobs())
+        {
+            <div class="form-group">
+                <label asp-for="LoadCount">@L("LoadCount")</label>
+                <input class="form-control" type="text" asp-for="LoadCount" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+            </div>
+        }
+        <div class="row">
+            <div class="col-6">
+                <label class="m-checkbox">
+                    <input type="checkbox" id="NonbillableFreight" name="NonbillableFreight" value="true" checked="@(Model.NonbillableFreight ? "checked" : null)" />
+                    @L("NonbillableFreight")
+                    <span></span>
+                </label>
+            </div>
+            <div class="col-6">
+                <label class="m-checkbox">
+                    <input type="checkbox" id="NonbillableMaterial" name="NonbillableMaterial" value="true" checked="@(Model.NonbillableMaterial ? "checked" : null)" />
+                    @L("NonbillableMaterial")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <label class="m-checkbox">
+                    <input type="checkbox" id="IsVerified" name="IsVerified" value="true" checked="@(Model.IsVerified ? "checked" : null)" />
+                    @L("Verified")
+                    <span></span>
+                </label>
+            </div>
+            <div class="col-6">
+                <label class="m-checkbox">
+                    <input type="checkbox" id="IsBilled" name="IsBilled" value="true" checked="@(Model.IsBilled ? "checked" : null)" />
+                    @L("Billed")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <label class="m-checkbox">
+                    <input type="checkbox" id="HasPayStatements" name="HasPayStatements" value="true" checked="@(Model.HasPayStatements ? "checked" : null)" disabled />
+                    @L("PayStatement")
+                    <span></span>
+                </label>
+            </div>
+            <div class="col-6">
+                <label class="m-checkbox">
+                    <input type="checkbox" id="HasLeaseHaulerStatements" name="HasLeaseHaulerStatements" value="true" checked="@(Model.HasLeaseHaulerStatements ? "checked" : null)" disabled />
+                    @L("LeaseHaulerStatement")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+        @if (Model.Id > 0)
+        {
+            <hr />
+        }
+    </form>
+    <div class="form-group" id="TicketPhotoBlock" abp-hidden>
+        <input type="hidden" asp-for="TicketPhotoId" />
+        <i class="fa-regular fa-file-image" id="showTicketPhotoButton"></i>
+    </div>
+    <div class="form-group" id="PrintTicketBlock" abp-hidden>
+        <input type="hidden" asp-for="IsInternal" />
+        <i class="fa-regular fa-file printTicketButton" id="printTicketButton"></i>
+    </div>
+    <div class="form-group" id="AddTicketPhotoBlock" abp-hidden>
+        <div id="SelectTicketPhotoBlock">
+            <form role="form" novalidate class="form-validation m-form" method="POST" action="">
+                <div class="form-group fileUpload">
+                    <div class="btn btn-primary browse_btn">
+                        <span>@L("Browse")</span>
+                        <input type="file" accept="image/jpeg,image/gif,image/png,application/pdf" capture class="upload" id="TicketPhoto" name="TicketPhoto">
+                    </div>
+                    <input id="FileNamePlaceholder" class="form-control file-upload" placeholder="No File Selected." disabled="disabled">
+                </div>
+                <input type="submit" abp-hidden />
+                <button type="button" id="AddTicketPhotoButton" class="btn btn-primary">Add Ticket Photo</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@if (Model.IsReadOnly)
+{
+    @await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithClose.cshtml")
+}
+else
+{
+    @await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")
+}
+

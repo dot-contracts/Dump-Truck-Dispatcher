@@ -1,0 +1,52 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Web.Areas.App.Models.Scheduling
+@model SelectTrailerModalViewModel
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Select Trailer"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="LeaseHaulerId" />
+        <div class="form-group">
+            <p id="ModalSubtitle"></p>
+        </div>
+        <div class="form-group">
+            <h5 id="Message"></h5>
+        </div>
+        <div class="form-group">
+            <label for="VehicleCategoryId">Category</label>
+            <select class="form-control" id="VehicleCategoryId" name="VehicleCategoryId">
+                <option value="">&nbsp;</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>@L("BedConstruction")</label>
+            <select class="form-control" id="BedConstruction" name="BedConstruction" asp-items="Html.GetEnumSelectListOrderedByName<BedConstructionEnum>()">
+                <option value="">&nbsp;</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="Make">Make</label>
+            <select class="form-control" id="Make" name="Make">
+                <option value="">&nbsp;</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="Model">Model</label>
+            <select class="form-control" id="Model" name="Model">
+                <option value="">&nbsp;</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label" for="TrailerId">Trailer</label>
+            <select class="form-control" asp-for="TrailerId" required>
+                <option value="">Select a trailer</option>
+                @if (Model.TrailerId.HasValue)
+                {
+                    <option value="@Model.TrailerId" selected>@Model.TrailerTruckCode</option>
+                }
+            </select>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

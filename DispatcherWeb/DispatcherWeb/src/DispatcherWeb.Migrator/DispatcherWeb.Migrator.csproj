@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props"></Import>
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AssemblyName>DispatcherWeb.Migrator</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>DispatcherWeb.Migrator</PackageId>
+    <UserSecretsId>MyCompanyName-DispatcherWeb-894FDFC1-6482-4A56-926A-3C46C9FE0329</UserSecretsId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <StartupObject>DispatcherWeb.Migrator.Program</StartupObject>
+    <ApplicationIcon />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Update="appsettings.json;log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'false'">
+    <PackageReference Include="Dtd.Abp.Castle.Log4Net" Version="$(DtdAbpVersion)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'true'">
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp.Castle.Log4Net\Abp.Castle.Log4Net.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DispatcherWeb.EntityFrameworkCore\DispatcherWeb.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
+</Project>

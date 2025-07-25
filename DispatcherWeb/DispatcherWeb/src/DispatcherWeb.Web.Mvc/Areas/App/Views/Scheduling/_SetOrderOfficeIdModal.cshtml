@@ -1,0 +1,35 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Scheduling.Dto
+@model SetOrderOfficeIdInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Select Office"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderId" />
+        <input type="hidden" asp-for="OrderLineId" />
+        <input type="hidden" name="OriginalOfficeId" value="@Model.OfficeId" />
+        <div class="form-group">
+            <label class="control-label" for="OfficeId">Select new value</label>
+            <select class="form-control" name="OfficeId" id="OfficeId">
+                <option selected value="@Model.OfficeId">@Model.OfficeName</option>
+            </select>
+        </div>
+        @if(Model.OrderLineId.HasValue)
+        {
+            <div class="form-group">
+                <div class="m-radio-list">
+                    <label class="m-radio">
+                        <input type="radio" name="TransferType" value="0" checked="checked"> Transfer entire order
+                        <span></span>
+                    </label>
+                    <label class="m-radio">
+                        <input type="radio" name="TransferType" value="1"> Transfer only this line item
+                        <span></span>
+                    </label>
+                </div>
+            </div>
+        }
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

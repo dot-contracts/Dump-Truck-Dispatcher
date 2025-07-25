@@ -1,0 +1,32 @@
+﻿@using DispatcherWeb.CannedTexts.Dto
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Infrastructure.Extensions
+@model CannedTextEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id.HasValue ? "Edit Canned Text: " + Model.Name : "Create new Canned Text"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label class="required-label">@L("Name")</label>
+            <input class="form-control" type="text" asp-for="Name" required>
+        </div>
+        <div class="form-group" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+            <label class="required-label">@L("Office")</label>
+            <select class="form-control" required asp-for="OfficeId" disabled="@(Model.IsSingleOffice ? "disabled" : null)">
+                <option value="">Select an option</option>
+                @if (Model.OfficeId != 0)
+                {
+                    <option value="@Model.OfficeId">@Model.OfficeName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>@L("Text")</label>
+            <textarea class="form-control" asp-for="Text" maxlength="@EntityStringFieldLengths.CannedText.Text"></textarea>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

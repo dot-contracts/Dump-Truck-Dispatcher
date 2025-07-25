@@ -1,0 +1,51 @@
+﻿@using DispatcherWeb.Designations;
+@using DispatcherWeb.Infrastructure.Extensions;
+@using DispatcherWeb.Items.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@inject IDesignationAppService DesignationAppService
+@model ItemPriceEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Price" : "Create new price"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation" name="ItemPriceInformationsForm">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="OfficeId" />
+        <input type="hidden" asp-for="ItemId" />
+        <div class="form-group">
+            <label class="required-label">@L("Designation")</label>
+            <select class="form-control" required asp-for="Designation" id="ItemPrice_Designation" asp-items="await DesignationAppService.GetDesignationSelectListItemsAsync(Model.Designation).ToSelectListItemsAsync()">
+                <option value="">Select a designation</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label">@L("MaterialUom")</label>
+            <select class="form-control" asp-for="MaterialUomId" id="ItemPrice_MaterialUomId">
+                <option value="">Select an option</option>
+                @if (Model.MaterialUomId > 0)
+                {
+                    <option value="@Model.MaterialUomId">@Model.MaterialUomName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label">@L("FreightUom")</label>
+            <select class="form-control" asp-for="FreightUomId" id="ItemPrice_FreightUomId">
+                <option value="">Select an option</option>
+                @if (Model.FreightUomId > 0)
+                {
+                    <option value="@Model.FreightUomId">@Model.FreightUomName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>@L("PricePerUnit")</label>
+            <input class="form-control" type="text" asp-for="PricePerUnit" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+        <div class="form-group">
+            <label>@L("FreightRate")</label>
+            <input class="form-control" type="text" asp-for="FreightRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

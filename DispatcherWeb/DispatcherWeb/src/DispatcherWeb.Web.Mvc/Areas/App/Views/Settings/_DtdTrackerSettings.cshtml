@@ -1,0 +1,26 @@
+﻿@using DispatcherWeb.Features
+@model DispatcherWeb.Configuration.Tenants.Dto.GpsIntegrationSettingsEditDto
+
+<div class="tab-pane" id="SettingsDtdTrackerTab" abp-hidden="@(Model.Platform != GpsPlatform.DtdTracker)">
+    <div class="row">
+        <div class="col-sm-6">
+            <form id="DtdTrackerSettingsForm" class="m-form">
+                <div class="form-group">
+                    <label for="EnableDriverAppGps" class="m-checkbox col-lg-12" abp-hidden="@(!await FeatureChecker.IsEnabledAsync(AppFeatures.AllowGpsTracking))">
+                        <input id="EnableDriverAppGps" type="checkbox" name="EnableDriverAppGps" value="true" checked=@(Model.DtdTracker.EnableDriverAppGps ? "checked" : null)>
+                        @L("EnableDriverAppGps") <i class="fa fa-info-circle text-primary tooltip-icon" title="@L("EnableDriverAppGpsHint")"></i>
+                        <span></span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="DtdTrackerAccount">@L("Account")</label>
+                    <input id="DtdTrackerAccount" type="text" name="AccountName" class="form-control" value="@Model.DtdTracker.AccountName" disabled>
+                </div>
+                <div class="form-group" abp-hidden="@(Model.DtdTracker.AccountId > 0)">
+                    <button type="button" class="btn btn-primary" id="LinkDtdTrackerAccountButton">@L("LinkAccount")</button>
+                    @*<button type="button" class="btn btn-primary" id="CreateDtdTrackerAccountButton">@L("CreateAccount")</button>*@
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

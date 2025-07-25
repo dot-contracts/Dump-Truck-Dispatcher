@@ -1,0 +1,90 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Items.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model ItemEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Product/Service: " + Model.Name : "Create new product/service"))
+@{
+    var isHaulZonesEnabled = await FeatureChecker.IsEnabledAsync(AppFeatures.HaulZone);
+}
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation" name="CustomerContactInformationsForm">
+        <input type="hidden" asp-for="Id" />
+        @if (await FeatureChecker.IsEnabledAsync(AppFeatures.PricingTiers))
+        {
+            foreach (var tier in Model.PricingTiers)
+            {
+                <input type="hidden" class="pricing-tier-name" value="@tier.Name" data-id="@tier.Id" />
+            }
+        }
+        <div class="form-group">
+            <label class="required-label">@L("ProductOrService")</label>
+            <input class="form-control" type="text" asp-for="Name" required
+                   maxlength="@(((QuickbooksIntegrationKind)await SettingManager.GetSettingValueAsync<int>(AppSettings.Invoice.Quickbooks.IntegrationKind)) == QuickbooksIntegrationKind.None
+                           ? EntityStringFieldLengths.Item.Name
+                           : EntityStringFieldLengths.Item.ServiceInQuickBooks)">
+        </div>
+        <div class="form-group">
+            <label>@L("Description")</label>
+            <input type="text" class="form-control" asp-for="Description" maxlength="@EntityStringFieldLengths.Item.Description">
+        </div>
+        <div class="m-checkbox-list">
+            <label class="custom-checkbox">
+                <input id="IsActive" type="checkbox" name="IsActive" value="true" @Html.Raw(Model.IsActive ? "checked=\"checked\"" : "")>
+                @L("Active")
+                <span></span>
+            </label>
+        </div>
+        <div class="form-group">
+            <label class="required-label">@L("Type")</label>
+            <select class="form-control" asp-for="Type" asp-items="@Html.GetItemTypeSelectList(Model.Type)" required>
+                <option value="">Select a type</option>
+            </select>
+        </div>
+        @if (isHaulZonesEnabled)
+        {
+            <div class="m-checkbox-list" id="UseZoneBasedRatesContainer">
+                <label class="custom-checkbox">
+                    <input id="UseZoneBasedRates" type="checkbox" name="UseZoneBasedRates" value="true" checked="@(Model.UseZoneBasedRates ? "checked" : null)">
+                    @L("UseZoneBasedRates")
+                    <span></span>
+                </label>
+            </div>
+        }
+        <div class="m-checkbox-list">
+            <label class="custom-checkbox">
+                <input id="IsTaxable" type="checkbox" name="IsTaxable" value="true" checked="@(Model.IsTaxable ? "checked" : null)">
+                @L("Taxable")
+                <span></span>
+            </label>
+        </div>
+        <div class="form-group">
+            <label>@L("IncomeAccount")</label>
+            <input class="form-control" type="text" asp-for="IncomeAccount" maxlength="@EntityStringFieldLengths.Item.IncomeAccount">
+        </div>
+        <div class="form-group">
+            <label>@L("ExpenseAccount")</label>
+            <input class="form-control" type="text" asp-for="ExpenseAccount" maxlength="@EntityStringFieldLengths.Item.ExpenseAccount">
+        </div>
+    </form>
+    <div id="RateContainer" abp-hidden>
+        <div class="box-border-top clearfix">
+            <div class="grid-caption pull-left">
+                <label>@L("Rates")</label>
+            </div>
+            <div class="box-actions pull-right">
+                <button type="button" class="btn btn-default" id="CreateNewItemPriceButton"><i class="fa fa-plus"></i>@L("AddRate")</button>
+            </div>
+        </div>
+        <div class="row" id="ItemPricesTableContainer">
+            <div class="col-sm-12">
+                <table class="display table table-striped table-bordered table-hover dt-responsive" id="ItemPricesTable"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

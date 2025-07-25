@@ -1,0 +1,15 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("SelectAnOffice")))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation">
+        <div class="form-group">
+            <label for="SelectOfficeModal_OfficeId" class="required-label">Office</label>
+            <select class="form-control" id="SelectOfficeModal_OfficeId" name="OfficeId" required>
+                <option value="">@L("SelectAnOffice")</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

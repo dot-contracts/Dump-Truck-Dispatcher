@@ -1,0 +1,18 @@
+﻿@using Abp.Authorization.Users
+@section Scripts
+{
+    <script abp-src="/view-resources/Views/Account/EmailActivation.js" asp-append-version="true"></script>
+}
+<form class="email-activation-form" asp-action="SendEmailActivationLink" method="post">
+    <h3>Email activation</h3>
+    <p class="login-page-description">
+        A link will be sent to your email to activate your email address. If you don't get an email within a few minutes, please re-try.
+    </p>
+    <div class="form-group">
+        <input class="form-control placeholder-no-fix" type="email" autocomplete="off" placeholder="Email address" name="EmailAddress" required maxlength="@AbpUserBase.MaxEmailAddressLength" />
+    </div>
+    <div class="form-actions">
+        <a asp-action="Login"><button type="button" id="back-btn" class="btn btn-default">Back</button></a>
+        <button type="submit" class="btn btn-primary pull-right">Submit</button>
+    </div>
+</form>

@@ -1,0 +1,83 @@
+﻿@using DispatcherWeb.Dispatching.Dto
+@using DispatcherWeb.Infrastructure.Extensions
+@model DispatchDestinationInfoDto
+@{
+    Layout = "_Layout";
+    bool useShifts = await SettingManager.UseShifts(Model.TenantId);
+}
+
+@section Scripts {
+    <environment names="Development">
+        <script src="~/view-resources/Areas/App/Views/Acknowledge/DispatchDestinationInfo.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/App/Views/Acknowledge/DispatchDestinationInfo.min.js" asp-append-version="true"></script>
+    </environment>
+
+}
+
+<form role="form" novalidate data-url-completed="@Url.Action("Completed")" id="CompleteDispatchForm">
+    <input type="hidden" asp-for="DispatchId" name="Id" />
+    <input type="hidden" asp-for="IsMultipleLoads" />
+
+    <div class="row form-group ">
+        <div class="col-4">
+            <label class="col-form-label text-bold">@(L("Date") + (useShifts ? "/" + L("Shift") : "")):</label>
+        </div>
+        <div class="col-8 margin-top-10">
+            @Model.Date.ToString("d") @(useShifts ? await SettingManager.GetShiftName(Model.Shift, Model.TenantId) : "")
+        </div>
+    </div>
+    <div class="row form-group ">
+        <div class="col-4">
+            <label class="col-form-label text-bold">@L("Customer"):</label>
+        </div>
+        <div class="col-8 margin-top-10 text-wrap">
+            @Model.CustomerName
+        </div>
+    </div>
+    <div class="row form-group ">
+        <div class="col-4">
+            <label class="col-form-label text-bold">Deliver To:</label>
+        </div>
+        <div class="col-8 margin-top-10 text-wrap">
+            @Model.CustomerAddress
+        </div>
+    </div>
+    <div class="row form-group ">
+        <div class="col-4">
+            <label class="col-form-label text-bold">Note:</label>
+        </div>
+        <div class="col-8 margin-top-10 text-wrap">
+            @Model.Note
+        </div>
+    </div>
+
+    <div class="form-group text-center">
+        <a class="btn btn-secondary" asp-action="Index" asp-route-editTicket="true">Edit Ticket</a>
+    </div>
+    <div class="form-group  text-center">
+        <h4><label class="col-form-label">@(Model.IsMultipleLoads ? L("ClickButtonToCompleteLoad") : L("ClickButtonToCompleteOrder"))</label></h4>
+    </div>
+    <div class="form-group text-center">
+        <button type="submit" class="btn btn-primary"><span>@L("Delivered")</span></button>
+    </div>
+</form>
+<div class="modal fade" id="ContinueMultiloadPopup" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <span>Do you want to continue delivering to this job?</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="ContinueMultiloadNoButton">No</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="ContinueMultiloadYesButton">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>

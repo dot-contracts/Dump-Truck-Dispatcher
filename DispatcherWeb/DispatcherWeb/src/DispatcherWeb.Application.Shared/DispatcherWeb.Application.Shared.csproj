@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props"></Import>
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net9.0</TargetFrameworks>
+    <RootNamespace>DispatcherWeb</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'false'">
+    <PackageReference Include="Dtd.Abp.Web.Common" Version="$(DtdAbpVersion)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'true'">
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp.Web.Common\Abp.Web.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MigraDocCore.DocumentObjectModel" Version="1.3.67" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DispatcherWeb.Core.Shared\DispatcherWeb.Core.Shared.csproj" />
+  </ItemGroup>
+</Project>

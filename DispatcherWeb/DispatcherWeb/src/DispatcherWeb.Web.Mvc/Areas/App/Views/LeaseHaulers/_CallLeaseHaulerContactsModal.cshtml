@@ -1,0 +1,21 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model int
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Call"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" id="Id" name="Id" value="@Model" />
+    </form>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <p>If you are on a cell phone, you can click one of the phone numbers below to initiate a call to that person.</p>
+            <table class="table table-striped table-bordered table-hover dt-responsive" id="CallLeaseHaulerContactsTable"></table>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+</div>

@@ -1,0 +1,37 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Orders.Dto
+@model CopyOrderInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Select delivery date"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderId" />
+        <input type="hidden" asp-for="OrderLineId" />
+        <div class="form-group">
+            <label class="control-label required-label" for="DateBegin">Delivery Date start range</label>
+            <input class="form-control" id="DateBegin" asp-for="DateBegin" type="text" required autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label class="control-label required-label" for="DateEnd">Delivery Date end range</label>
+            <input class="form-control" id="DateEnd" asp-for="DateEnd" type="text" required autocomplete="off">
+        </div>
+        @if(await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts))
+        {
+            <div class="form-group">
+                <label class="control-label required-label" for="Shift">@L("Shift")</label>
+                <select class="form-control" id="Shift" name="Shift" asp-items="@(await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id))" multiple="multiple" required>
+                </select>
+            </div>
+        }
+        <div class="form-group">
+            <input type="checkbox" class="minimal" name="CopyOrderTrucks" id="CopyOrderTrucks" value="true">
+            <label for="CopyOrderTrucks" class="cbx">Copy trucks with order @Html.QuestionMarkIcon(L("OnlyInternalTrucksWillBeCopied"), await FeatureChecker.IsEnabledAsync(AppFeatures.AllowLeaseHaulersFeature))</label>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

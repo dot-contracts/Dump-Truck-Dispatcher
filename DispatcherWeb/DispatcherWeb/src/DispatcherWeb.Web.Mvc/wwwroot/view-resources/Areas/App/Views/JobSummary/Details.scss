@@ -1,0 +1,98 @@
+.mbsc-timeline-resource-col, 
+.mbsc-timeline-sidebar-col {
+    width: 18em;
+}
+
+.trucks-timeline-header {
+    width: 100%;
+    background: #f8f9fa;
+    border: lightgray;
+    border-style: solid;
+    border-width: 1px;
+    text-indent: 5px;
+
+    > tbody > tr > td {
+        border: lightgray;
+        border-width: 0px 1px;
+        border-style: solid;
+
+        &.captions-column {
+            vertical-align: middle;
+            width: 120px;
+            padding: 5px;
+            font-weight: bold;
+        }
+
+        &.values-column {
+            background: white;
+            text-indent: 10px;
+
+            &:not(:last-child) {
+                width: 30%;
+            }
+        }
+
+        &.customer-cell {
+            font-weight: bold;
+        }
+    }
+}
+
+.trucks-timeline {
+    .trucks-timeline-wrapper {
+        height: 100%;
+
+        .mbsc-timeline-footer.mbsc-flex.mbsc-material.mbsc-ltr {
+            height: 60px;
+        }
+
+        .mbsc-timeline-footer-sticky mbsc-flex.mbsc-material {
+            border-bottom-color: lightgray;
+            border-bottom-style: solid;
+            border-bottom-width: 1px;
+        }
+
+        .mbsc-timeline-resource-footer .grid-item.grid-column-1 {
+            text-align: left;
+        }
+
+        .trip {
+            font-weight: normal !important;
+        }
+    }
+
+    .grid-container {
+        display: grid;
+        min-width: 100%;
+
+        .grid-item {
+            margin: 5px;
+            min-width: 30%;
+            position: relative;
+            text-align: center;
+        }
+
+        .grid-column-1 {
+            grid-column: 1;
+            width: 9.8em;
+            text-align: left;
+        }
+
+        .grid-column-2 {
+            grid-column: 2;
+            width: 4em;
+        }
+
+        .grid-column-3 {
+            grid-column: 3;
+            width: 4em;
+        }
+    }
+}
+
+.job-summary-header .job-status {
+    color: #58A3DC;
+    padding: 15px;
+    background-color: white;
+    font-weight: 600 !important;
+}

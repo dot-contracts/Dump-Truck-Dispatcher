@@ -1,0 +1,17 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model DispatcherWeb.Web.Areas.App.Models.Imports.ImportMappingViewModel
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Import Jacobus Energy data"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="BlobName" />
+        <input type="hidden" asp-for="ImportType" />
+        <input type="hidden" name="JacobusEnergy" value="true" />
+    </form>
+    <div>You have selected Jacobus Energy import. No mapping is required.</div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn default close-button" data-delete-url="@Url.Action("DeleteImportFile")">Cancel</button>
+    <button type="button" class="btn blue save-button"><i class="fas fa-file-import"></i> <span>Import Data</span></button>
+</div>

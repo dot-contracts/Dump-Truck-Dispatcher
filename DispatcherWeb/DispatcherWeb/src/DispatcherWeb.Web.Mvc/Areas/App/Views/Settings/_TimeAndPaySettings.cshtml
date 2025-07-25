@@ -1,0 +1,108 @@
+﻿@using DispatcherWeb.Features
+@model DispatcherWeb.Configuration.Tenants.Dto.TimeAndPaySettingsEditDto
+
+
+<div class="tab-pane" id="SettingsTimeAndPayTab">
+    <div class="row">
+        <div class="col-sm-6">
+            <h5>@L("TimeAndPay")</h5>
+            <form id="TimeAndPaySettingsForm" class="m-form">
+                <div class="form-group">
+                    <label for="TimeTrackingDefaultTimeClassificationId">@L("TimeTrackingDefaultTimeClassification")</label>
+                    <select class="form-control" id="TimeTrackingDefaultTimeClassificationId" name="TimeTrackingDefaultTimeClassificationId" required="required">
+                        @if (Model.TimeTrackingDefaultTimeClassificationId > 0)
+                        {
+                            <option value="@Model.TimeTrackingDefaultTimeClassificationId" selected>@Model.TimeTrackingDefaultTimeClassificationName</option>
+                        }
+                    </select>
+                </div>
+                @if (await FeatureChecker.IsEnabledAsync(AppFeatures.DriverProductionPayFeature))
+                {
+                    <div class="form-group">
+                        <label for="BasePayOnHourlyJobRate" class="m-checkbox col-lg-12">
+                            <input id="BasePayOnHourlyJobRate" type="checkbox" name="BasePayOnHourlyJobRate" value="true" checked=@(Model.BasePayOnHourlyJobRate ? "checked" : null)>
+                            @L("BasePayOnHourlyJobRate")
+                            <span></span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="UseDriverSpecificHourlyJobRate" class="m-checkbox col-lg-12">
+                            <input id="UseDriverSpecificHourlyJobRate" type="checkbox" name="UseDriverSpecificHourlyJobRate" value="true" checked=@(Model.UseDriverSpecificHourlyJobRate ? "checked" : null)>
+                            @L("UseDriverSpecificHourlyJobRate")
+                            <span></span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="AllowProductionPay" class="m-checkbox col-lg-12">
+                            <input id="AllowProductionPay" type="checkbox" name="AllowProductionPay" value="true" checked=@(Model.AllowProductionPay ? "checked" : null)>
+                            @L("AllowProductionPay")
+                            <span></span>
+                        </label>
+                    </div>
+                    <div class="ml-4">
+                        <div class="form-group">
+                            <label for="DefaultToProductionPay" class="m-checkbox col-lg-12">
+                                <input id="DefaultToProductionPay" type="checkbox" name="DefaultToProductionPay" value="true" checked=@(Model.DefaultToProductionPay ? "checked" : null)>
+                                @L("DefaultToProductionPay")
+                                <span></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="PreventProductionPayOnHourlyJobs" class="m-checkbox col-lg-12">
+                                <input id="PreventProductionPayOnHourlyJobs" type="checkbox" name="PreventProductionPayOnHourlyJobs" value="true" checked=@(Model.PreventProductionPayOnHourlyJobs ? "checked" : null)>
+                                @L("PreventProductionPayOnHourlyJobs")
+                                <span></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="AllowDriverPayRateDifferentFromFreightRate" class="m-checkbox col-lg-12">
+                                <input id="AllowDriverPayRateDifferentFromFreightRate" type="checkbox" name="AllowDriverPayRateDifferentFromFreightRate" value="true" checked=@(Model.AllowDriverPayRateDifferentFromFreightRate ? "checked" : null)>
+                                @L("AllowDriverPayRateDifferentFromFreightRate")
+                                <span></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="AllowLoadBasedRates" class="m-checkbox col-lg-12">
+                                <input id="AllowLoadBasedRates" type="checkbox" name="AllowLoadBasedRates" value="true" checked=@(Model.AllowLoadBasedRates ? "checked" : null)>
+                                @L("AllowLoadBasedRates")
+                                <span></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="DriverIsPaidForLoadBasedOn">@L("DriverIsPaidForLoadBasedOn")</label>
+                            <select class="form-control" id="DriverIsPaidForLoadBasedOn" name="DriverIsPaidForLoadBasedOn" asp-items="@Html.GetEnumSelectList(Model.DriverIsPaidForLoadBasedOn)"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="PayStatementReportOrientation">@L("Template")</label>
+                        <select class="form-control" id="PayStatementReportOrientation" name="PayStatementReportOrientation" asp-items="@Html.GetEnumSelectList(Model.PayStatementReportOrientation)"></select>
+                    </div>
+                    <div>
+                        <h5 class="mt-5 mb-4">@L("ShowColumnsOnDriverPayStatement")</h5>
+                        <div class="form-group">
+                            <label for="ShowFreightRateOnDriverPayStatementReport" class="m-checkbox">
+                                <input id="ShowFreightRateOnDriverPayStatementReport" type="checkbox" name="ShowFreightRateOnDriverPayStatementReport" value="true" checked=@(Model.ShowFreightRateOnDriverPayStatementReport ? "checked" : null)>
+                                @L("FreightRate")
+                                <span></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="ShowDriverPayRateOnDriverPayStatementReport" class="m-checkbox">
+                                <input id="ShowDriverPayRateOnDriverPayStatementReport" type="checkbox" name="ShowDriverPayRateOnDriverPayStatementReport" value="true" checked=@(Model.ShowDriverPayRateOnDriverPayStatementReport ? "checked" : null)>
+                                @L("DriverPayRate")
+                                <span></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="ShowQuantityOnDriverPayStatementReport" class="m-checkbox">
+                                <input id="ShowQuantityOnDriverPayStatementReport" type="checkbox" name="ShowQuantityOnDriverPayStatementReport" value="true" checked=@(Model.ShowQuantityOnDriverPayStatementReport ? "checked" : null)>
+                                @L("Quantity")
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+</div>

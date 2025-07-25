@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props"></Import>
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AssemblyName>DispatcherWeb.Web.Core</AssemblyName>
+    <PackageId>DispatcherWeb.Web.Core</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>DispatcherWeb.Web</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'false'">
+    <PackageReference Include="Dtd.Abp.AspNetCore" Version="$(DtdAbpVersion)" />
+    <PackageReference Include="Dtd.Abp.AspNetCore.SignalR" Version="$(DtdAbpVersion)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'true'">
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp.AspNetCore\Abp.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp.AspNetCore.SignalR\Abp.AspNetCore.SignalR.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DispatcherWeb.Application.ActiveReports\DispatcherWeb.Application.ActiveReports.csproj" />
+    <ProjectReference Include="..\DispatcherWeb.Application.DriverApp\DispatcherWeb.Application.DriverApp.csproj" />
+    <ProjectReference Include="..\DispatcherWeb.Application\DispatcherWeb.Application.csproj" />
+    <ProjectReference Include="..\DispatcherWeb.EntityFrameworkCore\DispatcherWeb.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Hangfire.Azure.ServiceBusQueue" Version="6.0.0" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.18" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.SnapshotCollector" Version="1.4.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.30.3" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.72.0" />
+    <PackageReference Include="NetEscapades.AspNetCore.SecurityHeaders" Version="1.1.0" />
+    <PackageReference Include="NetEscapades.AspNetCore.SecurityHeaders.TagHelpers" Version="1.1.0" />
+    <PackageReference Include="Owl.reCAPTCHA" Version="9.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.18" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="8.1.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,32 @@
+﻿@using DispatcherWeb.Quotes.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model EmailQuoteReportDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Send Email"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="QuoteId" />
+        <div class="form-group">
+            <label class="required-label">@L("From")</label>
+            <input class="form-control" type="text" asp-for="From" required>
+        </div>
+        <div class="form-group">
+            <label>@L("To")</label>
+            <input class="form-control" type="text" asp-for="To">
+        </div>
+        <div class="form-group">
+            <label>@L("CC")</label>
+            <input class="form-control" type="text" asp-for="CC">
+        </div>
+        <div class="form-group">
+            <label>@L("Subject")</label>
+            <input class="form-control" type="text" asp-for="Subject">
+        </div>
+        <div class="form-group">
+            <label>@L("Body")</label>
+            <textarea class="form-control" rows="5" asp-for="Body"></textarea>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

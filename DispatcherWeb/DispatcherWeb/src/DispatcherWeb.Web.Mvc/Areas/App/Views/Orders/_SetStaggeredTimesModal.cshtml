@@ -1,0 +1,37 @@
+﻿@using DispatcherWeb.Orders.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model StaggeredTimesDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("StaggeredTimeDialogCaption")))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation order-line-form">
+        <input type="hidden" asp-for="OrderLineId" />
+
+        <div class="form-group">
+            <label>@L("HowDoYouWantToStaggerTheTimes")</label>
+        </div>
+
+        @*@if (Model.StaggeredTimeKind != StaggeredTimeKind.None)*@
+            <div class="form-group">
+                <input type="radio" checked="@(Model.StaggeredTimeKind == StaggeredTimeKind.None ? "checked" : null)" name="StaggeredTimeKind" value="@((int)StaggeredTimeKind.None)" id="NoneKind" class="minimal" />
+                <label for="NoneKind">Not staggered</label>
+            </div>
+
+        <div class="form-group">
+            <input type="radio" checked="@(Model.StaggeredTimeKind == StaggeredTimeKind.SetInterval ? "checked" : null)" name="StaggeredTimeKind" value="@((int)StaggeredTimeKind.SetInterval)" id="SetIntervalKind" class="minimal" />
+            <label for="SetIntervalKind">@L("StaggerBySetNumberOfMinutes")</label>
+        </div>
+
+        <div class="form-group" abp-hidden="@(Model.StaggeredTimeKind != StaggeredTimeKind.SetInterval)">
+            <label>@L("NumberOfMinutesBetweenTrucks")</label>
+            <input class="form-control" type="text" asp-for="StaggeredTimeInterval" data-rule-number="true" data-rule-min="0" data-rule-max="1440">
+        </div>
+
+        <div class="form-group" abp-hidden="@(Model.StaggeredTimeKind != StaggeredTimeKind.SetInterval)">
+            <label>@L("FirstTimeOnJob")</label>
+            <input class="form-control" type="text" asp-for="FirstStaggeredTimeOnJob">
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

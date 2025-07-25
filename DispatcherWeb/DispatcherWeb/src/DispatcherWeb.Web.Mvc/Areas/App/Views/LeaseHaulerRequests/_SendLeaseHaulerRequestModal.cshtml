@@ -1,0 +1,65 @@
+﻿@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Request Lease Haulers"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="control-label required-label" for="Date">Request Date</label>
+                    <input class="form-control" name="Date" id="Date" type="text" required autocomplete="off">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                @if (await SettingManager.UseShifts())
+                {
+                    <div class="form-group">
+                        <label class="control-label required-label" for="Shift">@L("Shift")</label>
+                        <select class="form-control" id="Shift" name="Shift" asp-items="@(await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id))" required>
+                            <option value="">&nbsp;</option>
+                        </select>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+                    <label class="control-label required-label">@L("Office")</label>
+                    <select class="form-control" name="OfficeId" id="OfficeId" required></select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label required-label" for="Message">Message</label>
+            @*<button class="btn btn-sm btn-default float-right margin-bottom-5">Add Canned Text</button>*@
+            <div class="btn-group float-right margin-bottom-5">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    @L("InsertCannedText") <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu insert-canned-text-list" data-target-id="Message">
+                    <li data-id="loading" abp-hidden><a href="#">Loading...</a></li>
+                    <li data-id="no-items" abp-hidden><a href="#">No items</a></li>
+                </ul>
+            </div>
+            <textarea type="text" class="form-control" rows="3" id="Message" name="Message" maxlength="200" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label required-label" for="LeaseHaulerIds">Lease haulers to request</label>
+            <select class="form-control" id="LeaseHaulerIds" name="LeaseHaulerIds" required multiple>
+                <option value="">Select a Lease hauler</option>
+            </select>
+        </div>
+
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" class="btn btn-primary save-button">@L("Send")</button>
+</div>

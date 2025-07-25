@@ -1,0 +1,20 @@
+﻿@model DispatcherWeb.Web.Models.Account.SendSecurityCodeViewModel
+<form asp-action="SendSecurityCode" method="post">
+    <h3>@L("SendSecurityCode")</h3>
+    <p class="login-page-description">@L("SendSecurityCode_Information")</p>
+
+    @Html.Hidden("returnUrl", Model.ReturnUrl)
+    @Html.Hidden("rememberMe", Model.RememberMe)
+
+    <div class="form-group">
+        @Html.DropDownListFor(model => model.SelectedProvider, Model.Providers, new
+        {
+            @class = "form-control",
+            size = 1,
+        })
+    </div>
+
+    <div class="form-actions">
+        <input type="submit" class="btn btn-primary pull-right" value="@L("Submit")" />
+    </div>
+</form>

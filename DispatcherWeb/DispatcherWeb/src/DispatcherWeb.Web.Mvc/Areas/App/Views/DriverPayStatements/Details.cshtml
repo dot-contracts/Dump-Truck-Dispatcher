@@ -1,0 +1,76 @@
+@using DispatcherWeb.PayStatements.Dto
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.DriverPayStatements;
+}
+@model PayStatementEditDto
+
+@section Scripts{
+    <script src="~/view-resources/Areas/app/Views/DriverPayStatements/Details.js" asp-append-version="true"></script>
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("DriverPayStatementDetailHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("DriverPayStatementDetailHeaderInfo")
+            </span>
+        </div>
+        <div class="col-sm-12 col-md-6 text-right">
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--tab">
+        <form class="m-form m-form--fit m-form--label-align-right" id="DriverPayStatementForm">
+            <div class="m-portlet__body">
+                <div class="form-group m-form__group row">
+                    <label for="Id" class="ccol-sm-12 col-md-2 col-form-label">@L("StatementId"):</label>
+                    <div class="col-sm-12 col-md-2">
+                        <input type="text" class="form-control" asp-for="Id" autocomplete="off" disabled>
+                    </div>
+                    <label for="StatementDate" class="col-sm-12 col-md-2 col-form-label">@L("StatementDate"):</label>
+                    <div class="ccol-sm-12 col-md-2">
+                        <input type="text" class="form-control" asp-for="StatementDate" autocomplete="off" disabled>
+                    </div>
+                </div>
+                <div class="form-group m-form__group row">
+                    <label for="StartDate" class="ccol-sm-12 col-md-2 col-form-label">@L("StartDate"):</label>
+                    <div class="col-sm-12 col-md-2">
+                        <input type="text" class="form-control" asp-for="StartDate" autocomplete="off" disabled>
+                    </div>
+                    <label for="EndDate" class="col-sm-12 col-md-2 col-form-label">@L("EndDate"):</label>
+                    <div class="ccol-sm-12 col-md-2">
+                        <input type="text" class="form-control" asp-for="EndDate" autocomplete="off" disabled>
+                    </div>
+                </div>
+                
+
+                <div class="box-header-top clearfix">
+                    <div class="grid-caption pull-left pt-0">
+                        <label>@L("DriverPayStatementItems")</label>
+                    </div>
+                    <div class="box-actions pull-right mr-neg-10">
+                        @*<button type="button" class="btn btn-primary" id="CreateNewItemButton">
+                            <i class="fa fa-plus"></i>@L("AddNew")
+                        </button>*@
+                    </div>
+                </div>
+                <table class="table table-striped table-bordered table-hover dt-responsive" id="PayStatementItemsTable"></table>
+
+
+            </div>
+            <div class="m-portlet__foot m-portlet__foot--fit">
+                <div class="m-form__actions">
+                    <button id="PrintPayStatementButton" type="submit" class="btn btn-primary save-button"><i class="fas fa-print"></i> @L("Print")</button>
+                    <button id="ExportPayStatementButton" type="button" class="btn btn-primary save-button"><i class="fas fa-file-excel"></i> @L("Export")</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>

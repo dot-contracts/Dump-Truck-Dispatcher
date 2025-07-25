@@ -1,0 +1,19 @@
+﻿@model DispatcherWeb.Configuration.Tenants.Dto.GpsIntegrationSettingsEditDto
+
+<div class="row">
+    <div class="col-sm-6">
+        <h5>@L("GpsIntegration")</h5>
+        <form id="GpsIntegrationSettingsForm" class="m-form">
+            <div class="form-group">
+                <label for="Platform" class="required-label">@L("Platform")</label>
+                <select class="form-control" asp-for="Platform" asp-items="Html.GetEnumSelectList<GpsPlatform>()" value="@Model.Platform">
+                    <option value="0">None</option>
+                </select>
+            </div>
+        </form>
+        <partial name="_DtdTrackerSettings" model="Model" />
+        <partial name="_GeotabSettings" model="Model" />
+        <partial name="_SamsaraSettings" model="Model" />
+        <partial name="_IntelliShiftSettings" model="Model" />
+    </div>
+</div>

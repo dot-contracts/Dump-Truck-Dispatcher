@@ -1,0 +1,50 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Dispatching.Dto;
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model SendOrdersToDriversModalInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Send Orders to Drivers"))
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <div class="form-group">
+            <label class="control-label required-label">Delivery Date:</label>
+            <input type="text" class="form-control" asp-for="DeliveryDate" required autocomplete="off" disabled>
+        </div>
+        @if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts))
+        {
+            <div class="form-group">
+                <label class="control-label required-label" for="Shift">@L("Shift")</label>
+                <select class="form-control" asp-for="Shift" asp-items="@(await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id))" required></select>
+            </div>
+        }
+        <div class="form-group" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+            <label class="control-label" for="OfficeIds">@L("Office")</label>
+            <select class="form-control m-input" name="OfficeIds" id="OfficeIds" multiple="multiple">
+                @if (Model.SelectedOffices != null)
+                {
+                    foreach (var office in Model.SelectedOffices)
+                    {
+                        <option value="@office.Id" selected>@office.Name</option>
+                    }
+                } 
+            </select>
+        </div>
+        @{ var sendVia = (DispatchVia)await SettingManager.GetSettingValueAsync<int>(AppSettings.DispatchingAndMessaging.DispatchVia); }
+        @if (sendVia == DispatchVia.SimplifiedSms)
+        {
+            <div class="form-group">
+                <input type="checkbox" class="minimal" id="SendOnlyFirstOrderCheckbox" checked>
+                <label for="SendOnlyFirstOrderCheckbox">@L("SendOnlyTheFirstOrderOfTheDay") <i class="fa fa-info-circle" title="@L("SendOnlyTheFirstOrderOfTheDayDescription")"></i></label>
+            </div>
+        }
+        @if (sendVia == DispatchVia.DriverApplication)
+        {
+            <div class="form-group">
+                <input type="checkbox" class="minimal" id="CreateAllDispatchesCheckbox">
+                <label for="CreateAllDispatchesCheckbox">@L("AutomaticallyCreateAllDispatchesForTheDay")</label>
+            </div>
+        }
+    </form>
+</div>
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

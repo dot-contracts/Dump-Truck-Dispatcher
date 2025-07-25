@@ -1,0 +1,124 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Scheduling.Dto
+@model GetTrucksToAssignInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Assign Trucks"))
+<div class="modal-body">
+    <form class="m-form m-form--label-align-right">
+        <input type="hidden" asp-for="Date" />
+        <input type="hidden" asp-for="Shift" />
+        <input type="hidden" asp-for="OfficeId" />
+        <input type="hidden" asp-for="OrderLineId" />
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="form-group">
+                    <label class="control-label" for="VehicleCategoryIdsFilter">@L("Category")</label>
+                    <select class="form-control filter" name="VehicleCategoryIds" id="VehicleCategoryIdsFilter" multiple data-placeholder="All">
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="form-group">
+                    <label class="control-label" for="DriverNameFilter">@L("Driver")</label>
+                    <div class="typeahead-block-container">
+                        <input class="form-control filter" id="DriverNameFilter" name="DriverName" placeholder="All" type="text">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="PowerUnitsSection" class="mt-2" abp-hidden>
+            <h5>Power Units</h5>
+            <hr />
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="form-group">
+                        <label for="Make">Make</label>
+                        <select class="form-control" id="PowerUnitsMakeFilter" name="PowerUnitsMake">
+                            <option value="">&nbsp;</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="form-group">
+                        <label for="Model">Model</label>
+                        <select class="form-control" id="PowerUnitsModelFilter" name="PowerUnitsModel">
+                            <option value="">&nbsp;</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label" for="PowerUnitsBedConstructionFilter">@L("Bed")</label>
+                        <select class="form-control filter" name="PowerUnitsBedConstruction" id="PowerUnitsBedConstructionFilter" asp-items="Html.GetEnumSelectList<BedConstructionEnum>()">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <label class="control-label" for="">&nbsp;</label>
+                    <div>
+                        <label class="m-checkbox mb-0">
+                            <input type="checkbox" class="filter" name="IsApportioned" id="IsApportionedFilter">@L("Apportioned")
+                            <span></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="OptionButton" class="btn-group mt-3" role="group" abp-hidden>
+            <button type="button" class="btn btn-primary" id="UseAndForTrailerConditionButton">And</button>
+            <button type="button" class="btn btn-secondary" id="UseOrForTrailerConditionButton">Or</button>
+        </div>
+        <div id="TrailersSection" class="mt-4" abp-hidden>
+            <h5>Trailers</h5>
+            <hr />
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="form-group">
+                        <label for="Make">Make</label>
+                        <select class="form-control" id="TrailersMakeFilter" name="TrailersMake">
+                            <option value="">&nbsp;</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="form-group">
+                        <label for="Model">Model</label>
+                        <select class="form-control" id="TrailersModelFilter" name="TrailersModel">
+                            <option value="">&nbsp;</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label" for="TrailersBedConstructionFilter">@L("Bed")</label>
+                        <select class="form-control filter" name="TrailersBedConstruction" id="TrailersBedConstructionFilter" asp-items="Html.GetEnumSelectList<BedConstructionEnum>()">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-row">
+            <div class="d-flex justify-content-start mt-4 col-md-4 align-items-end pl-0">
+                <span id="SelectedQuantitiesLabel">0 selected</span>
+            </div>
+            <div class="d-flex justify-content-end mt-4 col-md-8 pr-0">
+                <button type="button" id="ClearSearchButton" class="btn btn-default d-block">
+                    <i class="fa fa-times"></i> @L("Clear")
+                </button>
+                <button type="submit" id="SearchButton" class="btn btn-primary d-block">
+                    <i class="fa fa-search"></i> @L("Search")
+                </button>
+                <button type="button" id="AddToScheduleButton" class="btn btn-primary">
+                    @L("AddToSchedule") <i class="fa fa-chevron-right ml-3"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <table class="table table-striped table-bordered table-hover" id="TrucksTable"></table>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-button" data-dismiss="modal">Close</button>
+</div>

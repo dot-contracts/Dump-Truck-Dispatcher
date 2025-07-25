@@ -1,0 +1,35 @@
+﻿@using DispatcherWeb.LeaseHaulerStatements.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model AddLeaseHaulerStatementInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("AddLeaseHaulerStatement")))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <div class="form-group">
+            <label>@L("LeaseHauler")</label>
+            <select class="form-control" asp-for="LeaseHaulerIds" data-placeholder="All" multiple></select>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="DateRange">@L("DateRange")</label>
+            <input class="form-control m-input" id="DateRange" name="DateRange" type="text" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <input type="checkbox" id="ReportOnly" name="ReportOnly" class="minimal" />
+                <label for="ReportOnly">@L("ReportOnly")</label>
+            </div>
+        </div>
+        <div id="ReportOptions" abp-hidden>
+            <div class="form-group">
+                <input type="radio" checked name="ExportLeaseHaulerStatementsOption" class="minimal" id="ExportAllLeaseHaulers" />
+                <label for="ExportAllLeaseHaulers">@L("ExportAsSingleFile")</label>
+            </div>
+            <div class="form-group">
+                <input type="radio" name="ExportLeaseHaulerStatementsOption" class="minimal" id="SplitByLeaseHauler" />
+                <label for="SplitByLeaseHauler">@L("ExportFileForEachLeaseHauler")</label>
+            </div>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

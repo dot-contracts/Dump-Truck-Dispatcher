@@ -1,0 +1,183 @@
+﻿@using DispatcherWeb.Customers.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure
+@model CustomerEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Customer: " + Model.Name : "Create new customer"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation" name="CustomerInformationsForm">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label class="required-label">@L("Name")</label>
+            <input class="form-control" type="text" asp-for="Name" required>
+        </div>
+        <div class="form-group">
+            <label>@L("AccountHash")</label>
+            <input class="form-control" type="text" asp-for="AccountNumber">
+        </div>
+        <div class="form-group">
+            <label>Tax Id Number</label>
+            <input class="form-control" type="text" asp-for="TaxIdNumber" maxlength="@EntityStringFieldLengths.Customer.TaxIdNumber">
+        </div>
+        <div class="m-form__group form-group">
+            <label class="m-checkbox">
+                <input id="CustomerIsCod" type="checkbox" name="CustomerIsCod" value="true" checked="@(Model.CustomerIsCod ? "checked" : null)">
+                @L("COD")
+                <span></span>
+            </label>
+        </div>
+        @if (await FeatureChecker.IsEnabledAsync(AppFeatures.PricingTiers))
+        {
+            <div class="form-group">
+                <label class="required-label">Tier</label>
+                <select class="form-control" asp-for="PricingTierId" required>
+                    <option value="">@L("SelectAPricingTier")</option>
+                    @if (Model.PricingTierId.HasValue)
+                    {
+                        <option selected value="@Model.PricingTierId">@Model.PricingTierName</option>
+                    }
+                </select>
+            </div>
+        }
+        <div class="card address-group">
+            <div class="card-body">
+                <h6 class="card-title">@L("BillingAddress")</h6>
+                <div class="form-group">
+                    <label>@L("Address1")</label>
+                    <input class="form-control" type="text" asp-for="BillingAddress1">
+                </div>
+                <div class="form-group">
+                    <label>@L("Address2")</label>
+                    <input class="form-control" type="text" asp-for="BillingAddress2">
+                </div>
+                <div class="row">
+                    <div class="form-group col-5">
+                        <label>@L("City")</label>
+                        <input class="form-control" type="text" asp-for="BillingCity">
+                    </div>
+                    <div class="form-group col-3">
+                        <label>@L("State")</label>
+                        <input class="form-control" type="text" asp-for="BillingState">
+                    </div>
+                    <div class="form-group col-2">
+                        <label>@L("ZipCode")</label>
+                        <input class="form-control" type="text" asp-for="BillingZipCode">
+                    </div>
+                    <div class="form-group col-2">
+                        <label>@L("CountryCode")</label>
+                        <input class="form-control" type="text" asp-for="BillingCountryCode">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="m-form__group form-group">
+            <label class="m-checkbox">
+                <input id="IsUseSameAddressAsBillingAddress" type="checkbox" name="UseSameAddressAsBillingAddress" value="true">
+                <strong> @L("UseSameAddressAsBiilingAddress")</strong>
+                <span></span>
+            </label>
+        </div>
+        <div class="card address-group">
+            <div class="card-body">
+                <h6 class="card-title">@L("PhysicalAddress")</h6>
+                <div class="form-group">
+                    <label>@L("Address1")</label>
+                    <input class="form-control" type="text" asp-for="Address1">
+                </div>
+                <div class="form-group">
+                    <label>@L("Address2")</label>
+                    <input class="form-control" type="text" asp-for="Address2">
+                </div>
+                <div class="row">
+                    <div class="form-group col-5">
+                        <label>@L("City")</label>
+                        <input class="form-control" type="text" asp-for="City">
+                    </div>
+                    <div class="form-group col-3">
+                        <label>@L("State")</label>
+                        <input class="form-control" type="text" asp-for="State">
+                    </div>
+                    <div class="form-group col-2">
+                        <label>@L("ZipCode")</label>
+                        <input class="form-control" type="text" asp-for="ZipCode">
+                    </div>
+                    <div class="form-group col-2">
+                        <label>@L("CountryCode")</label>
+                        <input class="form-control" type="text" asp-for="CountryCode">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>@L("InvoiceEmail")</label>
+            <input class="form-control" type="text" asp-for="InvoiceEmail">
+        </div>
+        <div class="row">
+            <div class="form-group col-6">
+                <label>@L("PreferredDeliveryMethod")</label>
+                <select class="form-control" asp-for="PreferredDeliveryMethod" asp-items="Html.GetEnumSelectList<PreferredBillingDeliveryMethodEnum>()">
+                    <option value="">Select an option</option>
+                </select>
+            </div>
+            <div class="form-group col-6">
+                <label>@L("Terms")</label>
+                <select class="form-control" asp-for="Terms" asp-items="@(Html.GetBillingTermsSelectList())">
+                    <option value="">Select an option</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>@L("InvoicingMethod")</label>
+            <select class="form-control" asp-for="InvoicingMethod" asp-items="Html.GetEnumSelectList<InvoicingMethodEnum>()">
+            </select>
+        </div>
+        <div class="row">
+            <div class="m-form__group form-group col-6">
+                <label class="m-checkbox">
+                    <input id="IsActive" type="checkbox" name="IsActive" value="true" @Html.Raw(Model.IsActive ? "checked=\"checked\"" : "")>
+                    @L("Active")
+                    <span></span>
+                </label>
+            </div>
+            <div class="col-6">
+                <label class="m-checkbox">
+                    <input id="IsTaxExempt" type="checkbox" name="IsTaxExempt" value="true" @Html.Raw(Model.IsTaxExempt ? "checked=\"checked\"" : "")>
+                    @L("CustomerIsTaxExempt")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <label class="m-checkbox">
+                    <input id="CombineTickets" type="checkbox" name="CombineTickets" value="true" @Html.Raw(Model.CombineTickets ? "checked=\"checked\"" : "")>
+                    @L("CombineTicketsForTruckOnJobForDay")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>@L("Notes")</label>
+            <textarea class="form-control" asp-for="Notes" maxlength="@EntityStringFieldLengths.Customer.Notes"></textarea>
+        </div>
+    </form>
+    <div class="box-border-top clearfix">
+        <div class="grid-caption pull-left">
+            <label>@L("Contacts")</label>
+        </div>
+        <div class="box-actions pull-right">
+            <button type="button" class="btn btn-default" id="CreateNewCustomerContactButton">
+                <i class="fa fa-plus"></i>@L("AddNewContact")
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="display table table-striped table-bordered table-hover dt-responsive" id="CustomerContactsTable"></table>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

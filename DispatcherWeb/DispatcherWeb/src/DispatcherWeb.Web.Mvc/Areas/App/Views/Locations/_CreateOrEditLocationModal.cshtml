@@ -1,0 +1,135 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Locations.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model LocationEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Location: " + Model.Name : Model.IsTemporary ? "Add Temporary Location" : "Add location"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation" autocomplete="off">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="MergeWithDuplicateSilently" />
+        <div class="row">
+            <div class="col-xl-12 form-group">
+                <label for="Name">@L("Name")</label>
+                <input class="form-control" type="text" asp-for="Name" autocomplete="off" maxlength="@EntityStringFieldLengths.Location.Name">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 form-group">
+                <label>@L("StreetAddress")</label>
+                <input class="form-control" type="text" asp-for="StreetAddress" maxlength="@EntityStringFieldLengths.GeneralAddress.MaxStreetAddressLength">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-6 form-group">
+                <label>@L("City")</label>
+                <input class="form-control" type="text" asp-for="City" maxlength="@EntityStringFieldLengths.GeneralAddress.MaxCityLength">
+            </div>
+            <div class="col-xl-2 form-group">
+                <label>@L("State")</label>
+                <input class="form-control" type="text" asp-for="State" maxlength="@EntityStringFieldLengths.GeneralAddress.MaxStateLength">
+            </div>
+            <div class="col-xl-2 form-group">
+                <label>@L("ZipCode")</label>
+                <input class="form-control" type="text" asp-for="ZipCode" maxlength="@EntityStringFieldLengths.GeneralAddress.MaxZipCodeLength">
+            </div>
+            <div class="col-xl-2 form-group">
+                <label>@L("CountryCode")</label>
+                <input class="form-control" type="text" asp-for="CountryCode" maxlength="@EntityStringFieldLengths.GeneralAddress.MaxCountryCodeLength">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 form-group">
+                <label class="required-label" for="CategoryId">@L("Category")</label>
+                <select class="form-control" asp-for="CategoryId" disabled=@(Model.IsTemporary ? "disabled" : null) required>
+                    <option value="">Select a category</option>
+                    @if (Model.CategoryId > 0)
+                    {
+                    <option selected value="@Model.CategoryId">@Model.CategoryName</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-6 form-group">
+                <label>@L("Latitude")</label>
+                <input class="form-control" type="text" asp-for="Latitude">
+            </div>
+            <div class="col-xl-6 form-group">
+                <label>@L("Longitude")</label>
+                <input class="form-control" type="text" asp-for="Longitude">
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs  m-tabs-line m--padding-top-25" role="tablist">
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link active" data-toggle="tab" href="#MapTab" role="tab">@L("Map")</a>
+            </li>
+            @if (!Model.IsTemporary)
+            {
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#ContactsTab" role="tab" id="ContactsTabButton">@L("Contacts")</a>
+                </li>
+            }
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link" data-toggle="tab" href="#MiscellaneousTab" role="tab">@L("Miscellaneous")</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="MapTab" role="tabpanel">
+                <input type="hidden" asp-for="PlaceId" />
+                <div id="map" class="google-map-container"></div>
+                <partial name="_GoogleMapsHelp" />
+            </div>
+            @if (!Model.IsTemporary)
+            {
+                <div class="tab-pane" id="ContactsTab" role="tabpanel">
+                    <div class="box-border-top clearfix">
+                        <div class="grid-caption pull-left">
+                            <label>@L("Contacts")</label>
+                        </div>
+                        <div class="box-actions pull-right">
+                            <button type="button" class="btn btn-default" id="CreateNewLocationContactButton"><i class="fa fa-plus"></i>@L("AddNewContact")</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="display table table-striped table-bordered table-hover dt-responsive" id="LocationContactsTable"></table>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="tab-pane" id="MiscellaneousTab" role="tabpanel">
+                <div class="form-group">
+                    <label>@L("Abbreviation")</label>
+                    <input class="form-control" type="text" asp-for="Abbreviation" maxlength="@EntityStringFieldLengths.Location.Abbreviation">
+                </div>
+                <div class="form-group">
+                    <label>@L("Notes")</label>
+                    <input class="form-control" type="text" asp-for="Notes" maxlength="@EntityStringFieldLengths.Location.Notes">
+                </div>
+                <div class="m-checkbox-list">
+                    <label class="custom-checkbox">
+                        <input id="IsActive" type="checkbox" name="IsActive" value="true" checked="@(Model.IsActive ? "checked" : null)">
+                        @L("Active")
+                        <span></span>
+                    </label>
+                </div>
+                @if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.FulcrumIntegration.IsEnabled))
+                {
+                    <div class="m-checkbox-list">
+                        <label class="custom-checkbox">
+                            <input id="SendToFulcrum" type="checkbox" name="SendToFulcrum" value="true" checked="@(Model.SendToFulcrum ? "checked" : null)">
+                            @L("SendToFulcrum")
+                            <span></span>
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

@@ -1,0 +1,50 @@
+﻿@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Infrastructure;
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Web.Areas.App.Models.FuelPurchases
+@model CreateOrEditFuelPurchaseModalViewModel
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit fuel" : "Create fuel"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation" data-new="@((Model.Id == 0).ToLowerCaseString())">
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+        <input type="hidden" asp-for="OfficeId" />
+        <div class="form-group">
+            <label class="required-label">Truck</label>
+            <select class="form-control" asp-for="TruckId" required>
+                <option value="">Select a truck</option>
+                @if (Model.TruckId != 0)
+                {
+                    <option selected value="@Model.TruckId">@Model.TruckCode</option>
+
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="Amount">Amount</label>
+            <input type="text" class="form-control" asp-for="Amount" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength" required>
+        </div>
+        <div class="form-group">
+            <label asp-for="Odometer">Odometer</label>
+            <input type="text" class="form-control" asp-for="Odometer" data-rule-number="true" data-rule-min="0" data-rule-max="10000000">
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="FuelDateTime">Fuel Date Time</label>
+            <input type="text" class="form-control" asp-for="FuelDateTime" required autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label asp-for="Rate">Rate</label>
+            <input type="text" class="form-control" asp-for="Rate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+        <div class="form-group">
+            <label asp-for="TicketNumber">@L("TicketNumber")</label>
+            <input class="form-control" type="text" asp-for="TicketNumber" maxlength="@EntityStringFieldLengths.Ticket.TicketNumber">
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" class="btn btn-secondary save-button"><i class="fa fa-save"></i> <span>@L("SaveAndExit")</span></button>
+    <button type="button" class="btn btn-primary save-new-button"><i class="fa fa-save"></i> <span>@L("SaveAndNew")</span></button>
+</div>

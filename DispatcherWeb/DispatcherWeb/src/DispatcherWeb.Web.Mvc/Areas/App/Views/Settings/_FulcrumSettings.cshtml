@@ -1,0 +1,29 @@
+﻿@model DispatcherWeb.Configuration.Tenants.Dto.FulcrumIntegrationSettingsEditDto
+
+<div class="row">
+    <div class="col-sm-12">
+        <h5>@L("FulcrumIntegration")</h5>
+        <form id="FulcrumSettingsForm" class="m-form">
+            <div class="form-group margin-top-20">
+                <label for="FulcrumIntegrationIsEnabled" class="m-checkbox col-lg-12">
+                    <input id="FulcrumIntegrationIsEnabled" type="checkbox" name="FulcrumIntegrationIsEnabled" value="true" checked=@(Model.FulcrumIntegrationIsEnabled ? "checked" : null)>
+                    @L("EnableFulcrumIntegration")
+                    <span></span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="FulcrumCustomerNumber">@L("CustomerNumber")</label>
+                <input id="FulcrumCustomerNumber" type="text" name="FulcrumCustomerNumber" autocomplete="off" class="form-control" value="@Model.FulcrumCustomerNumber" maxlength="64">
+            </div>
+            <div class="form-group">
+                <label for="FulcrumUserName">@L("UserName")</label>
+                <input id="FulcrumUserName" type="text" name="FulcrumUserName" autocomplete="new-password" class="form-control" value="@Model.FulcrumUserName" maxlength="64">
+            </div>
+            <div class="form-group">
+                <label for="FulcrumPassword">@L("Password")</label>
+                <input id="FulcrumPassword" type="password" name="FulcrumPassword" autocomplete="new-password" class="form-control" value="@Model.FulcrumPassword" maxlength="64">
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+﻿@using DispatcherWeb.Trucks.Dto
+@model MobileDeviceEditDto
+@{
+    var namePrefix = "MobileDevice-";
+}
+
+<div class="card mb-4">
+    <div class="card-header">
+        @Model.DeviceType.GetDisplayName()
+    </div>
+    <div class="card-body">
+        <div class="mobile-device-controls @(Model.Id > 0 ? "added" : "")" abp-hidden="@(Model.Id == null)">
+            <input type="hidden" name="@(namePrefix)Id" value="@Model.Id" />
+            <input type="hidden" name="@(namePrefix)DeviceType" value="@((int)Model.DeviceType)" />
+            <div class="form-group">
+                <label>@L("Make")</label>
+                <input class="form-control" type="text" name="@(namePrefix)Make" value="@Model.Make" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>@L("Model")</label>
+                <input class="form-control" type="text" name="@(namePrefix)Model" value="@Model.Model" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>@L("Imei")</label>
+                <input class="form-control" type="text" name="@(namePrefix)Imei" value="@Model.Imei" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>@L("SimId")</label>
+                <input class="form-control" type="text" name="@(namePrefix)SimId" value="@Model.SimId" maxlength="50">
+            </div>
+        </div>
+        @if (Model.Id == null)
+        {
+            <button type="button" class="btn btn-primary AddDeviceButton">Add</button>
+        }
+    </div>
+</div>

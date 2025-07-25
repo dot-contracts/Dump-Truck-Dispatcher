@@ -1,0 +1,67 @@
+﻿@using Abp.Web.Security.AntiForgery
+@using DispatcherWeb.Timing
+@using DispatcherWeb.Web.Resources
+@inject AppTimes AppTimes
+@inject IAbpAntiForgeryManager AbpAntiForgeryManager
+@inject IWebResourceManager WebResourceManager
+@{
+    Layout = null;
+    AbpAntiForgeryManager.SetCookie(Context);
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <partial name="_MetaTags" />
+    <partial name="_CommonInlineStyles" />
+    <partial name="_ApplicationInsights" />
+    <partial name="_Favicons" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/vendors.bundle.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="@(ApplicationPath)metronic/dist/html/blue/assets/base/style.bundle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/account-layout-libs.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/common-styles.min.css" asp-append-version="true" />
+    <link rel="stylesheet" abp-href="/view-resources/Views/TenantRegistration/_Layout.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", false)
+    <partial name="_AppPathScript" />
+</head>
+<body class="m--skin-">
+    <div class="m-content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="m-login__wrapper">
+                    <div class="m-login__logo">
+                        <a href="#">
+                            <vc:account-logo></vc:account-logo>
+                        </a>
+                    </div>
+                    @RenderBody()
+                </div>
+                <div>
+                    <vc:account-languages></vc:account-languages>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--begin::Base Scripts -->
+    <script src="/view-resources/Areas/App/Views/_Bundles/account-layout-libs.min.js" asp-append-version="true"></script>
+
+    <!-- Dynamic scripts of ABP system (They are created on runtime and can not be bundled) -->
+    <script src="~/AbpServiceProxies/GetAll?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+    <script src="/Common/Scripts/abp.proxies.overrides.js" asp-append-version="true"></script>
+    <script src="~/AbpScripts/GetScripts?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+
+    <script src="/view-resources/Areas/App/Views/_Bundles/common-scripts.min.js" asp-append-version="true"></script>
+
+    @WebResourceManager.RenderScripts();
+
+    @await RenderSectionAsync("Scripts", false)
+
+    <script type="text/javascript" asp-add-nonce>
+        jQuery(document).ready(function () {
+            if (window.CurrentPage) {
+                CurrentPage.init();
+            }
+        });
+    </script>
+</body>
+</html>

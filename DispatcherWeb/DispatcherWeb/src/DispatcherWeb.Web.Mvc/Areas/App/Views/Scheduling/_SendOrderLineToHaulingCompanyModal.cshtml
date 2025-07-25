@@ -1,0 +1,22 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.LeaseHaulers.Dto
+@model SendOrderLineToHaulingCompanyInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("SendOrderToLeaseHauler")))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderLineId" />
+        <div class="form-group">
+            <label class="control-label" for="OfficeId">Select Lease Hauer</label>
+            <select class="form-control" asp-for="LeaseHaulerId">
+                <option value="">Select a lease hauler</option>
+                @if (Model.LeaseHaulerId > 0)
+                {
+                    <option selected value="@Model.LeaseHaulerId">@Model.LeaseHaulerName</option>
+                }
+            </select>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

@@ -1,0 +1,25 @@
+﻿@using DispatcherWeb.Scheduling.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model OrderLineTruckToChangeDriverDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Change driver"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderLineTruckId" />
+        <input type="hidden" asp-for="HasTicketsOrLoads" />
+        <input type="hidden" asp-for="IsExternal" />
+        <input type="hidden" asp-for="LeaseHaulerId" />
+        <div class="form-group">
+            <label class="required-label">Driver</label>
+            <select class="form-control" name="DriverId" id="DriverId" required>
+                <option>Select a driver</option>
+                @if (Model.DriverId.HasValue)
+                {
+                    <option value="@Model.DriverId" selected>@Model.DriverName</option>
+                }
+            </select>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

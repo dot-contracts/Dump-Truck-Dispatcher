@@ -1,0 +1,53 @@
+﻿@*
+@using DispatcherWeb.Web.Areas.App.Startup
+@using DispatcherWeb.Web.Areas.App.Models.Settings
+@model QuickbooksOnlineViewModel
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.Settings;
+}
+
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/Settings/QuickbooksOnline.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/Settings/QuickbooksOnline.min.js" asp-append-version="true"></script>
+    </environment>
+
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("QuickbooksOnlineSettingsHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+            </span>
+        </div>
+        <div class="col-sm-12 col-md-6 text-right">
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--tab">
+        <form class="m-form m-form--fit m-form--label-align-right" id="QboSettingsForm">
+            <div class="m-portlet__body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-4 form-group">
+                        <label for="IncomeAccountForServicesId" class="col-form-label required-label">@L("DefaultIncomeAccount"):</label>
+                        <select class="form-control" asp-for="DefaultIncomeAccountId" asp-items="Model.IncomeAccountList" required>
+                            <option value="">Select an account</option>
+                        </select>
+                    </div>
+                </div>
+                <hr />
+                <button type="button" id="SaveButton" class="btn btn-primary">@L("Save")</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+*@

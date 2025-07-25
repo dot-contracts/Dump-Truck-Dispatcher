@@ -1,0 +1,20 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.OrderPayments.Dto
+@model CaptureOrderAuthorizationDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Payment Information"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation hearland-iframe-form">
+        <input type="hidden" asp-for="ReceiptId" />
+        <div class="form-group">
+            <label class="control-label">Authorization Amount</label>
+            <input type="text" class="form-control" asp-for="AuthorizationAmount" readonly>
+        </div>
+        <div class="form-group">
+            <label class="control-label required-label">Actual Amount</label>
+            <input type="text" class="form-control" asp-for="ActualAmount" required data-rule-number="true" data-rule-min="0.01" data-rule-max="@AppConsts.MaxHeartlandPaymentSize">
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

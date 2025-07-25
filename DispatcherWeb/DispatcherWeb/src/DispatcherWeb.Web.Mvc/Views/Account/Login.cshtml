@@ -1,0 +1,122 @@
+﻿@using System.Globalization
+@using Abp.Extensions
+@using Abp.MultiTenancy
+@using DispatcherWeb.Identity
+@model DispatcherWeb.Web.Models.Account.LoginFormViewModel
+@inject SignInManager SignInManager
+@section Scripts
+{
+    <script abp-src="/view-resources/Views/Account/Login.js" asp-append-version="true"></script>
+}
+
+<h3 class="form-title">@(Model.ForceHostLogin ? "Host Admin Login" : L("LogIn"))</h3>
+
+@if (!Model.SuccessMessage.IsNullOrEmpty())
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Model.SuccessMessage
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@if (!Model.WarningMessage.IsNullOrEmpty())
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @Model.WarningMessage
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<form asp-action="Login" class="login-form" method="post">
+    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+    <input type="hidden" name="returnUrlHash" />
+    <input type="hidden" name="ss" value="@ViewBag.SingleSignIn" />
+    <input type="hidden" asp-for="ForceHostLogin" />
+    <div class="form-group">
+        <input class="form-control form-control-solid placeholder-no-fix input-ltr" type="text" autocomplete="off" placeholder="@L("UserNameOrEmail")" name="usernameOrEmailAddress" value="@(Model.UserNameOrEmailAddress ?? "")" required disabled />
+    </div>
+    <div class="form-group">
+        <input class="form-control form-control-solid placeholder-no-fix input-ltr" type="password" autocomplete="off" placeholder="@L("Password")" name="password" required disabled />
+    </div>
+    <div class="rememberme">
+        <label class="m-checkbox m-checkbox--primary">
+            <input type="checkbox" name="rememberMe" value="true">
+            @L("RememberMe")
+            <span></span>
+        </label>
+    </div>
+    <div class="form-actions">
+        <a href="@Url.Action("ForgotPassword", "Account")" id="forget-password" class="forget-password">@L("ForgotPassword")</a>
+        <button type="submit" class="btn btn-primary" id="login-button" disabled>@L("LogIn")</button>
+    </div>
+</form>
+
+@{
+    var loginProviders = (await SignInManager.GetExternalAuthenticationSchemesAsync())
+        .Where(s => !s.DisplayName.IsNullOrWhiteSpace())
+        .ToList();
+
+    Func<string, string> getSocialIconClass = (provider) =>
+    {
+        provider = provider.ToLower(CultureInfo.InvariantCulture);
+
+        return provider;
+    };
+}
+
+@if ((await AbpSession.GetMultiTenancySideAsync() != MultiTenancySides.Host || !ViewBag.IsMultiTenancyEnabled) && loginProviders.Count > 0)
+{
+    <div class="login-options">
+        <h4>@L("LoginWith")</h4>
+        <ul class="social-icons">
+            <form asp-action="ExternalLogin" method="post">
+                <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                <input type="hidden" name="provider" value="" />
+                <input type="hidden" name="ss" value="@ViewBag.SingleSignIn" />
+
+                @foreach (var p in loginProviders)
+                {
+                    <li>
+                        <a class="social-login-icon social-icon-color @getSocialIconClass(p.DisplayName)"
+                           title="@p.DisplayName"
+                           data-provider="@p.DisplayName"
+                           ></a>
+                    </li>
+                }
+            </form>
+        </ul>
+    </div>
+}
+
+<div class="create-account">
+    <p>
+        @if (Model.IsSelfRegistrationEnabled)
+        {
+            <a href="@Url.Action("Register", "Account", new { ss = ViewBag.SingleSignIn, returnUrl = ViewBag.ReturnUrl })" id="register-btn" class="uppercase">@L("CreateAnAccount")</a>
+            <span class="pipe-divider"> | </span>
+        }
+        @if (Model.IsTenantSelfRegistrationEnabled)
+        {
+            <a href="@Url.Action("SelectEdition", "TenantRegistration")" id="register-btn" class="uppercase">@L("NewTenant")</a>
+            <span class="pipe-divider"> | </span>
+        }
+        @if (Model.IsEmailActivationEnabled)
+        {
+            <a href="@Url.Action("EmailActivation", "Account")" id="email-activation-btn" class="uppercase">Email activation</a>
+        }
+        @if (Model.ForceHostLogin)
+        {
+            <span class="pipe-divider"> | </span>
+            <a href="@Url.Action("Login", "Account", new { forceHostLogin = false, ss = ViewBag.SingleSignIn, returnUrl = ViewBag.ReturnUrl })">Back to normal login</a>
+        }
+        else if (!ViewBag.IsMultiTenancyEnabled)
+        {
+            <span class="pipe-divider"> | </span>
+            <a href="@Url.Action("Login", "Account", new { forceHostLogin = true, ss = ViewBag.SingleSignIn, returnUrl = ViewBag.ReturnUrl })">Host Admin Login</a>
+        }
+    </p>
+</div>

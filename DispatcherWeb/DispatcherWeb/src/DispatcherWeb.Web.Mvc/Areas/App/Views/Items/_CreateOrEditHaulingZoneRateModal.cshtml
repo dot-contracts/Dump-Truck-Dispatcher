@@ -1,0 +1,48 @@
+﻿@using DispatcherWeb.Items.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model HaulingCategoryEditDto;
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Rate" : "Create Rate"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation" name="ItemPriceInformationsForm">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ItemId" />
+        <div class="form-group">
+            <label class="required-label">@L("TruckCategory")</label>
+            <select class="form-control" asp-for="TruckCategoryId" required>
+                <option value="">@L("SelectATruckCategory")</option>
+                @if (Model.TruckCategoryId.HasValue)
+                {
+                    <option selected value="@Model.TruckCategoryId">@Model.TruckCategoryName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label">@L("UOM")</label>
+            <select class="form-control" asp-for="UnitOfMeasureId" id="ItemPrice_MaterialUomId" required>
+                <option value="">Select an option</option>
+                @if (Model.UnitOfMeasureId > 0)
+                {
+                    <option value="@Model.UnitOfMeasureId">@Model.UnitOfMeasureName</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="required-label">@L("MinimumBillableUnits")</label>
+            <input class="form-control" type="text" asp-for="MinimumBillableUnits" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength" required>
+        </div>
+
+        @foreach (var tier in @Model.HaulingCategoryPrices)
+        {
+            <partial name="_HaulingPrices" model="tier" />
+        }
+
+        <div class="form-group">
+            <label>@L("LHRate")</label>
+            <input class="form-control" type="text" asp-for="LeaseHaulerRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

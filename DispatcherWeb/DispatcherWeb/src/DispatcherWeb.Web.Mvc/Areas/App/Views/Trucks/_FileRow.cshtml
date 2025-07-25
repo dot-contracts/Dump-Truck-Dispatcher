@@ -1,0 +1,27 @@
+﻿@using DispatcherWeb.Trucks.Dto
+@model TruckFileEditDto
+
+<tr data-id="@Model.Id">
+    <td>
+        <input type="text" class="form-control" value="@Model.Title"/>
+        <br/>
+
+    </td>
+    <td>
+        <textarea class="form-control" rows="3">@Model.Description</textarea>
+    </td>
+    <td class="td-centered">
+        <a href="@Url.Action("DownloadFile", new { truckId = Model.TruckId, fileId = Model.FileId, fileName = Model.FileName })">
+            @if(Model.ThumbnailId.HasValue)
+            {
+                <img src="@Url.Action("DownloadFile", new { truckId = Model.TruckId, fileId = Model.ThumbnailId.Value, fileName = Model.FileName})" />
+
+            }
+            else
+            {
+                <i class="fa-2x fa @Utilities.GetFontAwesomeClass(Model.FileType)"></i>
+            }
+        </a>
+    </td>
+    <td class="td-centered"> <button type="button" class="btn btn-danger" data-id="@Model.Id">Delete</button></td>
+</tr>

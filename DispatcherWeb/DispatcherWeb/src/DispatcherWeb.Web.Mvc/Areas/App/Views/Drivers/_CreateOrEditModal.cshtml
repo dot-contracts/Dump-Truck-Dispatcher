@@ -1,0 +1,149 @@
+﻿@using DispatcherWeb.Drivers.Dto
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Infrastructure;
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model DriverEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Driver: " + Model.FullName : "Create new driver"))
+
+<div class="modal-body">
+    <ul class="nav nav-tabs  m-tabs-line" role="tablist">
+        <li class="nav-item m-tabs__item">
+            <a href="#DriverGeneralTab" class="nav-link m-tabs__link active" data-toggle="tab" role="tab">
+                @L("General")
+            </a>
+        </li>
+        <li class="nav-item m-tabs__item">
+            <a href="#DriverStatusTab" data-toggle="tab" role="tab" class="nav-link m-tabs__link">
+                @L("Status")
+            </a>
+        </li>
+        <li class="nav-item m-tabs__item">
+            <a href="#DriverPayTab" data-toggle="tab" role="tab" class="nav-link m-tabs__link">
+                @L("Pay")
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="DriverGeneralTab" role="tabpanel">
+            <form role="form" novalidate class="form-validation" name="DriverGeneralForm">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="IsUserActive" />
+                <div class="form-group">
+                    <label class="required-label">@L("FirstName")</label>
+                    <input class="form-control" type="text" asp-for="FirstName" required>
+                </div>
+                <div class="form-group">
+                    <label class="required-label">@L("LastName")</label>
+                    <input class="form-control" type="text" asp-for="LastName" required>
+                </div>
+                <div class="form-group" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+                    <label class="required-label">@L("Office")</label>
+                    <select class="form-control" asp-for="OfficeId" required>
+                        <option value="">Select an option</option>
+                        @if (Model.OfficeId > 0)
+                        {
+                            <option value="@Model.OfficeId">@Model.OfficeName</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="m-checkbox">
+                        <input type="checkbox" name="IsDefault" asp-for="IsInactive" id="IsInactive">@L("Inactive")<span></span>
+                    </label>
+                    @*<input type="checkbox" class="icheckbox_minimal-blue" >
+                    <label for="IsInactive" class="cbx">Inactive</label>*@
+                </div>
+                <div class="form-group">
+                    <label asp-for="EmailAddress">@L("EmailAddress")</label>
+                    <input class="form-control" type="text" asp-for="EmailAddress" maxlength="@EntityStringFieldLengths.Driver.EmailAddress">
+                </div>
+                <div class="form-group">
+                    <label asp-for="CellPhoneNumber">@L("CellPhoneNumber")</label>
+                    <input class="form-control" type="text" asp-for="CellPhoneNumber" placeholder="Cell Phone Number (format: +15554321)" maxlength="@EntityStringFieldLengths.General.PhoneNumber">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="OrderNotifyPreferredFormat">@L("PreferredFormat")</label>
+                    <select class="form-control" data-style="selectpicker-default" asp-for="OrderNotifyPreferredFormat" asp-items="Html.GetEnumSelectListWithDefaults<OrderNotifyPreferredFormat>()"></select>
+                </div>
+                <div class="form-group">
+                    <label>@L("Address")</label>
+                    <input class="form-control" type="text" asp-for="Address">
+                </div>
+                <div class="form-group">
+                    <label>@L("City")</label>
+                    <input class="form-control" type="text" asp-for="City">
+                </div>
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label>@L("State")</label>
+                        <input class="form-control" type="text" asp-for="State">
+                    </div>
+                    <div class="form-group col-6">
+                        <label>@L("ZipCode")</label>
+                        <input class="form-control" type="text" asp-for="ZipCode">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>@L("EmployeeId")</label>
+                    <input class="form-control" type="text" asp-for="EmployeeId" maxlength="@EntityStringFieldLengths.Driver.EmployeeId">
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane" id="DriverStatusTab" role="tabpanel">
+            <form role="form" novalidate class="form-validation" name="DriverStatusForm">
+                <div class="form-group">
+                    <label>@L("LicenseState")</label>
+                    <input class="form-control" type="text" asp-for="LicenseState">
+                </div>
+                <div class="form-group">
+                    <label>@L("LicenseNumber")</label>
+                    <input class="form-control" type="text" asp-for="LicenseNumber">
+                </div>
+                <div class="form-group">
+                    <label>@L("TypeOfLicense")</label>
+                    <input class="form-control" type="text" asp-for="TypeOfLicense">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="LicenseExpirationDate">@L("LicenseExpirationDate")</label>
+                    <input class="form-control" asp-for="LicenseExpirationDate" type="text" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="LastPhysicalDate">@L("LastPhysicalDate")</label>
+                    <input class="form-control" asp-for="LastPhysicalDate" type="text" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="NextPhysicalDueDate">@L("NextPhysicalDueDate")</label>
+                    <input class="form-control" asp-for="NextPhysicalDueDate" type="text" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="LastMvrDate">@L("LastMvrDate")</label>
+                    <input class="form-control" asp-for="LastMvrDate" type="text" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="NextMvrDueDate">@L("NextMvrDueDate")</label>
+                    <input class="form-control" asp-for="NextMvrDueDate" type="text" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="DateOfHire">@L("DateOfHire")</label>
+                    <input class="form-control" asp-for="DateOfHire" type="text" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="TerminationDate">@L("TerminationDate")</label>
+                    <input class="form-control" asp-for="TerminationDate" type="text" autocomplete="off">
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane" id="DriverPayTab" role="tabpanel">
+            <form role="form" novalidate class="form-validation" name="DriverPayForm">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="EmployeeTimeClassificationsTable"></table>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

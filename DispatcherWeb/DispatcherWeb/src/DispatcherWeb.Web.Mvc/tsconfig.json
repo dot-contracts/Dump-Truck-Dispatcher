@@ -1,0 +1,33 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "strictNullChecks": true,
+    "moduleResolution": "Classic",
+    "esModuleInterop": false,
+    "allowJs": true,
+    "noEmit": false,
+    "target": "ESNext",
+    "lib": [ "ES5", "ES6", "ESNext", "DOM" ],
+    "disableSizeLimit": true,
+    "module": "ES6",
+    "baseUrl": "./wwwroot"
+  },
+  "exclude": [
+    "bin",
+    "node_modules",
+    "obj",
+    "wwwroot/assets",
+    "wwwroot/lib",
+    "wwwroot/metronic",
+    "wwwroot/**/_Bundles"
+  ],
+  "include": [
+    "wwwroot/Common/Scripts/**/*.ts"
+  ],
+  "typeAcquisition": {
+    "enable": false,
+    "exclude": [ "node" ]
+  }
+}

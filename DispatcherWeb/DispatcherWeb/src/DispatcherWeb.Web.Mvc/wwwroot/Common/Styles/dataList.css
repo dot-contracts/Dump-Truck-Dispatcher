@@ -1,0 +1,5 @@
+﻿.datalist-button-container-placeholder {
+    /*todo set width to match the width of the rendered datalist-button-container later when more/less buttons are needed*/
+    width: 120px;
+    height: 66px;
+}

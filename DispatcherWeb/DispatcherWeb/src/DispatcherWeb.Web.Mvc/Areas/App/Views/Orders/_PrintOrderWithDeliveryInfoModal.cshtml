@@ -1,0 +1,17 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model Abp.Application.Services.Dto.EntityDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Print Order"))
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group" id="HidePricesBlock">
+            <input type="checkbox" class="minimal" id="HidePrices" checked>
+            <label for="HidePrices">Hide Prices</label>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" class="minimal" id="IncludeTickets">
+            <label for="IncludeTickets">@L("IncludeTicketImages")</label>
+        </div>
+    </form>
+</div>
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

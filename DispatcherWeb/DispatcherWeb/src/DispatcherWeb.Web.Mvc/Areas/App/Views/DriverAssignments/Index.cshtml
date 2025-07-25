@@ -1,0 +1,79 @@
+@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.DriverAssignment;
+}
+
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/App/Views/DriverAssignments/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/App/Views/DriverAssignments/Index.min.js" asp-append-version="true"></script>
+    </environment>
+
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("DriverAssignmentHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("DriverAssignmentHeaderInfo")
+            </span>
+        </div>
+        <div class="mr-auto-btn col-sm-12 col-md-6 text-center text-md-right">
+            <button id="AddDefaultStartTime" class="btn btn-secondary" title="@L("AddDefaultStartTimeDescription")"> @L("AddDefaultStartTime")</button>
+            <button id="AddUnscheduledTrucks" class="btn btn-secondary"> @L("AddUnscheduledTrucks")</button>
+            <button id="PrintDriverAssignment" class="btn btn-secondary"><i class="fa fa-print"></i> @L("PrintDriverAssignment")</button>
+            <button id="NotifyDrivers" class="btn btn-secondary"> @L("NotifyDrivers")</button>
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form id="filterForm" novalidate>
+                <div class="m-form m-form--label-align-right">
+                    <div class="row m--margin-bottom-10">
+                        <div class="form-group col-lg-4 col-md-4 col-sm-6">
+                            <label class="control-label required-label">@L("Date"):</label>
+                            <input type="text" class="form-control filter" name="Date" id="DateFilter" required data-msg="Date is required. Please enter a date and search again." autocomplete="off">
+                        </div>
+                        @if(await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts))
+                        {
+                            <div class="form-group col-lg-4 col-md-4 col-sm-6">
+                                <label class="control-label required-label" for="ShiftFilter">@L("Shift")</label>
+                                <select class="dropdown form-control filter" id="ShiftFilter" name="Shift" asp-items="@((await SettingManager.GetShiftSelectList()).WithNoShift(L("NoShift")).Select(x => new SelectListItem(x.Name, x.Id, false)))"></select>
+                            </div>
+                        }
+                        <div class="form-group col-lg-4 col-md-4 col-sm-6" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+                            <label class="control-label">@L("Office")</label>
+                            <select class="dropdown form-control filter" name="OfficeId" id="OfficeIdFilter">
+                                <option value="">Select an office</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row margin-bottom-10">
+                        <div class="col-lg-12 text-right">
+                            <button type="submit" id="SearchButton" class="btn btn-primary">
+                                <i class="fa fa-search"></i> @L("Search")
+                            </button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                <i class="fa fa-times"></i> @L("Clear")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap driverassignment-table" id="DriverAssignmentsTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

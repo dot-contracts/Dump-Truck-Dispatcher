@@ -1,0 +1,47 @@
+﻿@using DispatcherWeb.HaulZones.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model HaulZoneEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Haul Zone: " + Model.Name : "Create new haul zone"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation" name="HaulZoneForm">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label class="required-label">@L("Name")</label>
+            <input class="form-control" type="text" asp-for="Name" required>
+        </div>
+        <div class="form-group">
+            <label class="required-label">@L("Quantity")</label>
+            <input class="form-control" type="number" asp-for="Quantity" required>
+        </div>
+        <div class="form-group">
+            <label class="required-label">@L("UOM")</label>
+            <select class="form-control" asp-for="UnitOfMeasureId" required>
+                <option value="">Select an option</option>
+                @if (Model.UnitOfMeasureId > 0)
+                {
+                    <option value="@Model.UnitOfMeasureId">@Model.UnitOfMeasureName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label">@L("BillRatePerTon")</label>
+            <input class="form-control" type="number" asp-for="BillRatePerTon" required>
+        </div>
+        <div class="form-group d-none">
+            <label class="required-label">@L("MinPerLoad")</label>
+            <input class="form-control" type="number" asp-for="MinPerLoad">
+        </div>
+        <div class="form-group d-none">
+            <label class="required-label">@L("PayRatePerTon")</label>
+            <input class="form-control" type="number" asp-for="PayRatePerTon">
+        </div>
+        <div class="form-group">
+            <label class="m-checkbox">
+                <input type="checkbox" asp-for="IsActive">@L("Active")<span></span>
+            </label>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

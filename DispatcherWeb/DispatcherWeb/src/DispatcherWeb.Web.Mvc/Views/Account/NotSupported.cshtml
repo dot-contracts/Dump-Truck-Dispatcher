@@ -1,0 +1,47 @@
+﻿@using Abp.Timing
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>DispatcherWeb</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+    @await Html.PartialAsync("_CommonInlineStyles")
+    @await Html.PartialAsync("_ApplicationInsights")
+    @await Html.PartialAsync("_Favicons")
+
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/vendors.bundle.min.css" asp-append-version="true" />
+
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/account-layout-libs.min.css" asp-append-version="true" />
+
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/common-styles.min.css" asp-append-version="true" />
+
+    <link rel="stylesheet" abp-href="/view-resources/Views/Account/_Layout.css" asp-append-version="true" />
+
+</head>
+<body class="page-md login d-flex align-items-center justify-content-center">
+    <div class="menu-toggler sidebar-toggler">
+    </div>
+    <div class="content">
+        <div id="notsupported">
+            <h1>The browser you are currently using is not supported. Please upgrade to an updated version of one of the following web browsers:</h1>
+            <ul>
+                <li><a href="//www.google.com/chrome/">Google Chrome</a></li>
+                <li><a href="//www.microsoft.com/en-us/windows/microsoft-edge">Microsoft Edge</a></li>
+                <li><a href="//www.mozilla.org/en-US/firefox/">Mozilla Firefox</a></li>
+                <li><a href="//support.apple.com/downloads/safari">Apple Safari</a></li>
+            </ul>
+        </div>
+        <div class="copyright">
+            @Clock.Now.Year © Dump Truck Dispatcher, Inc.
+        </div>
+    </div>
+    <script src="/view-resources/Areas/App/Views/_Bundles/account-layout-libs.min.js" asp-append-version="true"></script>
+</body>
+</html>
+

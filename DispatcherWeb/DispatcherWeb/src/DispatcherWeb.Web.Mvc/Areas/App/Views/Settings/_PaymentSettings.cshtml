@@ -1,0 +1,25 @@
+﻿@model DispatcherWeb.Configuration.Tenants.Dto.PaymentSettingsEditDto
+
+<div class="tab-pane" id="SettingsPaymentTab">
+    <div class="row">
+        <div class="col-sm-6">
+            <h5>@L("PaymentSettings")</h5>
+            <form id="PaymentSettingsForm" class="m-form">
+                <div class="form-group">
+                    <label for="PaymentProcessor">@L("PaymentProcessor")</label>
+                    <select class="form-control" asp-for="PaymentProcessor" asp-items="@Html.GetEnumSelectList(Model.PaymentProcessor)"></select>
+                </div>
+                <div id="heartlandSettingsBlock" abp-hidden="@(Model.PaymentProcessor != PaymentProcessor.HeartlandConnect)">
+                    <div class="form-group">
+                        <label for="HeartlandPublicKey">@L("HeartlandPublicKey")</label>
+                        <input type="text" asp-for="HeartlandPublicKey" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="HeartlandSecretKey">@L("HeartlandSecretKey")</label>
+                        <input type="password" asp-for="HeartlandSecretKey" value="@Model.HeartlandSecretKey" class="form-control">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

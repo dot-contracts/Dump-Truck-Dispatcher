@@ -1,0 +1,98 @@
+﻿@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.RevenueAnalysis;
+}
+
+
+@section Scripts{
+<environment names="Development">
+
+    <script src="~/view-resources/Areas/app/Views/RevenueAnalysisReport/Index.js" asp-append-version="true"></script>
+</environment>
+
+<environment names="Staging,Production">
+    <script src="~/view-resources/Areas/app/Views/RevenueAnalysisReport/Index.min.js" asp-append-version="true"></script>
+</environment>
+
+}
+
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-7 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                @L("RevenueAnalysisReport")
+            </h3>
+            <span class="m-section__sub">
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+
+            <form id="CreateReportForm" novalidate>
+                <div class="m-form m-form--label-align-right">
+                    <div class="row">
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="required-label" for="DeliveryDateFilter">@L("DeliveryDate")</label>
+                            <input class="form-control filter" id="DeliveryDateFilter" name="DeliveryDate" type="text" required autocomplete="off">
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+                            <label for="OfficeIdFilter">@L("Office")</label>
+                            <select class="form-control filter" name="OfficeId" id="OfficeIdFilter">
+                                <option value="">Select an office</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label for="AnalyzeBy">@L("AnalyzeBy")</label>
+                            <select class="dropdown form-control filter" name="AnalyzeBy" id="AnalyzeBy">
+                                <option value="@AnalyzeRevenueBy.Driver.ToIntString()">@L("ByDriver")</option>
+                                <option value="@AnalyzeRevenueBy.Truck.ToIntString()" selected>@L("ByTruck")</option>
+                                <option value="@AnalyzeRevenueBy.Customer.ToIntString()">@L("ByCustomer")</option>
+                                <option value="@AnalyzeRevenueBy.Date.ToIntString()">@L("ByDate")</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6" abp-hidden="@(!await FeatureChecker.AllowLeaseHaulersFeature())">
+                            <label for="HasLeaseHaulerIdFilter">@L("LeaseHaulerInternal")</label>
+                            <select class="form-control filter" name="HasLeaseHaulerId" id="HasLeaseHaulerIdFilter">
+                                <option value="">All</option>
+                                <option value="false">Internal</option>
+                                <option value="true">Lease Haulers</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <button type="button" id="ViewButton" class="btn btn-primary mt-lg-4 mt-md-4 mt-sm-0 mt-xs-0">
+                                <i class="fa fa-search"></i> @L("View")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center justify-content-center mb-3">
+                <div id="revenueAnalysisLoading" abp-hidden>
+                    <div class="m-blockui d-inline-block">
+                        <span>Loading...</span><span>
+                            <span class="m-loader m-loader--brand "></span>
+                        </span>
+                    </div>
+                </div>
+                <div id="revenueAnalysisContainer" class="portlet-body-morris-fit morris-chart w-100" abp-hidden>
+                </div>
+            </div>
+            <a href="#" id="revenueAnalysisShowAllLink" abp-hidden>
+                @L("ShowAllCustomersThatWereServiced")
+            </a>
+        </div>
+    </div>
+</div>

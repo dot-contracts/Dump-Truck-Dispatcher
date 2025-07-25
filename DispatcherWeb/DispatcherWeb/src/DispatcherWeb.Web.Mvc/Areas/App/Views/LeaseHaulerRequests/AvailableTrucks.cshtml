@@ -1,0 +1,148 @@
+﻿@using DispatcherWeb.Configuration
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.LeaseHaulerRequests.Dto
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.LeaseHaulerAvailableTrucks;
+    ViewBag.PageTitle = AppPageTitles.GetDetailName(Model.HasAvailableBeenSent ? AppPageTitles.LeaseHaulerRequests.TruckStatus : AppPageTitles.LeaseHaulerRequests.AvailableTrucks, Model.CustomerName);
+    Layout = "_AnonymousLayout";
+}
+@model AvailableTrucksEditDto
+
+@section Scripts{
+    <script type="text/javascript" asp-add-nonce>
+        window.thankYouForTrucksTemplate = @(Html.Raw(DispatcherWeb.Web.Utils.HtmlHelper.EscapeJsString(await SettingManager.GetSettingValueAsync(AppSettings.LeaseHaulers.ThankYouForTrucksTemplate))));
+    </script>
+    <script src="~/view-resources/Areas/app/Views/LeaseHaulerRequests/AvailableTrucks.js" asp-append-version="true"></script>
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-12">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L(Model.HasAvailableBeenSent ? "TruckStatusHeader" : "AvailableTrucksHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+                @if (!Model.HasAvailableBeenSent)
+                {
+                    @L("AvailableTrucksHeaderInfo")
+                }
+            </span>
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form id="AvailableTrucksForm" class="m-form m-form--fit m-form--label-align-right">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="LeaseHaulerId" />
+                <input type="hidden" asp-for="HasAvailableBeenSent" />
+                <div class="form-group m-form__group row align-items-center">
+                    <label class="col-md-2 col-xs-3 control-label">@L("Customer"):</label>
+                    <div class="col-md-5 col-xs-7 mb-2">
+                        <label>@Model.CustomerName</label>
+                    </div>
+                </div>
+                <div class="form-group m-form__group row align-items-center">
+                    <label class="col-md-2 col-xs-3 control-label">@L("Date"):</label>
+                    <div class="col-md-5 col-xs-7">
+                        <label>@Model.Date.ToShortDateString() @Model.ShiftName</label>
+                    </div>
+                </div>
+                <div class="form-group m-form__group row align-items-center">
+                    <label class="col-md-2 col-xs-3 control-label">@L("RequestedTrucks"):</label>
+                    <div class="col-md-5 col-xs-7">
+                        <label>@Model.Message</label>
+                    </div>
+                </div>
+                <div class="form-group m-form__group row align-items-center">
+                    <label class="col-md-2 col-xs-3 control-label required-label">@L("NumberOfTrucksAvailable"):</label>
+                    <div class="col-md-5 col-xs-7">
+                        <input type="number" class="form-control" asp-for="Available" required data-rule-number="true" data-rule-min="0" data-rule-max="1000" data-rule-digits="true">
+                    </div>
+                </div>
+                @if (Model.HasAvailableBeenSent)
+                {
+
+                    <div class="form-group m-form__group row align-items-center">
+                        <label class="col-md-2 col-xs-3 control-label">@L("NumberOfTrucksApproved"):</label>
+                        <div class="col-md-5 col-xs-7">
+                            <label>@Model.Approved</label>
+                        </div>
+                    </div>
+                    <div class="form-group m-form__group row align-items-center">
+                        <label class="col-md-2 col-xs-3 control-label">@L("NumberOfTrucksScheduled"):</label>
+                        <div class="col-md-5 col-xs-7">
+                            <label>@Model.Scheduled</label>
+                        </div>
+                    </div>
+
+                    @if (Model.ShowTruckControls && Model.Approved > 0)
+                    {
+                        <br />
+                        <label>Please specify the trucks and drivers you will be making available. If you don't see a truck or driver in the dropdown, make a note in the comments area so we can add them to the system.</label>
+
+                        <div class="form-group m-form__group row align-items-center d-none d-sm-flex pb-0">
+                            <div class="col-sm-6">
+                                <label class="col-xs-12 control-label required-label">@L("Truck"):</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="col-xs-12 control-label required-label">@L("Driver"):</label>
+                            </div>
+                        </div>
+
+                        for (int i = 0; i < Model.Approved.Value; i++)
+                        {
+                            var truck = Model.Trucks?.Count > i && Model.Trucks[i].TruckId.HasValue ? Model.Trucks[i] : null;
+                            <div class="form-group m-form__group row align-items-center">
+                                <div class="col-sm-6">
+                                    <label class="col-xs-12 d-sm-none control-label required-label">@L("Truck") @(i + 1):</label>
+                                    <div class="col-xs-12">
+                                        <label for="Truck@(i)" abp-hidden>Truck @(i + 1):</label>
+                                        <select class="form-control lease-hauler-truck-select" name="Trucks[]" id="Truck@(i)" required data-truck-isinuse="@(truck?.IsTruckInUse ?? false)" data-truck-originalid="@(truck?.TruckId ?? 0)">
+                                            <option value="">Select an option</option>
+                                            @if (Model.Trucks?.Count > i && Model.Trucks[i].TruckId.HasValue)
+                                            {
+                                                <option selected value="@Model.Trucks[i].TruckId">@Model.Trucks[i].TruckCode</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="col-xs-12 d-sm-none control-label required-label">@L("Driver") @(i + 1):</label>
+                                    <div class="col-xs-12">
+                                        <label for="Driver@(i)" abp-hidden>Driver @(i + 1):</label>
+                                        <select class="form-control lease-hauler-driver-select" name="Drivers[]" id="Driver@(i)" required data-driver-isinuse="@(truck?.IsDriverInUse ?? false)" data-driver-originalid="@(truck?.DriverId ?? 0)">
+                                            <option value="">Select an option</option>
+                                            @if (Model.Trucks?.Count > i && Model.Trucks[i].DriverId.HasValue)
+                                            {
+                                                <option selected value="@Model.Trucks[i].DriverId">@Model.Trucks[i].DriverName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="col-sm-12">
+                            <div class="form-group m-form__group row align-items-center">
+                                <label>@L("Comments")</label>
+                                <textarea type="text" class="form-control" rows="3" asp-for="Comments" maxlength="@EntityStringFieldLengths.LeaseHaulerRequest.Comments"></textarea>
+                            </div>
+                        </div>
+
+                        <br />
+                        <label>We'll send the order information as soon as we have finalized our schedule</label>
+                    }
+                }
+                <div class="form-group m-form__group row">
+                    <div class="col-md-5 col-xs-7">
+                        <button type="submit" class="btn btn-primary" id="SaveAvailableTrucksButton">@L("Save")</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

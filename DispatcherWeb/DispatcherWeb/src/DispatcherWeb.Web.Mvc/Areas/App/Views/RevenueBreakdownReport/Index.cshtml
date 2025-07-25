@@ -1,0 +1,96 @@
+﻿@using Abp.Configuration
+@using Abp.Extensions
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    Layout = "../Shared/Reports/_ReportLayout";
+
+    ViewBag.CurrentPageName = AppPageNames.Tenant.RevenueBreakdown;
+}
+
+
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/RevenueBreakdownReport/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/RevenueBreakdownReport/Index.min.js" asp-append-version="true"></script>
+    </environment>
+
+}
+
+@section H1
+{
+    @L("RevenueBreakdownReportHeader")
+}
+@section Description
+{
+    @L("RevenueBreakdownReportHeaderInfo")
+}
+
+
+<form id="CreateReportForm" novalidate>
+    <div class="m-form m-form--label-align-right">
+        <div class="row">
+            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                <label class="required-label" for="DeliveryDateFilter">@L("DeliveryDate")</label>
+                <input class="form-control filter" id="DeliveryDateFilter" name="DeliveryDate" type="text" required autocomplete="off">
+
+            </div>
+            @if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts))
+            {
+                <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                    <label class="control-label required-label" for="Shifts">@L("Shift")</label>
+                    <select class="form-control filter" id="Shifts" name="Shifts" asp-items="@((await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id, true)).Union(new List<SelectListItem> { new SelectListItem("[No Shift]", ((int)Shift.NoShift).ToString(), false) }))" multiple="multiple" required></select>
+                </div>
+            }
+
+            @if ((await FeatureChecker.GetValueAsync(AppFeatures.AllowMultiOfficeFeature)).To<bool>())
+            {
+                <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                    <label for="OfficeIdFilter">@L("Office")</label>
+                    <select class="dropdown form-control filter" name="OfficeId" id="OfficeIdFilter">
+                        <option value="">Select an office</option>
+                    </select>
+                </div>
+            }
+
+            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                <label for="CustomerIdFilter">@L("Customer")</label>
+                <select class="dropdown form-control filter" name="CustomerId" id="CustomerIdFilter">
+                    <option value="">Select a customer</option>
+                </select>
+            </div>
+
+            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                <label for="LoadAtIdFilter">@L("LoadAt")</label>
+                <select class="dropdown form-control filter" name="LoadAtId" id="LoadAtIdFilter">
+                    <option value="">@L("SelectALocation")</option>
+                </select>
+            </div>
+
+            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                <label for="DeliverToIdFilter">@L("DeliverTo")</label>
+                <select class="dropdown form-control filter" name="DeliverToId" id="DeliverToIdFilter">
+                    <option value="">@L("SelectALocation")</option>
+                </select>
+            </div>
+
+            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                <label for="ItemIdFilter">@L("Item")</label>
+                <select class="dropdown form-control filter" name="ItemId" id="ItemIdFilter">
+                    <option value="">Select an item</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+
+
+

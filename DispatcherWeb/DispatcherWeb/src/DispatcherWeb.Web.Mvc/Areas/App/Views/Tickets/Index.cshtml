@@ -1,0 +1,234 @@
+﻿@using Abp.Extensions
+@using Abp.Configuration
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Startup
+
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.Tickets;
+}
+
+@section Scripts {
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/Tickets/Index.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/App/Views/Tickets/_CreateOrEditTicketModal.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/Tickets/Index.min.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/App/Views/Tickets/_CreateOrEditTicketModal.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("Tickets")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("TicketsHeaderInfo")
+            </span>
+        </div>
+        <div class="col-6 text-right">
+            @if (await IsGrantedAsync(AppPermissions.Pages_Tickets_Download))
+            {
+                <button id="DownloadSelectedTicketImagesButton" class="btn btn-primary" title="Download Ticket Images">@L("DownloadImages")</button>
+            }
+            @if (await IsGrantedAsync(AppPermissions.Pages_Imports_Tickets_TruxEarnings) && await SettingManager.GetSettingValueAsync<bool>(AppSettings.Trux.AllowImportingTruxEarnings)
+                || await IsGrantedAsync(AppPermissions.Pages_Imports_Tickets_LuckStoneEarnings) && await SettingManager.GetSettingValueAsync<bool>(AppSettings.LuckStone.AllowImportingLuckStoneEarnings)
+                || await IsGrantedAsync(AppPermissions.Pages_Imports_Tickets_IronSheepdogEarnings) && await SettingManager.GetSettingValueAsync<bool>(AppSettings.IronSheepdog.AllowImportingIronSheepdogEarnings)
+            )
+            {
+                <button type="button" id="ImportTicketsButton" class="btn btn-primary" data-toggle="tooltip" data-html="true" title="Import Tickets">@L("Import")</button>
+            }
+            @if (await IsGrantedAsync(AppPermissions.Pages_Tickets_Export) || await IsGrantedAsync(AppPermissions.CustomerPortal_TicketList_Export))
+            {
+                <div class="btn-group dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <span>@L("Export")</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="#" id="ExportAllTicketsToCsvButton">@L("ExportAll")</a>
+                        <a class="dropdown-item" href="#" id="ExportSelectedTicketsToCsvButton">@L("ExportSelected")</a>
+                    </div>
+                </div>
+            }
+            @if (await IsGrantedAsync(AppPermissions.Pages_Invoices))
+            {
+                <button id="InvoiceSelectedTicketsButton" class="btn btn-primary" data-toggle="tooltip" data-html="true"
+                        title="Invoice Selected Tickets">
+                    @L("Invoice")
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+<div abp-hidden>
+    <form role="form" name="TicketForm" novalidate class="form-validation">
+        <input type="file" accept="image/jpeg,image/gif,image/png,application/pdf" capture class="upload" id="TicketPhoto" name="TicketPhoto" abp-hidden />
+    </form>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right" novalidate>
+                <div id="CustomersFormFilter">
+                    <div class="row m--margin-bottom-10">
+                        <div class="form-group col-xl-3">
+                            <label class="control-label" for="TicketDateRangeFilter">@L("TicketDate")</label>
+                            <input class="form-control m-input filter" id="TicketDateRangeFilter" name="TicketDateRangeFilter" placeholder="@L("SearchWithThreeDot")" type="text" autocomplete="off">
+                            <input type="hidden" class="filter" name="TicketDateRangeBegin" id="TicketDateRangeBeginInput" />
+                            <input type="hidden" class="filter" name="TicketDateRangeEnd" id="TicketDateRangeEndInput" />
+                        </div>
+                        <div class="form-group col-xl-3">
+                            <label class="control-label" for="OrderDateRangeFilter">@L("OrderDate")</label>
+                            <input class="form-control m-input filter" id="OrderDateRangeFilter" name="OrderDateRangeFilter" type="text" autocomplete="off">
+                            <input type="hidden" class="filter" name="OrderDateRangeBegin" id="OrderDateRangeBeginInput" />
+                            <input type="hidden" class="filter" name="OrderDateRangeEnd" id="OrderDateRangeEndInput" />
+                        </div>
+                        @if (await IsGrantedAsync(AppPermissions.Pages_Tickets_View) || await IsGrantedAsync(AppPermissions.CustomerPortal_TicketList))
+                        {
+                            if (await SettingManager.UseShifts())
+                            {
+                                <div class="form-group col-xl-3">
+                                    <label class="control-label" for="Shifts">@L("Shift")</label>
+                                    <select class="form-control filter" id="Shifts" name="Shifts" asp-items="@((await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id, false)).Union(new List<SelectListItem> { new SelectListItem("[No Shift]", ((int)Shift.NoShift).ToString(), false) }))" multiple="multiple" required></select>
+                                </div>
+                            }
+                            if (await IsGrantedAsync(AppPermissions.Pages_LeaseHauler))
+                            {
+                                <div class="form-group col-xl-3">
+                                    <label class="control-label" for="CarrierFilter">@L("Carrier")</label>
+                                    <select class="form-control m-input filter" id="CarrierFilter" name="CarrierId" data-display-name="CarrierName">
+                                        <option value="">Select a Carrier</option>
+                                    </select>
+                                </div>
+                            }
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="ItemFilter">@L("Item")</label>
+                                <select class="form-control m-input filter" id="ItemFilter" name="ItemId" data-display-name="ItemName">
+                                    <option value="">Select an Item</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="TicketNumberFilter">@L("TicketNumber")</label>
+                                <input class="form-control m-input filter" id="TicketNumberFilter" name="TicketNumber" placeholder="Ticket Number" type="text">
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="TruckFilter">@L("Truck")</label>
+                                <select class="form-control m-input filter" name="TruckId" id="TruckFilter" data-display-name="TruckCode">
+                                    <option value="">Select a Truck</option>
+                                </select>
+                            </div>
+                            if (await FeatureChecker.IsEnabledAsync(AppFeatures.AllowInvoicingFeature))
+                            {
+                                <div class="form-group col-xl-3">
+                                    <label class="control-label" for="BillingStatusFilter">@L("BillingStatus")</label>
+                                    <select class="form-control m-input filter" name="BillingStatus" id="BillingStatusFilter" data-display-name="BillingStatusName" asp-items="Html.GetEnumSelectList<BillingStatus>()">
+                                        <option value="">@L("All")</option>
+                                    </select>
+                                </div>
+                            }
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="IsVerifiedFilter">@L("Verified")</label>
+                                <select class="form-control m-input filter" name="IsVerified" id="IsVerifiedFilter" data-display-name="IsVerifiedDescription">
+                                    <option value="">&nbsp;</option>
+                                    <option value="true">@L("Verified")</option>
+                                    <option value="false">@L("Unverified")</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="CustomerFilter">@L("Customer")</label>
+                                <select class="form-control m-input filter" name="CustomerId" id="CustomerFilter" data-display-name="CustomerName">
+                                    <option value="">Select a Customer</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="LoadAtFilter">@L("LoadAt")</label>
+                                <select class="dropdown form-control filter" name="LoadAtId" id="LoadAtFilter" data-display-name="LoadAtName">
+                                    <option value="">@L("SelectALocation")</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="DeliverToFilter">@L("DeliverTo")</label>
+                                <select class="dropdown form-control filter" name="DeliverToId" id="DeliverToFilter" data-display-name="DeliverToName">
+                                    <option value="">@L("SelectALocation")</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="TicketStatusFilter">@L("TicketStatus")</label>
+                                <select class="form-control filter" name="TicketStatus" id="TicketStatusFilter" asp-items="Html.GetEnumSelectList<TicketListStatusFilterEnum>()" data-display-name="TicketStatusDescription">
+                                    <option value="">Select ticket status</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="DriverFilter">@L("Driver")</label>
+                                <select class="form-control m-input filter" id="DriverFilter" name="DriverId" data-display-name="DriverName">
+                                    <option value="">Select a Driver</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="OrderIdFilter">@L("OrderNumber")</label>
+                                <select class="form-control m-input filter" id="OrderIdFilter" name="OrderId" data-display-name="OrderIdTitle">
+                                    <option value="">Select an order</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="JobNumberFilter">@L("JobNumber")</label>
+                                <input class="form-control m-input filter" id="JobNumberFilter" name="JobNumber" type="text" placeholder="@L("JobNumber")">
+                            </div>
+                            if ((await FeatureChecker.GetValueAsync(AppFeatures.AllowMultiOfficeFeature)).To<bool>())
+                            {
+                                <div class="form-group col-xl-3">
+                                    <label class="control-label" for="OfficeIdFilter">@L("Office")</label>
+                                    <select class="form-control m-input filter" id="OfficeIdFilter" name="OfficeId" data-display-name="OfficeName">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                            }
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="IsImportedFilter">@L("Imported")</label>
+                                <select class="form-control m-input filter" name="IsImported" id="IsImportedFilter" data-display-name="IsImportedDescription">
+                                    <option value="">&nbsp;</option>
+                                    <option value="true">@L("Imported")</option>
+                                    <option value="false">@L("NotImported")</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="PONumberFilter">@L("PONumber")</label>
+                                <input class="form-control m-input filter" id="PONumberFilter" name="PONumber" type="text" placeholder="@L("PONumber")">
+                            </div>
+                            <div class="form-group col-xl-3">
+                                <label class="control-label" for="HasImageFilter">@L("TicketImage")</label>
+                                <select class="form-control m-input filter" name="HasImage" id="HasImageFilter" data-display-name="HasImageDescription">
+                                    <option value="">&nbsp;</option>
+                                    <option value="true">@L("HasImage")</option>
+                                    <option value="false">@L("MissingImage")</option>
+                                </select>
+                            </div>
+                        }
+                    </div>
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-xl-12 text-right margin-top-20">
+                            <button type="submit" id="SearchButton" class="btn btn-primary">
+                                <i class="fa fa-search"></i> @L("Search")
+                            </button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                <i class="fa fa-times"></i> @L("Clear")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table id="TicketTable" class="display table table-striped table-bordered table-hover dt-responsive"></table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,184 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Designations;
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Orders.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@inject IDesignationAppService DesignationAppService
+@model JobEditDto
+@{
+    var separateItems = await FeatureChecker.IsEnabledAsync(AppFeatures.SeparateMaterialAndFreightItems);
+}
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ExtendedModalHeader.cshtml", new ExtendedModalHeaderViewModel(Model.OrderId > 0 ? "Edit Job" : "Add Job" , Model.CustomerIsCod ? "COD" : ""))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation order-line-form">
+        <input type="hidden" asp-for="OrderId" />
+        <input type="hidden" asp-for="PricingTierId" />
+        <input type="hidden" asp-for="CustomerIsCod" />
+        <input type="hidden" asp-for="CustomerIsTaxExempt" />
+        <input type="hidden" asp-for="QuoteIsTaxExempt" />
+        <input type="hidden" asp-for="OrderLineId" />
+        <input type="hidden" asp-for="TicketId" />
+        <input type="hidden" asp-for="UseZoneBasedRates" />
+        <input type="hidden" asp-for="IsMaterialPricePerUnitOverridden" />
+        <input type="hidden" asp-for="IsFreightPricePerUnitOverridden" />
+        <input type="hidden" asp-for="IsFreightRateToPayDriversOverridden" />
+        <input type="hidden" asp-for="IsLeaseHaulerPriceOverridden" />
+        <input type="hidden" asp-for="IsMaterialPriceOverridden" />
+        <input type="hidden" asp-for="IsFreightPriceOverridden" />
+        @if (separateItems)
+        {
+            <input type="hidden" asp-for="IsMaterialTaxable" />
+            <input type="hidden" asp-for="IsFreightTaxable" />
+        }
+        else
+        {
+            <input type="hidden" asp-for="IsTaxable" />
+        }
+        <input type="hidden" asp-for="StaggeredTimeKind" value="@((int)Model.StaggeredTimeKind)" />
+        <input type="hidden" asp-for="QuoteLineId" />
+        <input type="hidden" asp-for="FocusFieldId" />
+        <input type="hidden" asp-for="DefaultLoadAtLocationId" />
+        <input type="hidden" asp-for="DefaultLoadAtLocationName" />
+        <input type="hidden" asp-for="DefaultMaterialItemId" />
+        <input type="hidden" asp-for="DefaultMaterialItemName" />
+        <input type="hidden" asp-for="DefaultMaterialUomId" />
+        <input type="hidden" asp-for="DefaultMaterialUomName" />
+
+        @*<input type="hidden" asp-for="IsClosed" />*@
+        <input type="hidden" asp-for="MaterialCompanyOrderId" />
+        <input type="hidden" asp-for="SpectrumNumber" />
+        <input type="hidden" asp-for="Directions" />
+
+        <div class="row">
+            <div class="col-6 form-group">
+                <label class="required-label">@L("DeliveryDate")</label>
+                <input type="text" class="form-control order-field" asp-for="DeliveryDate" required autocomplete="off" />
+            </div>
+            <div class="col-6 form-group">
+                <label class="required-label">@L("Customer")</label>
+                <select class="form-control order-field" asp-for="CustomerId" id="JobCustomerId" required>
+                    <option value="">Select a customer</option>
+                    @if (Model.CustomerId != 0)
+                    {
+                        <option selected value="@Model.CustomerId">@Model.CustomerName</option>
+                    }
+                </select>
+                <div class="d-none">
+                    <select class="form-control quote-dropdown order-field" asp-for="QuoteId">
+                        <option value=""
+                                data-placeholder-default="Not on a quote"
+                                data-placeholder-no-items="No quotes defined for the selected customer"
+                                data-placeholder-no-parent="Select a customer first">
+                            Select a quote
+                        </option>
+                        @if (Model.QuoteId.HasValue)
+                        {
+                            <option selected value="@Model.QuoteId">@Model.QuoteName</option>
+                        }
+                    </select>
+                </div>
+                <input type="checkbox" id="JobIsTaxExempt" name="IsTaxExempt" value="true" class="d-none" checked="@(Model.IsTaxExempt ? "checked" : null)">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 form-group">
+                <label>@L("Contact"):</label>
+                <select class="form-control" asp-for="ContactId" id="JobContactId">
+                    <option value=""
+                            data-placeholder-default="Select a contact"
+                            data-placeholder-no-items="No contacts defined for the selected customer"
+                            data-placeholder-no-parent="Select a customer first">
+                        Select a contact
+                    </option>
+                    @if (Model.ContactId.HasValue)
+                    {
+                        <option selected value="@Model.ContactId" data-phoneNumber="@Model.ContactPhone">@Model.ContactName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-6 form-group">
+                <div class="d-flex align-items-end h-100">
+                    <input type="text" class="form-control" asp-for="ContactPhone" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 form-group" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts))">
+                <label class="required-label">@L("Shift"):</label>
+                <select class="form-control" asp-for="Shift" id="JobShift" asp-items="@(await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id))" required>
+                    <option value="">Select a shift</option>
+                </select>
+            </div>
+            @if (!separateItems)
+            {
+                <div class="col-6 form-group" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+                    <label>@L("Office"):</label>
+                    <select class="form-control" asp-for="OfficeId" id="JobOfficeId" disabled="@(Model.IsSingleOffice ? "disabled" : null)">
+                        <option value="">Select an office</option>
+                        @if (Model.OfficeId != 0)
+                        {
+                            <option selected value="@Model.OfficeId">@Model.OfficeName</option>
+                        }
+                    </select>
+                </div>
+            }
+        </div>
+        <div class="row">
+            @if (!separateItems)
+            {
+                <div class="col-6 form-group">
+                    <label>@L("JobNumber")</label>
+                    <input class="form-control order-line-field" type="text" asp-for="JobNumber" maxlength="@EntityStringFieldLengths.OrderLine.JobNumber">
+                </div>
+                <div class="col-6 form-group">
+                    <label>@L("PONumber")</label>
+                    <input class="form-control order-line-field" type="text" asp-for="PONumber" maxlength="@EntityStringFieldLengths.Order.PoNumber">
+                </div>
+            }
+            <div class="col-6 form-group">
+                <label class="required-label">@L("Designation")</label>
+                <select class="form-control order-line-field" required asp-for="Designation" id="JobDesignation" asp-items="await DesignationAppService.GetDesignationSelectListItemsAsync(Model.Designation).ToSelectListItemsAsync()">
+                    <option value="">Select a designation</option>
+                </select>
+            </div>
+            <div class="col-6 d-flex align-items-end">
+                <div class="form-group" abp-hidden>
+                    <button type="button" class="btn btn-primary" id="OpenQuoteBasedOrderLinesModalButton">Select a line item</button>
+                </div>
+            </div>
+        </div>
+        <div id="DesignationRelatedFields">
+            @if (separateItems)
+            {
+                @await Html.PartialAsync("JobPartialViews/SeparateItemsJobPartialView")
+            }
+            else
+            {
+                @await Html.PartialAsync("JobPartialViews/JobPartialView")
+            }
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <div class="save-button-container">
+        <button type="button" class="btn btn-primary save-job-button"><i class="fa fa-save"></i> <span>@L("Save")</span></button>
+    </div>
+    <div class="btn-group dropdown save-button-dropdown save-and-print-buttons-container">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span>
+                <i class="fa fa-save"></i>
+                <span>@L("Save")</span>
+            </span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item save-job-button" href="#">@L("Save")</a>
+            <a class="dropdown-item" href="#" id="SaveAndPrintButton">@L("SaveAndPrint")</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,76 @@
+﻿@using System.Globalization
+@using Abp.Timing
+@using Abp.Web.Security.AntiForgery
+@using DispatcherWeb.Localization
+@using DispatcherWeb.Timing
+@using DispatcherWeb.Web.Resources
+@inject ScriptPaths ScriptPaths
+@inject AppTimes AppTimes
+@inject IAbpAntiForgeryManager AbpAntiForgeryManager
+@inject IWebResourceManager WebResourceManager
+@{
+    Layout = null;
+    AbpAntiForgeryManager.SetCookie(Context);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <partial name="_MetaTags" />
+    <partial name="_CommonInlineStyles" />
+    <partial name="_ApplicationInsights" />
+    <partial name="_Favicons" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/vendors.bundle.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="@(ApplicationPath)metronic/dist/html/blue/assets/base/style.bundle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/account-layout-libs.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/common-styles.min.css" asp-append-version="true" />
+    <link rel="stylesheet" abp-href="/view-resources/Views/Account/_Layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/view-resources/Areas/App/Views/_Bundles/app-layout-libs.min.css" asp-append-version="true" />
+    <link rel="stylesheet" abp-href="/Common/Scripts/Datatables/datatables.css" asp-append-version="true" />
+    <link rel="stylesheet" abp-href="/Common/Styles/metronic-customize.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", false)
+
+    <partial name="_AppPathScript" />
+</head>
+<body class="m-page--fluid m--skin-light2
+      m-content--skin-light2
+      m-header--fixed
+      m-header--fixed-mobile
+      m-aside-left--fixed
+      @(Context.Request.Cookies.ContainsKey("sidebar_toggle_state") && Context.Request.Cookies["sidebar_toggle_state"] == "on" ? "m-aside-left--minimize m-brand--minimize":"")
+      m-aside-left--enabled
+      m-aside-left--skin-light
+      m-aside-left--offcanvas">
+    <div class="menu-toggler sidebar-toggler">
+    </div>
+    <div class="content">
+        <div class="dispatch-layout">
+            @RenderBody()
+        </div>
+        <div class="footer-copyright">
+            @Clock.Now.Year © Dump Truck Dispatcher, Inc.
+        </div>
+    </div>
+
+    <script src="/view-resources/Areas/App/Views/_Bundles/app-layout-libs.min.js" asp-append-version="true"></script>
+    <script src="/view-resources/Areas/App/Views/_Bundles/scripts.bundle.min.js" asp-append-version="true"></script>
+    <!-- Dynamic scripts of ABP system (They are created on runtime and can not be bundled) -->
+    <script src="@(ApplicationPath)AbpServiceProxies/GetAll?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+    <script src="/Common/Scripts/abp.proxies.overrides.js" asp-append-version="true"></script>
+    <script src="@(ApplicationPath)AbpScripts/GetScripts?v=@(AppTimes.StartupTime.Ticks)" type="text/javascript"></script>
+    <script type="text/javascript" asp-add-nonce>
+        abp.localization.currentCulture = $.extend({}, abp.localization.currentCulture, { displayNameEnglish: '@CultureInfo.CurrentUICulture.EnglishName' });
+        moment.locale('@(CultureHelper.UsingLunarCalendar ? "en": CultureInfo.CurrentUICulture.Name )'); //Localizing moment.js
+    </script>
+    <script src="/view-resources/Areas/App/Views/_Bundles/common-scripts.min.js" asp-append-version="true"></script>
+    <script src="/view-resources/Areas/App/Views/_Bundles/app-common-scripts.min.js" asp-append-version="true"></script>
+
+    <script src="~@ScriptPaths.JQuery_Validation_Localization" asp-append-version="true"></script>
+    <script src="~@ScriptPaths.JQuery_Timeago_Localization" asp-append-version="true"></script>
+    <script src="~@ScriptPaths.Select2_Localization" asp-append-version="true"></script>
+
+    @WebResourceManager.RenderScripts()
+
+    @await RenderSectionAsync("Scripts", false)
+</body>
+</html>

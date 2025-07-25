@@ -1,0 +1,16 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Scheduling.Dto
+@model SetOrderLineNoteInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Edit Note"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderLineId" />
+        <div class="form-group">
+            <label class="control-label" for="Note">@L("Note")</label>
+            <textarea class="form-control" rows="5" asp-for="Note"></textarea>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

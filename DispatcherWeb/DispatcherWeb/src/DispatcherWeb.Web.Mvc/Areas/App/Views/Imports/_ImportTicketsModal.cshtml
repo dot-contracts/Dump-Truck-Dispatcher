@@ -1,0 +1,42 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Tickets Import"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation m-form" id="ImportForm" asp-action="UploadFile">
+        <div class="form-group">
+            <label class="required-label">@L("ImportType")</label>
+            <select class="form-control" required id="ImportType" name="ImportType">
+                <option value="">Select an option</option>
+                @if (await IsGrantedAsync(AppPermissions.Pages_Imports_Tickets_TruxEarnings) && await SettingManager.GetSettingValueAsync<bool>(AppSettings.Trux.AllowImportingTruxEarnings))
+                {
+                    <option value="@((int)ImportType.Trux)">@L("Trux")</option>
+                }
+                @if (await IsGrantedAsync(AppPermissions.Pages_Imports_Tickets_LuckStoneEarnings) && await SettingManager.GetSettingValueAsync<bool>(AppSettings.LuckStone.AllowImportingLuckStoneEarnings))
+                {
+                    <option value="@((int)ImportType.LuckStone)">@L("LuckStone")</option>
+                }
+                @if (await IsGrantedAsync(AppPermissions.Pages_Imports_Tickets_IronSheepdogEarnings) && await SettingManager.GetSettingValueAsync<bool>(AppSettings.IronSheepdog.AllowImportingIronSheepdogEarnings))
+                {
+                    <option value="@((int)ImportType.IronSheepdog)">@L("IronSheepdog")</option>
+                }
+            </select>
+        </div>
+        <div class="form-group fileUpload" abp-hidden>
+            <div class="btn btn-primary browse_btn">
+                <span>@L("Browse")</span>
+                <input id="ImportFile" type="file" accept=".csv" class="upload">
+            </div>
+            <input class="form-control file-upload" placeholder="No File Selected." disabled="disabled">
+            <div class="col-xs-12 mt-1">
+                <span class="m-form__help">This should be a CSV file.</span>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+</div>

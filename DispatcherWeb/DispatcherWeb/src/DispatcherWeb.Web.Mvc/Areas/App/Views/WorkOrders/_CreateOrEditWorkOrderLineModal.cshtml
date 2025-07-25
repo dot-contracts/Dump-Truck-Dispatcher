@@ -1,0 +1,43 @@
+﻿@using DispatcherWeb.WorkOrders.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model WorkOrderLineEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit work order line" : "Create new work order line"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="WorkOrderId" />
+        <div class="form-group">
+            <label class="required-label" asp-for="VehicleServiceId">@L("Service")</label>
+            <select class="form-control" asp-for="VehicleServiceId" required>
+                <option value="">Select service</option>
+                @if(Model.VehicleServiceId != 0)
+                {
+                    <option selected value="@Model.VehicleServiceId">@Model.VehicleServiceName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="Note">@L("Notes")</label>
+            <textarea type="text" class="form-control" rows="3" asp-for="Note" maxlength="1000"></textarea>
+        </div>
+        <div class="form-group">
+            <label asp-for="LaborTime">@L("LaborTime") @L("(Hours)")</label>
+            <input type="text" class="form-control" asp-for="LaborTime" data-rule-number="true" data-rule-min="0" data-rule-max="10000">
+        </div>
+        <div class="form-group">
+            <label asp-for="LaborRate">@L("LaborRate")</label>
+            <input type="text" class="form-control" asp-for="LaborRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+        <div class="form-group">
+            <label asp-for="LaborCost">@L("LaborCost")</label>
+            <input type="text" class="form-control" asp-for="LaborCost" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+        <div class="form-group">
+            <label asp-for="PartsCost">@L("PartsCost")</label>
+            <input type="text" class="form-control" asp-for="PartsCost" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

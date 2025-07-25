@@ -1,0 +1,150 @@
+﻿@using Abp.Collections.Extensions
+@using DispatcherWeb.Infrastructure.Extensions
+@model DispatcherWeb.Imports.Dto.ImportResultDto
+
+@section Scripts
+    {
+    @*<environment names="Development">
+            <script src="~/view-resources/Areas/app/Views/ImportData/Index.js" asp-append-version="true"></script>
+        </environment>
+        <environment names="Staging,Production">
+            <script src="~/view-resources/Areas/app/Views/ImportData/Index.min.js" asp-append-version="true"></script>
+        </environment>*@
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-7 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                Import result
+            </h3>
+            <span class="m-section__sub">
+            </span>
+        </div>
+        <div class="col-5 col-md-6 text-right">
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <table class="display table table-striped table-bordered table-hover dt-responsive nowrap">
+                <tr>
+                    <td>Import finished without critical errors</td>
+                    <td>@Model.IsImported.ToYesNoString()</td>
+                </tr>
+                <tr>
+                    <td>Rows imported</td>
+                    <td>@Model.ImportedNumber</td>
+                </tr>
+                <tr>
+                    <td>Rows skipped</td>
+                    <td>@Model.SkippedNumber</td>
+                </tr>
+                <tr>
+                    <td>Errors</td>
+                    <td>@Model.HasErrors.ToYesNoString()</td>
+                </tr>
+                @if (Model.EmptyRows.Count > 0)
+                {
+                    <tr>
+                        <td>Empty row numbers</td>
+                        <td>
+                            @Model.EmptyRows.Select(x => x + 1).JoinAsString(", ")
+                        </td>
+                    </tr>
+                }
+                @if (Model.NotFoundTrucks.Count > 0)
+                {
+                    <tr>
+                        <td>Not found trucks</td>
+                        <td>
+                            @Model.NotFoundTrucks.JoinAsString(", ")
+                        </td>
+                    </tr>
+                }
+                @if (Model.NotFoundOffices.Count > 0)
+                {
+                    <tr>
+                        <td>Not found offices</td>
+                        <td>
+                            @Model.NotFoundOffices.JoinAsString(", ")
+                        </td>
+                    </tr>
+                }
+                @if (Model.ResourceErrors.Count > 0)
+                {
+                    <tr>
+                        <td>Resource errors</td>
+                        <td>
+                            @foreach (var error in Model.ResourceErrors)
+                            {
+                                <div>@error</div>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (Model.TruckCodeInOffices.Count > 0)
+                {
+                    <tr>
+                        <td>The same truck code exists in two or more offices <br />and an office is not specified in the import data</td>
+                        <td>
+                            @foreach (var truck in Model.TruckCodeInOffices)
+                            {
+                                <div>
+                                    Truck code: @truck.truckCode;
+                                    Offices: @truck.offices.JoinAsString(", ")
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (Model.StringExceedErrors.Count > 0)
+                {
+                    <tr>
+                        <td>Too long strings</td>
+                        <td>
+                            @foreach (var rowKeyValuePair in Model.StringExceedErrors)
+                            {
+                                <div>Row @(rowKeyValuePair.Key + 1):</div>
+                                foreach (var keyValuePair in rowKeyValuePair.Value)
+                                {
+                                    <div>Failed to write string "@keyValuePair.Value.Item1" to the field @keyValuePair.Key with maximum length @keyValuePair.Value.Item2</div>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (Model.ParseErrors.Count > 0)
+                {
+                    <tr>
+                        <td>Parse errors</td>
+                        <td>
+                            @foreach (var rowKeyValuePair in Model.ParseErrors)
+                            {
+                                <div>Row @(rowKeyValuePair.Key + 1):</div>
+                                foreach (var keyValuePair in rowKeyValuePair.Value)
+                                {
+                                    <div>Failed to parse value "@keyValuePair.Value.value" in the field @(keyValuePair.Key). @GetDataTypeHelpString(keyValuePair.Value.type)</div>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>
+@{
+    string GetDataTypeHelpString(Type type)
+    {
+        switch (type)
+        {
+            case Type dateTime when dateTime == typeof(DateTime):
+                return "Format should be : MM/DD/YYYY HH:MM:SS PM and time is optional.";
+            default:
+                return "";
+        }
+    }
+}

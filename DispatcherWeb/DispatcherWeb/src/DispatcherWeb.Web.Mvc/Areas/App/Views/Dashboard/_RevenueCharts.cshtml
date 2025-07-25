@@ -1,0 +1,176 @@
+﻿@using DispatcherWeb.Authorization.Users.Cache
+@using DispatcherWeb.Dashboard
+@using DispatcherWeb.Dashboard.Dto
+@using DispatcherWeb.Features
+@inject IDashboardSettingManager DashboardSettingManager
+@inject IUserOrganizationUnitCache UserOrganizationUnitCache
+@model RevenueChartsDataDto
+@{
+    Layout = null;
+    var currencyCulture = await SettingManager.GetCurrencyCultureAsync();
+    var hasAccessToAllOffices = await UserOrganizationUnitCache.HasAccessToAllOffices();
+}
+
+@if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.RevenueCharts.Revenue))
+{
+    <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+        <div class="card card-body">
+            <h2 class="card-title bg-white">@Model.TotalRevenue.ToString("C2", currencyCulture)</h2>
+            <div class="progress h-40px">
+                <div class="progress-bar bg-freight" role="progressbar" data-toggle="tooltip" title="Freight: @Model.FreightRevenueValue.ToString("C2", currencyCulture)" aria-valuenow="@Math.Round(Model.FreightRevenuePercent)" aria-valuemin="0" aria-valuemax="100">
+                    @if (Model.FreightRevenuePercent != decimal.Zero)
+                    {
+                        <div>Freight</div>
+                    }
+                </div>
+                <div class="progress-bar bg-material" role="progressbar" data-toggle="tooltip" title="Material: @Model.MaterialRevenueValue.ToString("C2", currencyCulture)" aria-valuenow="@Math.Round(Model.MaterialRevenuePercent)" aria-valuemin="0" aria-valuemax="100">
+                    @if (Model.MaterialRevenueValue != decimal.Zero)
+                    {
+                        <div>Material</div>
+                    }
+                </div>
+                <div class="progress-bar bg-fuel" role="progressbar" data-toggle="tooltip" title="Fuel Surcharge: @Model.FuelSurchargeValue.ToString("C2", currencyCulture)" aria-valuenow="@Math.Round(Model.FuelSurchargePercent)" aria-valuemin="0" aria-valuemax="100">
+                    @if (Model.FuelSurchargeValue != decimal.Zero)
+                    {
+                        <div>Fuel Surcharge</div>
+                    }
+                </div>
+            </div>
+            <br />
+            <h4 class="card-text">Revenue</h4>
+        </div>
+    </div>
+}
+
+@if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.RevenueCharts.RevenuePerTruck) && hasAccessToAllOffices)
+{
+    <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+        <div class="card card-body">
+            <h2 class="card-title bg-white">@Model.TotalRevenuePerTruck.ToString("C2", currencyCulture)</h2>
+            <div class="progress h-40px">
+                <div class="progress-bar bg-freight" role="progressbar" data-toggle="tooltip" title="Freight: @Model.FreightRevenuePerTruckValue.ToString("C2", currencyCulture)" aria-valuenow="@Math.Round(Model.FreightRevenuePerTruckPercent)" aria-valuemin="0" aria-valuemax="100">
+                    @if (Model.FreightRevenuePerTruckPercent != decimal.Zero)
+                    {
+                        <div>Freight</div>
+                    }
+                </div>
+                <div class="progress-bar bg-material" role="progressbar" data-toggle="tooltip" title="Material: @Model.MaterialRevenuePerTruckValue.ToString("C2", currencyCulture)" aria-valuenow="@Math.Round(Model.MaterialRevenuePerTruckPercent)" aria-valuemin="0" aria-valuemax="100">
+                    @if (Model.MaterialRevenuePerTruckValue != decimal.Zero)
+                    {
+                        <div>Material</div>
+                    }
+                </div>
+                <div class="progress-bar bg-fuel" role="progressbar" data-toggle="tooltip" title="Fuel Surcharge: @Model.FuelSurchargePerTruckValue.ToString("C2", currencyCulture)" aria-valuenow="@Math.Round(Model.FuelSurchargePerTruckPercent)" aria-valuemin="0" aria-valuemax="100">
+                    @if (Model.FuelSurchargePerTruckValue != decimal.Zero)
+                    {
+                        <div>Fuel Surcharge</div>
+                    }
+                </div>
+            </div>
+            <br />
+            <h4 class="card-text">Revenue/Truck</h4>
+        </div>
+    </div>
+}
+
+@if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.RevenueCharts.FuelCost) && hasAccessToAllOffices)
+{
+    <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+        <div class="card card-body">
+            <h2 class="card-title bg-white">@Model.FuelCostValue.ToString("C2", currencyCulture)</h2>
+            <div class="h-40px"></div>
+            <br />
+            <h4 class="card-text">Fuel Cost</h4>
+        </div>
+    </div>
+}
+
+@if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.RevenueCharts.AdjustedRevenue) && hasAccessToAllOffices)
+{
+    <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+        <div class="card card-body">
+            <h2 class="card-title bg-white">@Model.AdjustedRevenueValue.ToString("C2", currencyCulture)</h2>
+            <div class="h-40px"></div>
+            <br />
+            <h4 class="card-text">Adj. Revenue</h4>
+        </div>
+    </div>
+}
+
+@if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.RevenueCharts.AverageAdjustedRevenuePerTruck) && hasAccessToAllOffices)
+{
+    <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+        <div class="card card-body">
+            <h2 class="card-title bg-white">@Model.AvgAdjustedRevnuePerTruckValue.ToString("C2", currencyCulture)</h2>
+            <div class="h-40px"></div>
+            <br />
+            <h4 class="card-text">Avg.Adjusted Rev/Truck</h4>
+        </div>
+    </div>
+}
+
+@if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.RevenueCharts.AverageFuelCostPerMile) && hasAccessToAllOffices)
+{
+    @if (Model.IsGPSConfigured)
+    {
+        <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+            <div class="card card-body">
+                @if (Model.RequestedTicketType == TicketType.InternalTrucks)
+                {
+                    <h2 class="card-title bg-white">@Model.AvgFuelCostPerMileValue.ToString("C3", currencyCulture)/mi</h2>
+                }
+                else
+                {
+                    <h2 class="card-title bg-white">N/A</h2>
+                }
+                <div class="h-40px" ></div>
+                <br />
+                <h4 class="card-text">Avg. Fuel Cost/Mile</h4>
+            </div>
+        </div>
+    }
+}
+
+@if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.RevenueCharts.AverageRevenuePerHour) && hasAccessToAllOffices)
+{
+    @if (Model.IsGPSConfigured)
+    {
+        <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+            <div class="card card-body">
+                @if (@Model.RequestedTicketType == TicketType.InternalTrucks)
+                {
+                    <h2 class="card-title bg-white">@Model.AvgRevenuePerHourValue.ToString("C3", currencyCulture)/hr</h2>
+                }
+                else
+                {
+                    <h2 class="card-title bg-white">N/A</h2>
+                }
+                <div class="h-40px"></div>
+                <br />
+                <h4 class="card-text">Avg. Revenue/Hour</h4>
+            </div>
+        </div>
+    }
+}
+
+@if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.RevenueCharts.AverageRevenuePerMile) && hasAccessToAllOffices)
+{
+    @if (Model.IsGPSConfigured)
+    {
+        <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+            <div class="card card-body">
+                @if (Model.RequestedTicketType == TicketType.InternalTrucks)
+                {
+                    <h2 class="card-title bg-white">@Model.AvgRevenuePerMileValue.ToString("C3", currencyCulture)/mi</h2>
+                }
+                else
+                {
+                    <h2 class="card-title bg-white">N/A</h2>
+                }
+                <div class="h-40px"></div>
+                <br />
+                <h4 class="card-text">Avg. Revenue/Mile</h4>
+            </div>
+        </div>
+    }
+}

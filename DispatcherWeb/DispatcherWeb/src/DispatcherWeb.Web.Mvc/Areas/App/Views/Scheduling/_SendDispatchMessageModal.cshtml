@@ -1,0 +1,86 @@
+﻿@using DispatcherWeb.Dispatching
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Web.Areas.App.Models.Scheduling
+@model SendDispatchMessageModalViewModel
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("SendDispatchMessage")))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderLineId" />
+        <input type="hidden" asp-for="FreightUom" />
+        <div class="form-group" abp-hidden>
+            <div class="d-flex justify-content-between">
+                <label class="required-label" for="Message">@L("MessageText")</label>
+                <label id="MessageLength">@L("{0}chars", Model.Message.Length)</label>
+            </div>
+            <textarea class="form-control" rows="6" asp-for="Message" required maxlength="@(EntityStringFieldLengths.Dispatch.Message - 100)"></textarea>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-link pr-0" id="ClearMessageBtn">@L("ClearText")</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="required-label">Send to</label>
+            <select class="form-control" name="OrderLineTruckIds" id="OrderLineTruckIds" multiple="multiple" required>
+                @foreach (var orderLineTruck in Model.OrderLineTrucks)
+                {
+                    <option value="@orderLineTruck.Value"
+                        selected=@(orderLineTruck.Selected ? "selected" : null)
+                        data-hascontactinfo="@orderLineTruck.HasContactInfo.ToLowerCaseString()">
+                        @orderLineTruck.Text
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group m-form__group row">
+            <label class="required-label col-form-label col-sm-9">How many dispatches to create for each truck?</label>
+            <div class="col-sm-3">
+                <input class="form-control" type="number" name="NumberOfDispatches" id="NumberOfDispatches"
+                       value="1" data-rule-number="true" data-rule-min="1" min="1"
+                       data-rule-max="@DispatchingAppService.MaxNumberOfDispatches" max="@DispatchingAppService.MaxNumberOfDispatches" required />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="IsMultipleLoads" class="m-checkbox">
+                <input id="IsMultipleLoads" type="checkbox" name="IsMultipleLoads" value="true" checked="@(Model.IsMultipleLoads ? "checked" : null)">
+                @L("RunUntilStopped")
+                <span></span>
+            </label>
+        </div>
+
+        <div class="form-group" abp-hidden="@(!Model.CanAddDispatchBasedOnTime)">
+            <label for="AddDispatchBasedOnTime" class="m-checkbox">
+                <input id="AddDispatchBasedOnTime" type="checkbox" name="AddDispatchBasedOnTime" value="true" checked="@(Model.CanAddDispatchBasedOnTime ? "checked" : null)">
+                @L("AddDispatchBasedOnTimeOnJob")
+                <span></span>
+            </label>
+        </div>
+
+        @if (Model.MaterialItemId != null || Model.FreightUomBaseId != UnitOfMeasureBaseEnum.Hours)
+        {
+            <div class="form-group">
+                <label for="UseTruckCapacityForLoadQuantity" class="m-checkbox">
+                    <input id="UseTruckCapacityForLoadQuantity" type="checkbox" name="UseTruckCapacityForLoadQuantity" value="true" checked="@(Model.UseTruckCapacityForLoadQuantity ? "checked" : null)">
+                    @L("UseTruckCapacityForLoadQuantity")
+                    <span></span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label class="">@L("LoadMaterialQuantity")</label>
+                <input class="form-control" id="LoadMaterialQuantity" type="number" min="0" step="0.0001" max="1000000" value="@Model.LoadMaterialQuantity" name="LoadMaterialQuantity" />
+            </div>
+        }
+
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" class="btn btn-primary save-button"><i class="fa fa-save"></i> <span>@L("Send")</span></button>
+</div>

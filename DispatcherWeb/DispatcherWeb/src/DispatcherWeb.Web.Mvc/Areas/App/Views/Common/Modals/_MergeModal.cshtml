@@ -1,0 +1,21 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model MergeModalViewModel
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Merge"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="IdsToMerge" />
+        <div class="alert alert-warning" role="alert">
+            @Model.Description
+        </div>
+        <div class="form-group">
+            <label class="required-label">Select main entry</label>
+            <select class="form-control" required asp-for="MainRecordId">
+                <option value="">Select an option</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

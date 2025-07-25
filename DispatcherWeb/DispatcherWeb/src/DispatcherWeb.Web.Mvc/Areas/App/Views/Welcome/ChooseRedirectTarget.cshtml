@@ -1,0 +1,35 @@
+﻿@using DispatcherWeb.Authorization;
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="m-alert m-alert--icon m-alert--icon-solid m-alert--outline alert alert-brand fade show" role="alert">
+                <div class="m-alert__icon">
+                    <i class="fa fa-exclamation-circle" aria-label="@L("Welcome")"></i>
+                    <span></span>
+                </div>
+                <div class="m-alert__text">
+                    <h5 class="mx-2">@L("ChooseRedirectTargetPage_Title")</h5>
+                    @L("ChooseRedirectTargetPage_Info")<br />
+                    @if (Session.ImpersonatorUserId.HasValue)
+                    {
+                        <a href="#" class="btn btn-primary m-2" id="BackToMyAccountButton">
+                            @L("BackToMyAccount")
+                        </a>
+                    }
+                    @if (await IsGrantedAsync(AppPermissions.Pages_Dashboard))
+                    {
+                        <a asp-action="Index" asp-controller="Dashboard" class="btn btn-primary m-2">Main application</a>
+                    }
+                    @if (await IsGrantedAsync(AppPermissions.Pages_DriverApplication_WebBasedDriverApp))
+                    {
+                        <a asp-action="PWA" asp-controller="DriverApplication" class="btn btn-primary m-2">@L("WebBasedDriverApp")</a>
+                    }
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany))
+                    {
+                        <a asp-action="Index" asp-controller="MyCompany" class="btn btn-primary m-2">@L("LeaseHaulerPortal")</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    

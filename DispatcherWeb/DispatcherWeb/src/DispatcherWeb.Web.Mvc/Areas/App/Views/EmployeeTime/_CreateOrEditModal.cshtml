@@ -1,0 +1,80 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.EmployeeTime.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model EmployeeTimeEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Time" : "Add new time"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation" name="EmployeeTimeForm">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="TimeClassificationAllowsManualTime" />
+        <input type="hidden" asp-for="TimeOffId" />
+        <input type="hidden" asp-for="HasSingleDriverCompany" />
+        <div class="form-group">
+            <label><span class="required-label">@L("Employee")</span></label>
+            <select class="form-control" asp-for="EmployeeId" required disabled="@(Model.LockToCurrentUser ? "disabled" : null)">
+                <option value="">Select an employee</option>
+                @if (Model.EmployeeId > 0)
+                {
+                    <option value="@Model.EmployeeId" selected>@Model.EmployeeName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group" abp-hidden="@(Model.HasSingleDriverCompany || Model.DriverCompanies?.Any() != true)">
+            <div class="alert alert-warning">@L("SelectDriverCompanyForSelectedUserPrompt")</div>
+            <label><span class="required-label">@L("DriverCompany")</span></label>
+            <select class="form-control" asp-for="DriverId">
+                <option value="">Select a company</option>
+                @if (Model.DriverCompanies != null)
+                {
+                    @foreach (var driverCompany in Model.DriverCompanies)
+                    {
+                        <option value="@driverCompany.DriverId">@driverCompany.CompanyName</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label><span class="required-label">@L("TimeClassification")</span></label>
+            <select class="form-control" asp-for="TimeClassificationId" required>
+                <option value="">Select a time classification</option>
+                @if (Model.TimeClassificationId > 0)
+                {
+                    <option value="@Model.TimeClassificationId">@Model.TimeClassificationName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="StartDateTime"><span class="required-label">@L("StartDateTime")</span></label>
+            <input class="form-control" type="text" asp-for="StartDateTime" required>
+        </div>
+        <div class="form-group" abp-hidden="@Model.ManualHourAmount.HasValue">
+            <label for="EndDateTime"><span>@L("EndDateTime")</span></label>
+            <input class="form-control" type="text" asp-for="EndDateTime">
+        </div>
+        <div class="form-group" abp-hidden="@(!Model.ManualHourAmount.HasValue)">
+            <label for="ManualHourAmount"><span>@L("ManualHourAmount")</span></label>
+            <input class="form-control" type="number" asp-for="ManualHourAmount">
+        </div>
+        <div class="form-group mt-4 mb-2">
+            <label class="m-checkbox">
+                <input type="checkbox" id="IsManualTime" value="true" checked="@(Model.ManualHourAmount.HasValue ? "checked" : null)">
+                @L("ManualTime")
+                <span></span>
+            </label>
+        </div>
+        <div class="form-group" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.BasePayOnHourlyJobRate))">
+            <label>@L("PayRate")</label>
+            <input class="form-control" type="text" asp-for="PayRate" data-rule-number="true" data-rule-min="0"
+                   data-rule-max="@AppConsts.MaxDecimalDatabaseLength"
+                   disabled="@(Model.LockToCurrentUser ? "disabled" : null)">
+        </div>
+        <div class="form-group">
+            <label for="Description"><span>@L("Description")</span></label>
+            <textarea class="form-control" type="text" asp-for="Description" maxlength="@DispatcherWeb.Infrastructure.EntityStringFieldLengths.EmployeeTime.Description"></textarea>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

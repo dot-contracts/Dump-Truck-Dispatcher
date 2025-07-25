@@ -1,0 +1,60 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Shared
+
+@model ReportViewModelBase
+@{
+    Layout = "~/Areas/App/Views/Layout/default/_Layout.cshtml";
+}
+
+@section Scripts
+{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/Shared/Reports/Report.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/Shared/Reports/Report.min.js" asp-append-version="true"></script>
+    </environment>
+
+    @await RenderSectionAsync("Scripts")
+}
+
+
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-12">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span> @await RenderSectionAsync("H1") </span>
+            </h3>
+            <span class="m-section__sub">
+                @await RenderSectionAsync("Description", false)
+            </span>
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right" id="CreateReportForm">
+                <div id="CustomersFormFilter">
+                    @RenderBody()
+
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-xl-12 text-right margin-top-20">
+                            @if(Model.ShowCsv)
+                            {
+                                <button type="button" id="CreateReportCsv" class="btn btn-primary">
+                                    <i class="fa fa-file-excel-o"></i> @L("ExportToCsv")
+                                </button>
+                            }
+                            @if(Model.ShowPdf)
+                            {
+                                <button type="button" id="CreateReportPdf" class="btn btn-primary">
+                                    <i class="fa fa-print"></i> @L("Print")
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

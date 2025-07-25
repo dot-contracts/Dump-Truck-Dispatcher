@@ -1,0 +1,163 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.TicketsByDriver;
+}
+@section Scripts{
+    <script src="~/view-resources/Areas/app/Views/Tickets/TicketsByDriver.js" asp-append-version="true"></script>
+}
+
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("TicketsByDriver")</span>
+            </h3>
+        </div>
+        <div class="col-6 text-right">
+        </div>
+    </div>
+</div>
+
+<div abp-hidden>
+    <form role="form" name="TicketForm" novalidate class="form-validation">
+        <input type="file" accept="image/jpeg,image/gif,image/png,application/pdf" capture class="upload" id="TicketPhoto" name="TicketPhoto" abp-hidden />
+    </form>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+
+            <div class="m-form m-form--label-align-right">
+                <form>
+                    <div class="row align-items-center mb-4">
+                        <div class="form-group col-lg-4 col-md-4 col-sm-6">
+                            <label for="DateFilter" class="control-label required-label">@L("Date")</label>
+                            <input type="text" class="form-control filter filter-date" autocomplete="off" name="Date" id="DateFilter">
+                        </div>
+                        <div class="form-group col-lg-4 col-md-4 col-sm-6">
+                            <label class="control-label" for="DriverIdFilter">@L("Driver")</label>
+                            <select class="form-control filter" name="DriverId" id="DriverIdFilter">
+                                <option value="">@L("All")</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-xl-2 col-lg-4 col-md-3 col-sm-6">
+                            <label for="HideVerifiedTickets" class="m-checkbox mt-35px">
+                                <input id="HideVerifiedTickets" class="filter" type="checkbox" name="HideVerifiedTickets" />
+                                @L("HideVerifiedTickets")
+                                <span></span>
+                            </label>
+                        </div>
+                        <div class="form-group col-xl-2 col-lg-12 col-md-12 col-sm-6" id="CurrentFuelCostContainer">
+                            <div class="text-lg-right text-md-right">
+                                <div class="d-lg-inline-block d-md-inline-block text-left">
+                                    <label class="control-label" for="CurrentFuelCost">@L("CurrentFuelCost")</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control no-numeric-spinner" name="CurrentFuelCost" id="CurrentFuelCost"  max="99" required="required" disabled>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-secondary" type="button" id="EditCurrentFuelCostButton">
+                                                <span class="fa fa-edit"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        @*<div class="form-group col-lg-4 col-md-4 col-sm-12">
+                            <label class="control-label">&nbsp;</label>
+                            <div class="text-right">
+                                <button type="submit" id="SearchButton" class="btn btn-primary">
+                                    <i class="fa fa-search"></i> @L("Search")
+                                </button>
+                                <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                    <i class="fa fa-times"></i> @L("Clear")
+                                </button>
+                            </div>
+                        </div>*@
+                    </div>
+                </form>
+            </div>
+            <div id="TicketList">
+
+                @*<div class="card card-collapsable card-collapse bg-superlight mb-4">
+                    <div class="card-header bg-superlight">
+                        <div class="m-form m-form--label-align-right">
+                            <form>
+                                <div class="row align-items-center">
+                                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                                        <label class="control-label" for="DriverId">@L("Driver")</label>
+                                        <select class="form-control filter" name="DriverId" id="DriverId0">
+                                            <option value="">John Doe</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                                        <label class="control-label" for="DriverId">@L("Customer")</label>
+                                        <select class="form-control filter" name="DriverId" id="DriverId1">
+                                            <option value="">John Doe</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                                        <label class="control-label" for="DriverId">@L("LoadAt")</label>
+                                        <select class="form-control filter" name="DriverId" id="DriverId2">
+                                            <option value="">John Doe</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                                        <label class="control-label" for="DriverId">@L("DeliverTo")</label>
+                                        <select class="form-control filter" name="DriverId" id="DriverId3">
+                                            <option value="">John Doe</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                                        <label class="control-label" for="DriverId">@L("Item")</label>
+                                        <select class="form-control filter" name="DriverId" id="DriverId4">
+                                            <option value="">John Doe</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                                        <label class="control-label" for="MaterialUomId">UOM</label>
+                                        <select class="form-control" name="MaterialUomId">
+                                            <option value="">Select UOM</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-2 col-md-4 col-sm-5">
+                                        <label class="control-label">Freight Rate</label>
+                                        <input class="form-control" type="text" name="FreightPricePerUnit" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+                                    </div>
+                                    <div class="form-group col-lg-2 col-md-4 col-sm-5">
+                                        <label class="control-label">Material Rate</label>
+                                        <input class="form-control" type="text" name="MaterialPricePerUnit" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+                                    </div>
+                                    <div class="form-group col-lg-2 col-md-4 col-sm-2">
+                                        <label class="control-label">&nbsp;</label>
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-primary" data-card-tool="toggle"><span class="arrow fa fa-angle-up"></span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body py-0" abp-hidden>
+                        <table class="table table-striped table-bordered table-hover order-line-tickets-table" id="TicketsTable"></table>
+                    </div>
+                </div>*@
+
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+</div>
+
+

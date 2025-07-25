@@ -1,0 +1,17 @@
+﻿@using DispatcherWeb.Orders.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Infrastructure
+@model OrderInternalNotesDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Edit Internal Notes"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderId" />
+        <div class="form-group">
+            <label class="control-label">Internal Notes:</label>
+            <textarea class="form-control" rows="5" asp-for="InternalNotes" maxlength="@(EntityStringFieldLengths.Order.InternalNotes)"></textarea>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

@@ -1,0 +1,70 @@
+﻿@using Abp.Configuration;
+@using DispatcherWeb.Configuration;
+@using DispatcherWeb.Features;
+@using DispatcherWeb.LeaseHaulers
+@using DispatcherWeb.LeaseHaulers.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model LeaseHaulerContactEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Contact: " + Model.Name : "Create new contact"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="LeaseHaulerId" />
+        <div class="form-group">
+            <label class="required-label">@L("Name")</label>
+            <input class="form-control" type="text" asp-for="Name" required>
+        </div>
+        <div class="form-group">
+            <label>@L("Title")</label>
+            <input class="form-control" type="text" asp-for="Title">
+        </div>
+        <div class="form-group">
+            <label asp-for="IsDispatcher" class="m-checkbox">
+                <input type="checkbox" id="IsDispatcher" name="IsDispatcher" value="true" @Html.Raw(!Model.IsDispatcher ? "" : "checked=\"checked\"")>
+                @L("ReceivesTruckRequests")
+                <span></span>
+            </label>
+        </div>
+        @if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.LeaseHaulers.AllowLeaseHaulerRequestProcess) && await FeatureChecker.IsEnabledAsync(AppFeatures.LeaseHaulerPortalJobBasedLeaseHaulerRequest))
+        {
+            <div class="form-group">
+                <label asp-for="AllowPortalAccess" class="m-checkbox">
+                    <input type="checkbox" id="AllowPortalAccess" name="AllowPortalAccess" value="true" @Html.Raw(!Model.AllowPortalAccess ? "" : "checked=\"checked\"")>
+                    @L("AllowPortalAccess")
+                    <span></span>
+                </label>
+            </div>
+        }
+        <div class="form-group">
+            <label>@L("OfficePhoneNumber")</label>
+            <input class="form-control" type="text" asp-for="Phone">
+        </div>
+        <div class="form-group">
+            <label asp-for="CellPhoneNumber">@L("CellPhoneNumber")</label>
+            <input class="form-control" type="text" asp-for="CellPhoneNumber" placeholder="Cell Phone Number (format: +15554321)" maxlength="@LeaseHaulerContact.MaxCellPhoneNumberLength">
+        </div>
+        <div class="form-group">
+            <label>@L("Email")</label>
+            <div class="d-flex align-items-start">
+                <div class="w-100">
+                    <input class="form-control" type="text" asp-for="Email">
+                </div>
+                @if (await FeatureChecker.IsEnabledAsync(AppFeatures.LeaseHaulerPortalJobBasedLeaseHaulerRequest) && await SettingManager.GetSettingValueAsync<bool>(AppSettings.LeaseHaulers.AllowLeaseHaulerRequestProcess))
+                {
+                    <button type="button" class="btn btn-primary ml-2 d-none" id="SendInviteButton" title="Send an invite to the portal.">
+                        <i class="fa fa-paper-plane"></i>
+                        <span>@L("SendInvite")</span>
+                    </button>
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" asp-for="NotifyPreferredFormat">@L("PreferredFormat")</label>
+            <select class="form-control" data-style="selectpicker-default" asp-for="NotifyPreferredFormat" asp-items="Html.GetEnumSelectListWithDefaults<OrderNotifyPreferredFormat>()"></select>
+        </div>
+
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

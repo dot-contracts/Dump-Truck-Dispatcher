@@ -1,0 +1,108 @@
+﻿@using DispatcherWeb.Authorization
+@using DispatcherWeb.Web.Areas.App.Startup
+@using DispatcherWeb.PreventiveMaintenanceSchedule.Dto
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Models.PreventiveMaintenanceSchedule
+@model PreventiveMaintenanceListViewModel
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.PreventiveMaintenanceSchedule;
+}
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/PreventiveMaintenanceSchedule/Index.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/PreventiveMaintenanceSchedule/_CreateOrEditPreventiveMaintenanceModal.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/PreventiveMaintenanceSchedule/Index.min.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/PreventiveMaintenanceSchedule/_CreateOrEditPreventiveMaintenanceModal.min.js" asp-append-version="true"></script>
+    </environment>
+
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-8">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("PreventiveMaintenanceScheduleHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("PreventiveMaintenanceScheduleHeaderInfo")
+            </span>
+        </div>
+        <div class="mr-auto-btn col-sm-12 col-md-4 text-center text-md-right">
+            @if (await IsGrantedAsync(AppPermissions.Pages_PreventiveMaintenanceSchedule_Edit))
+            {
+                <button id="AddPreventiveMaintenance" class="btn btn-primary"><i class="fa fa-plus"></i> @L("AddPM")</button>
+            }
+            @if (await IsGrantedAsync(AppPermissions.Pages_WorkOrders_Edit) || await IsGrantedAsync(AppPermissions.Pages_WorkOrders_EditLimited))
+            {
+                <button class="btn btn-primary" id="CreateWorkOrders" disabled="disabled" title="Select items below that should be used to create work orders"><i class="fa fa-plus"></i> @L("CreateWorkOrders")</button>
+            }
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right" data-disable-load-state="@Model.DisableLoadState.ToLowerCaseString()">
+                <div>
+                    <div class="row m--margin-bottom-10">
+                        <input type="hidden" class="filter" name="OfficeId" asp-for="Filter.OfficeId" />
+                        <input type="hidden" class="filter" name="DueForService" asp-for="Filter.DueForService" />
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="TruckFilter">@L("Truck")</label>
+                            <input class="form-control filter" id="TruckFilter" name="TruckCode" placeholder="Search..." type="text">
+                        </div>
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="DueDateFilter">@L("DueDate")</label>
+                            <input class="form-control filter" name="DueDateFilter" id="DueDateFilter" type="text" autocomplete="off">
+                        </div>
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6"> 
+                            <label class="control-label" for="StatusFilter">@L("Status")</label>
+                            <select class="form-control filter" name="Status" id="StatusFilter" asp-for="Filter.Status" asp-items="@Html.GetEnumSelectListWithDefaults<GetPreventiveMaintenancePagedListInput.PreventiveMaintenanceStatus>()"></select>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="VehicleServiceFilter">@L("Service")</label>
+                            <select class="form-control filter" name="VehicleServiceId" id="VehicleServiceFilter" data-display-name="VehicleServiceName">
+                                <option value="">Select Service</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-lg-12 text-right">
+                            <button type="submit" id="SearchButton" class="btn btn-primary">
+                                <i class="fa fa-search"></i> @L("Search")
+                            </button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                <i class="fa fa-times"></i>@L("Clear")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="PreventiveMaintenanceTable">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>@L("Truck")</th>
+                            <th>@L("CurrMiles")</th>
+                            <th>@L("Service")</th>
+                            <th>@L("DueDate")</th>
+                            <th>@L("DueMileage")</th>
+                            <th>Days<br /> until due</th>
+                            <th>Miles<br /> until due</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

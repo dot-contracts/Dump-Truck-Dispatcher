@@ -1,0 +1,76 @@
+﻿@using DispatcherWeb.Authorization
+@using DispatcherWeb.Web.Areas.App.Models.VehicleServices
+@using DispatcherWeb.Web.Areas.App.Startup
+@model VehicleServiceListViewModel
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.VehicleServices;
+}
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/VehicleServices/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/VehicleServices/Index.min.js" asp-append-version="true"></script>
+    </environment>
+    
+}
+
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span> @L("ServiceHeader") </span>
+            </h3>
+            <span class="m-section__sub">
+                @L("ServiceHeaderInfo")
+            </span>
+        </div>
+        <div class="col-6 text-right">
+            @if (await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_VehicleService_Edit))
+            {
+                <button id="CreateNewServiceButton" class="btn btn-primary"><i class="fa fa-plus"></i>@L("AddNew")</button>
+            }
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right">
+                <div id="CustomersFormFilter">
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-xl-6">
+                            <label for="NameFilter">@L("Name")</label>
+                            <input class="form-control m-input filter" id="NameFilter" name="Name" placeholder="@L("SearchWithThreeDot")" type="text">
+                        </div>
+                        <div class="col-xl-6 text-right margin-top-20">
+                            <button type="submit" id="SearchButton" class="btn btn-primary">
+                                <i class="fa fa-search"></i> @L("Search")
+                            </button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                <i class="fa fa-times"></i> @L("Clear")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table id="ServicesTable" class="display table table-striped table-bordered table-hover dt-responsive nowrap">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>@L("Name")</th>
+                            <th>@L("Description")</th>
+                            <th>@Html.Raw(L("GridHeader_RecommendedTimeInterval"))</th>
+                            <th>@Html.Raw(L("GridHeader_RecommendedMileageInterval"))</th>
+                            <th>@Html.Raw(L("GridHeader_RecommendedHourInterval"))</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

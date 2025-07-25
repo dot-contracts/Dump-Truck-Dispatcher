@@ -1,0 +1,93 @@
+﻿@using Abp.Extensions
+@using DispatcherWeb.Features
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.DriverMessages;
+    ViewBag.PageTitle = AppPageTitles.DriverMessages.Index;
+}
+@section Scripts
+    {
+<environment names="Development">
+    <script src="~/view-resources/Areas/app/Views/DriverMessages/_SendMessageModal.js" asp-append-version="true"></script>
+    <script src="~/view-resources/Areas/app/Views/DriverMessages/_ViewMessageModal.js" asp-append-version="true"></script>
+    <script src="~/view-resources/Areas/app/Views/DriverMessages/Index.js" asp-append-version="true"></script>
+</environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/DriverMessages/Index.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("DriverMessagesHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("DriverMessagesHeaderInfo")
+            </span>
+        </div>
+        <div class="col-6 text-right">
+            <button id="SendNewMessageButton" class="btn btn-primary" asp-action="Details"><i class="fa fa-plus"></i> @L("SendNewMessage")</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="box-container">
+                <form class="m-form m-form--label-align-right">
+
+                    <div class="row m--margin-bottom-10">
+                        @if ((await FeatureChecker.GetValueAsync(AppFeatures.AllowMultiOfficeFeature)).To<bool>())
+                        {
+                            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                                <label class="control-label">Office</label>
+                                <select class="form-control filter" name="OfficeId" id="OfficeIdFilter" data-display-name="OfficeName">
+                                    <option value="">Select an office</option>
+                                </select>
+                            </div>
+                        }
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="DateFilter">Date Range</label>
+                            <input class="form-control filter" name="Date" id="DateFilter" type="text" autocomplete="off">
+                        </div>
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="DriverIdFilter">Driver</label>
+                            <select class="form-control filter" name="DriverId" id="DriverIdFilter" data-display-name="DriverName">
+                                <option value="">Select a driver</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="UserIdFilter">Sent by</label>
+                            <select class="form-control filter" name="UserId" id="UserIdFilter" data-display-name="UserName">
+                                <option value="">Select a user</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-lg-12 text-right">
+                            <button type="submit" id="SearchButton" class="btn btn-primary">
+                                <i class="fa fa-search"></i> Search
+                            </button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                <i class="fa fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="m-separator m-separator--md m-separator--dashed"></div>
+                <div class="row align-items-center">
+                    <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="DriverMessagesTable"></table>
+                </div>
+            </div>
+        </div>
+        </div>
+</div>
+

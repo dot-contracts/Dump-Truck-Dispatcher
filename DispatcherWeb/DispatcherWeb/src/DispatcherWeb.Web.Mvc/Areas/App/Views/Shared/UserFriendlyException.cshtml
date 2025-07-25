@@ -1,0 +1,27 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Shared
+@model UserFriendlyExceptionViewModel
+@{
+    ViewData["Title"] = "UserFriendlyException";
+}
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right">
+                <div class="row">
+                    <div class=" col-sm-12">
+                        <div class="m-alert m-alert--icon m-alert--icon-solid m-alert--outline alert alert-warning fade show" role="alert">
+                            <div class="m-alert__icon">
+                                <i class="fa-regular fa-circle-exclamation"></i>
+                                <span></span>
+                            </div>
+                            <div class="m-alert__text">
+                                <strong>@Model.Message</strong> @Model.Details
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+﻿@using DispatcherWeb.QuoteHistory.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model QuoteHistoryDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Quote History Details"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="QuoteId" />
+        <div class="form-group">
+            <label>@L("QuoteName")</label>
+            <input class="form-control" type="text" asp-for="QuoteName" readonly>
+        </div>
+        <div class="form-group">
+            <label>@L("WhenChanged")</label>
+            <input class="form-control" type="text" asp-for="DateTime" readonly>
+        </div>
+        <div class="form-group">
+            <label>@L("ChangedBy")</label>
+            <input class="form-control" type="text" asp-for="ChangedByUserName" readonly>
+        </div>
+        <div class="form-group">
+            <label>@L("TypeOfChange")</label>
+            <input class="form-control" type="text" asp-for="ChangeTypeName" readonly>
+        </div>
+    </form>
+    <div class="box-border-top clearfix">
+        <div class="box-actions pull-right">
+            <a class="btn btn-default" id="GoToQuoteButton"><i class="fa fa-reply"></i> @L("GoToQuote")</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-striped table-bordered table-hover dt-responsive" id="FieldDiffsTable"></table>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

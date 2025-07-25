@@ -1,0 +1,38 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    Layout = "../Shared/Reports/_ReportLayout";
+
+    ViewBag.CurrentPageName = AppPageNames.Tenant.DriverActivityDetailReport;
+}
+
+@section Scripts {
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/DriverActivityDetailReport/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/DriverActivityDetailReport/Index.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+@section H1
+{
+    Driver Activity Report
+}
+
+<form id="CreateReportForm" novalidate>
+    <div class="m-form m-form--label-align-right">
+        <div class="row">
+            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                <label class="required-label" for="DateFilter">@L("Date")</label>
+                <input class="form-control filter" id="DateFilter" name="Date" type="text" required autocomplete="off">
+            </div>
+            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                <label for="DriverIdFilter">@L("Driver")</label>
+                <select class="dropdown form-control filter" name="DriverId" id="DriverIdFilter">
+                    <option value="">Select a driver</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</form>

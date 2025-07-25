@@ -1,0 +1,46 @@
+﻿@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Web.Areas.App.Models.VehicleUsages
+@model CreateOrEditVehicleUsageModalViewModel
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit vehicle usage" : "Create vehicle usage"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation" data-new="@((Model.Id == 0).ToLowerCaseString())">
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+        <input type="hidden" asp-for="OfficeId" />
+        <div class="form-group">
+            <label class="required-label">Truck</label>
+            <select class="form-control" asp-for="TruckId" required>
+                <option value="">Select a truck</option>
+                @if (Model.TruckId != 0)
+                {
+                    <option selected value="@Model.TruckId">@Model.TruckCode</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="ReadingDateTime">Reading Date Time</label>
+            <input type="text" class="form-control" asp-for="ReadingDateTime" required autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="ReadingType">Reading Type</label>
+            <select class="form-control filter" asp-for="ReadingType" id="ReadingType" required asp-items="Html.GetEnumSelectList<ReadingType>()">
+                <option value="">Select reading type</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label">Engine Hours</label>
+            <input type="text" class="form-control" asp-for="EngineHours" id="EngineHours" data-rule-number="true" data-rule-max="@AppConsts.MaxDecimalDatabaseLength" required>
+        </div>
+        <div class="form-group">
+            <label class="required-label">Mileage</label>
+            <input type="text" class="form-control" asp-for="Mileage" id="Mileage" data-rule-number="true" data-rule-max="@AppConsts.MaxDecimalDatabaseLength" required>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" class="btn btn-secondary save-button"><i class="fa fa-save"></i> <span>@L("SaveAndExit")</span></button>
+    <button type="button" class="btn btn-primary save-new-button"><i class="fa fa-save"></i> <span>@L("SaveAndNew")</span></button>
+</div>

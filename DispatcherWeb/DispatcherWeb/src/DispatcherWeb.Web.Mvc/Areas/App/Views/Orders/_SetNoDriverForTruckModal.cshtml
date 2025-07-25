@@ -1,0 +1,28 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.DriverAssignments.Dto
+@using DispatcherWeb.Infrastructure.Extensions
+@model SetNoDriverForTruckInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Select dates to mark a truck as having no driver"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="TruckId" />
+        <div class="form-group">
+            <label class="control-label required-label" for="Date">Beginning and End Date</label>
+            <input class="form-control" id="Date" type="text" required autocomplete="off">
+            <input type="hidden" asp-for="StartDate" />
+            <input type="hidden" asp-for="EndDate" />
+        </div>
+        @if(await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts))
+        {
+            <div class="form-group">
+                <label class="control-label required-label" for="Shift">@L("Shift")</label>
+                <select class="form-control" id="Shift" name="Shift" asp-items="@(await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id))" required></select>
+            </div>
+        }
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

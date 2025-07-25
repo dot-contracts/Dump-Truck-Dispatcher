@@ -1,0 +1,240 @@
+﻿@using Abp.Application.Services.Dto
+@using Abp.Authorization.Users
+@using Abp.Configuration;
+@using Abp.Timing;
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Authorization.Users
+@using DispatcherWeb.Configuration;
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Web.Areas.App.Models.Profile
+@model MySettingsViewModel
+
+@await Html.PartialAsync("~/Areas/App/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("MySettings")))
+
+<div class="modal-body">
+    <ul class="nav nav-tabs  m-tabs-line" role="tablist">
+        <li class="nav-item m-tabs__item">
+            <a href="#MySettingsTab" class="nav-link m-tabs__link active" data-toggle="tab" role="tab">
+                @L("Profile")
+            </a>
+        </li>
+        <li class="nav-item m-tabs__item">
+            <a href="#TwoFactorLoginTab" data-toggle="tab" role="tab" class="nav-link m-tabs__link">
+                @L("TwoFactorLogin")
+            </a>
+        </li>
+        <li class="nav-item m-tabs__item">
+            <a href="#OptionsTab" data-toggle="tab" role="tab" class="nav-link m-tabs__link">
+                @L("Options")
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="MySettingsTab">
+
+            <form name="MySettingsModalForm" class="m-form">
+                <div class="form-group">
+                    <label class="required-label" for="Name">@L("Name")</label>
+                    <input id="Name" class="form-control edited" type="text" name="Name" value="@Model.Name" required maxlength="@AbpUserBase.MaxNameLength">
+                </div>
+
+                <div class="form-group">
+                    <label class="required-label" for="Surname">@L("Surname")</label>
+                    <input id="Surname" type="text" name="Surname" class="form-control" value="@Model.Surname" required maxlength="@AbpUserBase.MaxSurnameLength">
+                </div>
+
+                <div class="form-group">
+                    <label class="required-label" for="EmailAddress">@L("EmailAddress")</label>
+                    <input id="EmailAddress" type="email" name="EmailAddress" class="form-control" value="@Model.EmailAddress" required maxlength="@AbpUserBase.MaxEmailAddressLength">
+                </div>
+                @if (Model.CanVerifyPhoneNumber())
+                {
+                    <div class="form-group">
+                        <label>@L("PhoneNumber")</label>
+                        <div class="input-group">
+                            <input id="PhoneNumber" type="text" name="PhoneNumber" class="form-control m-input" value="@Model.PhoneNumber" maxlength="@UserConsts.MaxPhoneNumberLength">
+                            @if (!Model.IsPhoneNumberConfirmed)
+                            {
+                                <span id="SpanSmsVerificationUnverified" class="input-group-btn" data-original-title="@L("YourPhoneNumberIsNotVerified")">
+                                    <button id="btnSmsVerification" class="btn btn-primary" type="button"><i class="fa-regular fa-warning"></i> @L("Verify")</button>
+                                </span>
+                                <div class="input-group-append" id="SpanSmsVerificationVerified" abp-hidden>
+                                    <span class="input-group-text tooltips" data-original-title="@L("YourPhoneNumberIsVerified")">
+                                        <i class="fa fa-check m--font-success" aria-label="@L("Verified")"></i>
+                                    </span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="input-group-append">
+                                    <span class="input-group-text tooltips" data-original-title="@L("YourPhoneNumberIsVerified")">
+                                        <i class="fa fa-check m--font-success" aria-label="@L("Verified")"></i>
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        <label for="PhoneNumber">@L("PhoneNumber") </label>
+                        <input id="PhoneNumber" type="text" name="PhoneNumber" class="form-control edited" value="@Model.PhoneNumber" maxlength="@UserConsts.MaxPhoneNumberLength">
+                    </div>
+                }
+                <div class="form-group">
+                    <label for="UserName">@L("UserName")</label>
+                    <input id="UserName" type="text" @Html.Raw(!Model.CanChangeUserName ? "disabled=\"disabled\"" : "") class="form-control edited" value="@Model.UserName" name="UserName" required maxlength="@AbpUserBase.MaxUserNameLength">
+                    @if (!Model.CanChangeUserName)
+                    {
+                        <span class="m-form__help">@L("CanNotChangeAdminUserName")</span>
+                    }
+                </div>
+                @if (Clock.SupportsMultipleTimezone)
+                {
+                    <div class="form-group">
+                        <label for="Timezone">@L("Timezone")</label>
+                        @Html.DropDownList("Timezone", Model.TimezoneItems.Select(i => i.ToSelectListItem()), new { @class = "form-control edited", id= "Timezone" })
+                    </div>
+                }
+            </form>
+        </div>
+        <div class="tab-pane" id="TwoFactorLoginTab">
+            <div>
+                <h4>
+                    Google Authenticator
+                </h4>
+
+                <div class="google-authenticator-enable" abp-hidden="@(!Model.IsGoogleAuthenticatorEnabled)">
+                    <div>
+                        @L("ScanQrCodeWithYourMobileApp")
+                    </div>
+                    <div class="text-center">
+                        <img src="@Model.QrCodeSetupImageUrl" />
+                    </div>
+                    <small>
+                        @L("GoogleAuthenticatorReferrerLink"): <a href="https://support.google.com/accounts/answer/1066447" target="_blank" rel="noopener noreferrer">Google Authenticator</a>
+                    </small>
+                </div>
+
+                <div class="google-authenticator-enable" abp-hidden="@(Model.IsGoogleAuthenticatorEnabled)">
+                    <button type="button" class="btn blue" id="btnEnableGoogleAuthenticator">@L("Enable")</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="tab-pane" id="OptionsTab">
+            <form name="OptionsModalForm" class="m-form">
+                <div class="m-checkbox-list">
+                    <label for="DontShowZeroQuantityWarning" class="m-checkbox">
+                        <input id="DontShowZeroQuantityWarning" type="checkbox" name="DontShowZeroQuantityWarning" value="true" checked=@(Model.Options?.DontShowZeroQuantityWarning == true ? "checked" : null)>
+                        @L("DontShowZeroQuantityWarning")
+                        <span></span>
+                    </label>
+                    <label for="PlaySoundForNotifications" class="m-checkbox">
+                        <input id="PlaySoundForNotifications" type="checkbox" name="PlaySoundForNotifications" value="true" checked=@(Model.Options?.PlaySoundForNotifications == true ? "checked" : null)>
+                        @L("PlaySoundForNotifications")
+                        <span></span>
+                    </label>
+                    @if (await IsGrantedAsync(AppPermissions.Pages_Invoices))
+                    {
+                        <label for="CCMeOnInvoices" class="m-checkbox">
+                            <input id="CCMeOnInvoices" type="checkbox" name="CCMeOnInvoices" value="true" checked=@(Model.Options?.CCMeOnInvoices == true ? "checked" : null)>
+                            @L("CCMeOnInvoices")
+                            <span></span>
+                        </label>
+                    }
+                    <label for="DoNotShowWaitingForTicketDownload" class="m-checkbox">
+                        <input id="DoNotShowWaitingForTicketDownload" type="checkbox" name="DoNotShowWaitingForTicketDownload" value="true" checked=@(Model.Options?.DoNotShowWaitingForTicketDownload == true ? "checked" : null)>
+                        @L("DoNotShowWaitingForTicketDownload")
+                        <span></span>
+                    </label>
+                </div>
+                <h5 class="mt-4 mb-3">@L("EmailSubscriptions")</h5>
+                <h6 class="mb-3">@L("UncheckForEmailsYouDontWantToReceive")</h6>
+                <div class="m-checkbox-list">
+                        @{
+                            var hostEmailPreferenceCheckboxes = new[]
+                            {
+                                new { Value = HostEmailPreference.ReleaseNotes, Label = L("ReleaseNotes") },
+                                new { Value = HostEmailPreference.Transactional, Label = L("TransactionalEmails") },
+                                new { Value = HostEmailPreference.ServiceStatus, Label = L("ServiceStatusEmails") },
+                                new { Value = HostEmailPreference.Marketing, Label = L("MarketingEmails") },
+                            };
+                            @foreach (var checkbox in hostEmailPreferenceCheckboxes)
+                            {
+                                <label class="m-checkbox">
+                                    <input type="checkbox" class="HostEmailPreferenceCheckbox" value="@((int)checkbox.Value)"
+                                           checked=@(Model.Options?.HostEmailPreference.HasFlag(checkbox.Value) == true ? "checked" : null)>
+                                    @checkbox.Label
+                                    <span></span>
+                                </label>
+                            }
+                        }
+                </div>
+                @if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.DispatchingAndMessaging.AllowCounterSalesForTenant)
+                    && await IsGrantedAsync(AppPermissions.Pages_CounterSales))
+                {
+                    <h5 class="mt-4 mb-3">@L("CounterSalesDefaults")</h5>
+                    <div class="mb-1">
+                        <label class="m-checkbox">
+                            <input type="checkbox" name="AllowCounterSalesForUser" id="AllowCounterSalesForUser" value="true" checked=@(Model.Options?.AllowCounterSalesForUser == true ? "checked" : null)>
+                            @L("AllowCounterSales")
+                            <span></span>
+                        </label>
+                    </div>
+                    <div class="mb-1">
+                        <label class="m-checkbox">
+                            <input type="checkbox" name="DefaultDesignationToMaterialOnly" id="DefaultDesignationToMaterialOnlyForUser" value="true" checked=@(Model.Options?.DefaultDesignationToMaterialOnly == true ? "checked" : null)>
+                            @L("DefaultDesignationToMaterialOnly")
+                            <span></span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="DefaultLoadAtLocationIdForUser">@L("DefaultLoadAtLocation")</label>
+                        <select class="form-control" id="DefaultLoadAtLocationIdForUser" name="DefaultLoadAtLocationId">
+                            <option value="">@L("SelectALocation")</option>
+                            @if (Model.Options?.DefaultLoadAtLocationId > 0)
+                            {
+                                <option value="@Model.Options?.DefaultLoadAtLocationId" selected>@Model.Options?.DefaultLoadAtLocationName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>@L("DefaultMaterial")</label>
+                        <select class="form-control" id="DefaultMaterialItemId" name="DefaultMaterialItemId">
+                            <option value="">Select an item</option>
+                            @if (Model.Options?.DefaultMaterialItemId != 0)
+                            {
+                                <option selected value="@Model.Options?.DefaultMaterialItemId">@Model.Options?.DefaultMaterialItemName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="DefaultMaterialUomId">@L("DefaultMaterialUOM")</label>
+                        <select class="form-control" id="DefaultMaterialUomId" name="DefaultMaterialUomId">
+                            <option value=""
+                                    data-placeholder-default="Select a UOM"
+                                    data-placeholder-no-items="No Prices defined for the selected Item"
+                                    data-placeholder-no-parent="Select an Item first">
+                                Select Material UOM
+                            </option>
+                            @if (Model.Options.DefaultMaterialUomId != 0)
+                            {
+                                <option selected value="@Model.Options.DefaultMaterialUomId">@Model.Options.DefaultMaterialUomName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <label for="DefaultAutoGenerateTicketNumberForUser" class="m-checkbox">
+                            <input id="DefaultAutoGenerateTicketNumberForUser" type="checkbox" name="DefaultAutoGenerateTicketNumber" value="true" checked=@(Model.Options?.DefaultAutoGenerateTicketNumber == true ? "checked" : null)>
+                            @L("DefaultAutoGenerateTicket")
+                            <span></span>
+                        </label>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+</div>
+@await Html.PartialAsync("~/Areas/App/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

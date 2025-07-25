@@ -1,0 +1,9 @@
+.generate-widths(0, 100, 0);
+
+.generate-widths(@min: 0, @max: 100, @i: 0) when (@i =< @max) {
+    .progress-bar[aria-valuemax="@{max}"][aria-valuemin="@{min}"][aria-valuenow="@{i}"] {
+        width: ((@i - @min) * 100) / (@max - @min) * 1%;
+    }
+
+    .generate-widths(@min, @max, (@i + 1));
+}

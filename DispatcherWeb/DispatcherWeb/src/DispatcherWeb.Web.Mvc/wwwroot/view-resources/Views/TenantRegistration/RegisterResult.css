@@ -1,0 +1,118 @@
+﻿html {
+    font-size: 16px;
+}
+
+body {
+    background-color: #ecf0f5;
+    font-family: 'Arial', sans-serif;
+}
+
+.container {
+    max-width: 816px;
+    text-align: center;
+}
+
+.logo img {
+    max-width: 126px;
+    width: 100%;
+    margin-bottom: 3rem;
+}
+
+
+.info-block {
+    text-align: center;
+    background-color: #5680B4;
+    margin-bottom: 3rem;
+}
+.info-block h5 {
+    color: #ffffff;
+    margin: 1.25rem;
+    font-weight: 700;
+}
+
+
+.steps-header h4 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #444444;
+}
+.steps-header p {
+    font-size: 0.813rem;
+    font-weight: 400;
+    color: #2B2C28;
+    margin-bottom: 1.5rem;
+}
+
+
+.steps {
+    padding-right: 8px;
+    padding-left: 8px;
+}
+.steps .col-md-4 {
+    margin-bottom: 0.5rem;
+    padding-right: 7px;
+    padding-left: 7px;
+}
+.steps .step {
+    height: 100%;
+    background-color: #fff;
+    border: 1px solid #E3E6E9;
+    padding: 2.7rem 1.9rem 2.5rem;
+}
+.steps .step h6 {
+    font-weight: 700;
+    font-size: 0.813rem;
+    color: #6C7881;
+    text-transform: uppercase;
+    margin-bottom: 1.4rem;
+}
+.steps .step img {
+    max-width: 45px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+.steps .col-md-4:nth-child(1) img {
+    margin-top: 10px;
+}
+.steps .col-md-4:nth-child(2) img {
+    margin-top: 3px;
+}
+.steps .step h5 {
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: #444444;
+}
+.steps .step p {
+    font-size: 0.73rem;
+    color: #444444;
+    margin-bottom: 0;
+    overflow-wrap: break-word;
+    line-height: 0.95rem;
+}
+.steps .step a {
+    font-size: 0.73rem;
+    text-decoration: underline;
+    color: #67A2D7;
+}
+.steps .step a:hover {
+    text-decoration: none;
+}
+.steps .step p span,
+.steps-footer p span{
+    color: #67A2D7;
+}
+.steps-footer p {
+    font-size: 0.73rem;
+    color: #6C7881;
+    text-align: left;
+    line-height: 0.95rem;
+}
+.steps-footer .btn-secondary {
+    font-family: 'Arial';
+    font-weight: 700;
+    font-size: 0.813rem;
+    color: #444444;
+    background: #E3E6E9;
+    border: 1px solid #9A9CA4;
+    border-radius: 0;
+}

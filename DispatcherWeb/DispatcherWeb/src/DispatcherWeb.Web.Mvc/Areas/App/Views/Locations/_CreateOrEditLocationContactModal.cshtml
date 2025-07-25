@@ -1,0 +1,31 @@
+﻿@using DispatcherWeb.Locations.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model LocationContactEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Contact: " + Model.Name : "Create new contact"))
+
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="LocationId" />
+        <div class="form-group">
+            <label for="Name" class="required-label">@L("Name")</label>
+            <input class="form-control" type="text" asp-for="Name" required>
+        </div>
+        <div class="form-group">
+            <label>@L("Title")</label>
+            <input class="form-control" type="text" asp-for="Title">
+        </div>
+        <div class="form-group">
+            <label>@L("PhoneNumber")</label>
+            <input class="form-control" type="text" asp-for="Phone">
+        </div>
+        <div class="form-group">
+            <label>@L("Email")</label>
+            <input class="form-control" type="text" asp-for="Email">
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")
+

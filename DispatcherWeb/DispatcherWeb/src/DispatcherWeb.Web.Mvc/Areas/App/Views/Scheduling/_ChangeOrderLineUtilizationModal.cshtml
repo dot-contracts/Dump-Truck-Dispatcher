@@ -1,0 +1,16 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Scheduling.Dto
+@model ChangeOrderLineUtilizationInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("ChangeUtilization")))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderLineId" />
+        <div class="form-group">
+            <label for="Utilization">@L("ChangeOrderLineUtilization_Label") <i class="tooltip-icon fa fa-info-circle text-primary" id="UtilizationLabelInfo" title="@L("ChangeOrderLineUtilization_LabelInfo")"></i></label>
+            <input type="number" asp-for="Utilization" id="Utilization" class="form-control" data-rule-number="true" data-rule-min="0" data-rule-max="1" data-rule-step="0.01" step="0.1" required/>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

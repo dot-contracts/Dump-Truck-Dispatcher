@@ -1,0 +1,10 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Uploading..."))
+
+<div class="modal-body">
+    <i class="fa fa-spinner fa-spin h3"></i> Uploading file, please wait
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn red save-button"><i class="fa fa-ban"></i> <span>Cancel Upload</span></button>
+</div>

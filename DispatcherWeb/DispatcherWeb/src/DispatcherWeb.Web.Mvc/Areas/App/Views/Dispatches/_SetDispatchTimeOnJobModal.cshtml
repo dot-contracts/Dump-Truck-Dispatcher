@@ -1,0 +1,17 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Dispatching.Dto
+@model SetDispatchTimeOnJobDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(@L("ChangeTimeOnJob")))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label for="TimeOnJob">@L("TimeOnJob")</label>
+            <input type="text" asp-for="TimeOnJob" class="form-control" />
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

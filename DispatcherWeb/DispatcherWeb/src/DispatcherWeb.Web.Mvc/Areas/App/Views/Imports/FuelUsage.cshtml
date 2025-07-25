@@ -1,0 +1,37 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    Layout = "../Imports/_ImportLayout";
+
+    ViewBag.CurrentPageName = AppPageNames.Tenant.ImportFuelUsage;
+    ViewBag.ImportType = ImportType.FuelUsage;
+}
+
+@section Scripts
+{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/Imports/FuelUsage.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/Imports/FuelUsage.min.js" asp-append-version="true"></script>
+    </environment>
+
+}
+
+
+@section H1
+{
+    Fuel usage import
+}
+
+@section AboveUpload
+{
+    <div class="d-flex">
+        <div class="form-group col-xs-12">
+            <label for="FuelImportType">Fuel Import Type</label>
+            <select id="FuelImportType" data-jacobus-value="jacobus" class="select2-preset">
+                <option value="user">User Mapped</option>
+                <option value="jacobus">Jacobus Energy</option>
+            </select>
+        </div>
+    </div>
+}

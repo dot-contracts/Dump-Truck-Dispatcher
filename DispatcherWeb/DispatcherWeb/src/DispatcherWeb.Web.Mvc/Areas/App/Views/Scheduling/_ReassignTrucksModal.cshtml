@@ -1,0 +1,23 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+
+@model DispatcherWeb.Web.Areas.App.Models.Scheduling.ReassignTrucksModalViewModel
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Re-assign trucks"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="@Model.OrderLineId" />
+        <div class="form-group">
+            <label class="required-label">Select order to assign the trucks to</label>
+            <select class="form-control" name="DestinationOrderLineId" id="DestinationOrderLineId" required>
+                <option value="" selected="selected">Select order to assign the trucks to</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label">Trucks</label>
+            <select class="form-control" name="TruckIds" id="TruckIds" asp-items="Model.Trucks" required multiple="multiple">
+            </select>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

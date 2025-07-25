@@ -1,0 +1,88 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Authorization.Users.Cache
+@using DispatcherWeb.Features
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Dashboard
+@using DispatcherWeb.Web.Areas.App.Startup
+@inject IDashboardSettingManager DashboardSettingManager
+@inject IUserOrganizationUnitCache UserOrganizationUnitCache
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.Dashboard;
+}
+
+@section Scripts {
+    <script src="~/view-resources/Areas/app/Views/Dashboard/Index.js" asp-append-version="true"></script>
+}
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("Dashboard")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("DashboardHeaderInfo")
+            </span>
+        </div>
+        <div class="text-right">
+            <div class="dropdown">
+                <button class="btn btn-primary btn-sm" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-h"></i></button>
+                <ul class="dropdown-menu dropdown-menu-right dropdown-menu-lg-right">
+                    <li><a class="dropdown-item clickable" id="btnModifyDashboard"><i class="fa fa-wrench"></i>@L("ModifyDashboard")</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    @{
+        var showGettingStarted = await SettingManager.GetSettingValueAsync<bool>(AppSettings.GettingStarted.ShowGettingStarted);
+        var isPaidFunctionality = await FeatureChecker.IsEnabledAsync(AppFeatures.PaidFunctionality);
+        var hasAccessToAllOffices = await UserOrganizationUnitCache.HasAccessToAllOffices();
+    }
+    @if (showGettingStarted && isPaidFunctionality)
+    {
+        <div id="gettingStartedContainer d-none"></div>
+    }
+
+    @if (await DashboardSettingManager.IsAnyEnabledAsync(DashboardSettings.ScheduledTruckCounters.All))
+    {
+        <div class="row align-items-stretch" id="scheduledTruckCountLoading">
+            <div class="col-md-12 col-sm-12">
+                <div class="card card-body">
+                    <div class="row align-items-center justify-content-center">
+                        <div class="m-blockui mt-1">
+                            <span>Loading...</span><span>
+                                <span class="m-loader m-loader--brand"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div id="scheduledTruckCountContainer"></div>
+    }
+
+    <partial name="_DotRequirementCharts" />
+
+    @if (await DashboardSettingManager.IsAnyEnabledAsync(DashboardSettings.RevenueCharts.All))
+    {
+        <partial name="_RevenueChartsContainer" />
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.RevenuePerTruckByDateGraph) && hasAccessToAllOffices)
+    {
+        <partial name="_RevenuePerTruckByDateGraph" />
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.RevenueByDateGraph))
+    {
+        <partial name="_RevenueByDateGraph" />
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.TruckUtilizationGraph))
+    {
+        <partial name="_TruckUtilizationGraph" />
+    }
+</div>

@@ -1,0 +1,276 @@
+﻿@using DispatcherWeb.Authorization
+@using DispatcherWeb.Web.Areas.App.Startup
+@using DispatcherWeb.LeaseHaulers.Dto
+@model LeaseHaulerDto
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.LeaseHaulerMyCompany;
+}
+
+@section Scripts {
+    <script src="~/view-resources/Areas/App/Views/MyCompany/Index.js" asp-append-version="true"></script>
+}
+
+<div class="m-subheader">
+    <div class="d-flex align-items-center row">
+        <div class="mr-auto col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("MyCompany")</span>
+            </h3>
+        </div>
+        <div class="col-sm-12 col-md-6 text-right">
+            <button id="SaveButton" class="btn btn-primary save-profile-btn"><i class="fa fa-save"></i> @L("Save")</button>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div id="SettingsTabPanel" class="tabbable-line">
+                <ul class="nav nav-tabs m-tabs-line" role="tablist">
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany_Profile))
+                    {
+                        <li class="nav-item m-tabs__item">
+                            <a href="#LeaseHaulerGeneralTab" aria-expanded="true" class="nav-link m-tabs__link active" data-toggle="tab" role="tab">@L("General")</a>
+                        </li>
+                    }
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany_Insurance))
+                    {
+                        <li class="nav-item m-tabs__item">
+                            <a href="#LeaseHaulerInsurancesTab" aria-expanded="true" class="nav-link m-tabs__link" data-toggle="tab" role="tab">@L("InsuranceAndCert")</a>
+                        </li>
+                    }
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany_Contacts))
+                    {
+                        <li class="nav-item m-tabs__item">
+                            <a href="#LeaseHaulerContactsTab" aria-expanded="true" class="nav-link m-tabs__link" data-toggle="tab" role="tab">@L("Contacts")</a>
+                        </li>
+                    }
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany_Drivers))
+                    {
+                        <li class="nav-item m-tabs__item">
+                            <a href="#LeaseHaulerDriversTab" aria-expanded="true" class="nav-link m-tabs__link" data-toggle="tab" role="tab">@L("Drivers")</a>
+                        </li>
+                    }
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany_Trucks))
+                    {
+                        <li class="nav-item m-tabs__item">
+                            <a href="#LeaseHaulerTrucksTab" aria-expanded="true" class="nav-link m-tabs__link" data-toggle="tab" role="tab">@L("Trucks")</a>
+                        </li>
+                    }
+                </ul>
+
+                <div class="tab-content">
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany_Profile))
+                    {
+                        <div class="tab-pane active" id="LeaseHaulerGeneralTab">
+                            <form id="LeaseHaulerGeneralSettingsForm" class="m-form">
+                                <input type="hidden" asp-for="Id" id="leaseHaulerId" />
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label for="Name" class="required-label">@L("Name")</label>
+                                        <input type="text" class="form-control" asp-for="Name" required />
+                                    </div>
+                                </div>
+                                <div class="card address-group">
+                                    <div class="card-body">
+                                        <h6 class="card-title">@L("MailingAddress")</h6>
+                                        <div class="row">
+                                            <div class="form-group col-md-6 col-lg-6">
+                                                <label for="MailingAddress1">@L("StreetAddress1")</label>
+                                                <input type="text" class="form-control" asp-for="MailingAddress1" />
+                                            </div>
+                                            <div class="form-group col-md-6 col-lg-6">
+                                                <label for="MailingAddress2">@L("StreetAddress2")</label>
+                                                <input type="text" class="form-control" asp-for="MailingAddress2" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="form-group col-md-5 col-lg-5">
+                                                <label for="MailingCity">@L("City")</label>
+                                                <input type="text" class="form-control" asp-for="MailingCity" />
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3">
+                                                <label for="MailingState">@L("State")</label>
+                                                <input type="text" class="form-control" asp-for="MailingState" />
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2">
+                                                <label for="MailingZipCode">@L("ZipCode")</label>
+                                                <input type="text" class="form-control" asp-for="MailingZipCode" />
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2">
+                                                <label for="MailingCountryCode">@L("CountryCode")</label>
+                                                <input type="text" class="form-control" asp-for="MailingCountryCode" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="m-form__group form-group">
+                                    <label class="m-checkbox">
+                                        <input id="UseSameAddressAsMailingAddress" type="checkbox" name="UseSameAddressAsMailingAddress" value="true" />
+                                        <strong>@L("UseSameAddressAsMailingAddress")</strong>
+                                        <span></span>
+                                    </label>
+                                </div>
+                                <div class="card address-group">
+                                    <div class="card-body">
+                                        <h6 class="card-title">@L("PhysicalAddress")</h6>
+                                        <div class="row">
+                                            <div class="form-group col-md-6 col-lg-6">
+                                                <label for="StreetAddress1">@L("StreetAddress1")</label>
+                                                <input class="form-control" type="text" asp-for="StreetAddress1" />
+                                            </div>
+                                            <div class="form-group col-md-6 col-lg-6">
+                                                <label for="StreetAddress2">@L("StreetAddress2")</label>
+                                                <input class="form-control" type="text" asp-for="StreetAddress2">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-md-5 col-lg-5">
+                                                <label for="City">@L("City")</label>
+                                                <input class="form-control" type="text" asp-for="City">
+                                            </div>
+                                            <div class="form-group col-md-3 col-lg-3">
+                                                <label for="State">@L("State")</label>
+                                                <input class="form-control" type="text" asp-for="State">
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2">
+                                                <label for="ZipCode">@L("ZipCode")</label>
+                                                <input class="form-control" type="text" asp-for="ZipCode">
+                                            </div>
+                                            <div class="form-group col-md-2 col-lg-2">
+                                                <label for="CountryCode">@L("CountryCode")</label>
+                                                <input class="form-control" type="text" asp-for="CountryCode">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-4">
+                                        <label for="MotorCarrierNumber">@L("MCNumber")</label>
+                                        <input class="form-control" type="text" asp-for="MotorCarrierNumber" />
+                                    </div>
+                                    <div class="form-group col-4">
+                                        <label for="DeptOfTransportationNumber">@L("DOTNumber")</label>
+                                        <input class="form-control" type="text" asp-for="DeptOfTransportationNumber" />
+                                    </div>
+                                    <div class="form-group col-4">
+                                        <label for="EinOrTin">@L("EINOrTIN")</label>
+                                        <input class="form-control" type="text" asp-for="EinOrTin" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-6">
+                                        <label for="HireDate">@L("HireDate")</label>
+                                        <input type="text" class="form-control m-input" asp-for="HireDate" autocomplete="off" />
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label for="TerminationDate">@L("TerminationDate")</label>
+                                        <input type="text" class="form-control m-input" asp-for="TerminationDate" autocomplete="off" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-3 col-lg-3">
+                                        <label for="PhoneNumber">@L("PhoneNumber")</label>
+                                        <input type="text" class="form-control" asp-for="PhoneNumber" />
+                                    </div>
+                                </div>
+                                <div class="box-border-top clearfix">
+                                    <div class="box-actions pull-right">
+                                        <button type="button" class="btn btn-primary save-profile-btn"><i class="fa fa-save"></i> @L("Save")</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    }
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany_Insurance))
+                    {
+                        <div class="tab-pane" id="LeaseHaulerInsurancesTab">
+                            <div class="m-form">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="clearfix">
+                                            <div class="pull-left">
+                                                <h5>@L("Insurance")</h5>
+                                            </div>
+                                            <div class="box-actions pull-right">
+                                                <button type="button" class="btn btn-default" id="AddNewInsurance"><i class="fa fa-plus"></i>@L("AddPolicy")</button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div id="InsuranceDataList" class="mt-3"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany_Contacts))
+                    {
+                        <div class="tab-pane" id="LeaseHaulerContactsTab">
+                            <div class="box-border-top clearfix">
+                                <div class="grid-caption pull-left">
+                                    <label>@L("Contacts")</label>
+                                </div>
+                                <div class="box-actions pull-right">
+                                    <button type="button" class="btn btn-default" id="CreateNewLeaseHaulerContactButton"><i class="fa fa-plus"></i>@L("AddNewContact")</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-striped table-bordered table-hover dt-responsive" id="LeaseHaulerContactsTable"></table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany_Drivers))
+                    {
+                        <div class="tab-pane" id="LeaseHaulerDriversTab">
+                            <div class="m-form">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="clearfix">
+                                            <div class="pull-left">
+                                                <h5>@L("Drivers")</h5>
+                                            </div>
+                                            <div class="box-actions pull-right">
+                                                <button type="button" class="btn btn-default" id="CreateNewLeaseHaulerDriverButton"><i class="fa fa-plus"></i>@L("AddNewDriver")</button>
+                                            </div>
+                                        </div>
+                                        <table class="table table-striped table-bordered table-hover dt-responsive" id="LeaseHaulerDriversTable"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_MyCompany_Trucks))
+                    {
+                        <div class="tab-pane" id="LeaseHaulerTrucksTab">
+                            <div class="m-form">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="clearfix">
+                                            <div class="pull-left">
+                                                <h5>@L("Trucks")</h5>
+                                            </div>
+                                            <div class="box-actions pull-right">
+                                                <button type="button" class="btn btn-default" id="CreateNewLeaseHaulerTruckButton"><i class="fa fa-plus"></i>@L("AddNewTruck")</button>
+                                            </div>
+                                        </div>
+                                        <table class="table table-striped table-bordered table-hover dt-responsive" id="LeaseHaulerTrucksTable"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

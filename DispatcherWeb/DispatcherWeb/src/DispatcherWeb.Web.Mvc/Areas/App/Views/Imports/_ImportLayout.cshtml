@@ -1,0 +1,54 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Shared
+
+@model ReportViewModelBase
+@{
+    Layout = "~/Areas/App/Views/Layout/Default/_Layout.cshtml";
+}
+
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/Imports/Import.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/Imports/Import.min.js" asp-append-version="true"></script>
+    </environment>
+
+    @await RenderSectionAsync("Scripts", false)
+
+}
+
+
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-12">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span> @await RenderSectionAsync("H1") </span>
+            </h3>
+            <span class="m-section__sub">
+                @await RenderSectionAsync("Description", false)
+            </span>
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right" id="ImportForm" asp-action="UploadFile">
+                <input type="hidden" id="ImportType" value="@ViewBag.ImportType" />
+                @await RenderSectionAsync("AboveUpload", false)
+                <div class="m--margin-bottom-10">
+                    <div class="form-group fileUpload margin-top-20">
+                        <div class="btn btn-primary browse_btn">
+                            <span>@L("Browse")</span>
+                            <input id="ImportFile" type="file" accept=".csv" class="upload">
+                        </div>
+                        <input class="form-control file-upload" placeholder="No File Selected." disabled="disabled">
+                    </div>
+                    <div class="col-xs-12 margin-bottom-10">
+                        <span class="m-form__help">This should be a CSV file.</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

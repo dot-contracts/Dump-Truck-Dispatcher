@@ -1,0 +1,39 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model DispatcherWeb.Web.Areas.App.Models.Imports.ImportMappingViewModel
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Map fields for import"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation" data-getfields-url="@Url.Action("GetImportFields", "Imports")">
+        <input type="hidden" asp-for="BlobName" />
+        <input type="hidden" asp-for="ImportType" />
+
+        <div class="import-mapping-table-container">
+            <table class="table table-striped table-bordered">
+                <tr>
+                    <th class="w-50">CSV headings</th>
+                    <th>Fields</th>
+                </tr>
+                @foreach (string field in Model.CsvFields)
+                {
+                    <tr>
+                        <td class="align-middle">@field</td>
+                        <td>
+                            <select data-field="@field">
+                                <option value="">-Ignore-</option>
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+        &nbsp;
+        <div id="RequiredFields">
+            Required fields to map: <span></span>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn default close-button" data-delete-url="@Url.Action("DeleteImportFile")">Cancel</button>
+    <button type="button" class="btn blue save-button"><i class="fas fa-file-import"></i> <span>Import Data</span></button>
+</div>

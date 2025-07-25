@@ -1,0 +1,70 @@
+﻿@using DispatcherWeb.Configuration
+@using DispatcherWeb.Configuration.Tenants.Dto
+@inject IAppSettingAvailabilityProvider SettingAvailabilityProvider
+@model LeaseHaulerSettingsEditDto
+
+<div class="tab-pane" id="SettingsLeaseHaulerTab">
+    <div class="row">
+        <div class="col-sm-12">
+            <h5>@L("Settings_LeaseHaulers")</h5>
+            <form id="LeaseHaulerSettingsForm" class="m-form">
+                <div class="form-group margin-top-20">
+                    <label for="ShowLeaseHaulerRateOnQuote" class="m-checkbox col-lg-12">
+                        <input id="ShowLeaseHaulerRateOnQuote" type="checkbox" name="ShowLeaseHaulerRateOnQuote" value="true" checked="@(Model.ShowLeaseHaulerRateOnQuote ? "checked" : null)">
+                        @L("ShowLeaseHaulerRateOnQuote")
+                        <span></span>
+                    </label>
+                </div>
+                <div class="form-group margin-top-20">
+                    <label for="ShowLeaseHaulerRateOnOrder" class="m-checkbox col-lg-12">
+                        <input id="ShowLeaseHaulerRateOnOrder" type="checkbox" name="ShowLeaseHaulerRateOnOrder" value="true" checked="@(Model.ShowLeaseHaulerRateOnOrder ? "checked" : null)">
+                        @L("ShowLeaseHaulerRateOnOrder")
+                        <span></span>
+                    </label>
+                </div>
+                <div class="form-group margin-top-20">
+                    <label for="AllowSubcontractorsToDriveCompanyOwnedTrucks" class="m-checkbox col-lg-12">
+                        <input id="AllowSubcontractorsToDriveCompanyOwnedTrucks" type="checkbox" name="AllowSubcontractorsToDriveCompanyOwnedTrucks" value="true" checked="@(Model.AllowSubcontractorsToDriveCompanyOwnedTrucks ? "checked" : null)">
+                        @L("AllowSubcontractorsToDriveCompanyOwnedTrucks")
+                        <span></span>
+                    </label>
+                </div>
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.LeaseHaulers.AllowLeaseHaulerRequestProcess))
+                {
+                    <div class="form-group margin-top-20">
+                        <label for="AllowLeaseHaulerRequestProcess" class="m-checkbox col-lg-12">
+                            <input id="AllowLeaseHaulerRequestProcess" type="checkbox" name="AllowLeaseHaulerRequestProcess" value="true" checked="@(Model.AllowLeaseHaulerRequestProcess ? "checked": null)" />
+                            @L("AllowLeaseHaulerRequestProcess")
+                            <span></span>
+                        </label>
+                    </div>
+                }
+                <div class="form-group margin-top-20">
+                    <label for="NotAllowSchedulingLeaseHaulersWithExpiredInsurance" class="m-checkbox col-lg-12">
+                        <input id="NotAllowSchedulingLeaseHaulersWithExpiredInsurance" type="checkbox" name="NotAllowSchedulingLeaseHaulersWithExpiredInsurance" value="true" checked="@(Model.NotAllowSchedulingLeaseHaulersWithExpiredInsurance ? "checked" : null)">
+                        @L("NotAllowSchedulingLeaseHaulersWithExpiredInsurance")
+                        <span></span>
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-8">
+                        <label for="BrokerFee" class="required-label">@L("BrokerageFee")</label>
+                        <div class="input-group">
+                            <input class="form-control" id="BrokerFee" type="number" required data-rule-number="true" data-rule-min="0.00" data-rule-max="100.00" value="@Model.BrokerFee.ToString("F2")" name="BrokerFee" />
+                            <div class="input-group-append">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-8">
+                        <label class="required-label" asp-for="ThankYouForTrucksTemplate">@L("ThankYouForTrucksTemplate")</label>
+                        <textarea class="form-control" asp-for="ThankYouForTrucksTemplate" rows="3" required></textarea>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

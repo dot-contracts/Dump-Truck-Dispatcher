@@ -1,0 +1,15 @@
+﻿@using DispatcherWeb.Configuration
+@using Abp.Configuration
+@{
+    Layout = "_Layout";
+    var dispatchVia = (DispatchVia)await SettingManager.GetSettingValueAsync<int>(AppSettings.DispatchingAndMessaging.DispatchVia);
+}
+
+@if (dispatchVia == DispatchVia.DriverApplication)
+{
+    <text>This dispatch has been completed. Check your SMS for new dispatches.</text>
+}
+else
+{
+    <text>There are no open dispatches assigned to you. Check with your dispatcher for your next dispatch.</text>
+}

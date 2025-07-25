@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<localizationDictionary culture="en">
+  <texts>
+    <text name="CurrentUserDidNotLoginToTheApplication">The current user is not logged into the application.</text>
+  </texts>
+</localizationDictionary>

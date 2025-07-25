@@ -1,0 +1,25 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.TrailerAssignments.Dto
+@model SetTractorForTrailerInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Change tractor"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Date" />
+        <input type="hidden" asp-for="OfficeId" />
+        <input type="hidden" asp-for="Shift" />
+        <input type="hidden" asp-for="TrailerId" />
+        <div class="form-group">
+            <label class="required-label" for="TractorId">Tractor</label>
+            <select class="form-control" asp-for="TractorId" required>
+                <option value="">Select a tractor</option>
+                @if (Model.TractorId.HasValue)
+                {
+                    <option value="@Model.TractorId" selected>@Model.TractorTruckCode</option>
+                }
+            </select>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

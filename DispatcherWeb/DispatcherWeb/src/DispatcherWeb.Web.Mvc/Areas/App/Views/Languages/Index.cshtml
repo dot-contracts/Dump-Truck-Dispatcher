@@ -1,0 +1,57 @@
+﻿@using Abp.MultiTenancy
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Web.Areas.App.Startup
+@model DispatcherWeb.Web.Areas.App.Models.Languages.LanguagesIndexViewModel
+@{
+    ViewBag.CurrentPageName = AppPageNames.Common.Languages;
+}
+
+@section Scripts {
+    <script src="/view-resources/Areas/App/Views/_Bundles/language-list.min.js" asp-append-version="true"></script>
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("Languages")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("LanguagesHeaderInfo")
+            </span>
+        </div>
+        <div class="col-sm-12 col-md-6 text-right">
+            @if (await IsGrantedAsync(AppPermissions.Pages_Administration_Languages_Create) && await AbpSession.GetMultiTenancySideAsync() == MultiTenancySides.Host)
+            {
+                <button id="CreateNewLanguageButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("CreateNewLanguage")</button>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="row align-items-center">
+                <table id="LanguagesTable" class="display table table-striped table-bordered table-hover dt-responsive nowrap">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>@L("Name")</th>
+                            <th>@L("Code")</th>
+                            <th>@L("CreationTime")</th>
+                            <th>@L("IsEnabled")</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+                @if (Model.IsTenantView)
+                {
+                    <p class="margin-top-20">
+                        @("* " + L("CanNotEditOrDeleteDefaultLanguages"))
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

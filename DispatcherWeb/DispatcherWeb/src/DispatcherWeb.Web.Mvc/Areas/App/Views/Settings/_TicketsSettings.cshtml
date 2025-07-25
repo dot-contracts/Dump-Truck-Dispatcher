@@ -1,0 +1,19 @@
+﻿@using DispatcherWeb.Configuration.Tenants.Dto
+@model TicketsSettingsEditDto
+
+<div class="tab-pane" id="TicketsTab">
+    <h5>@L("Tickets")</h5>
+    <form id="TicketsSettingsForm" class="m-form">
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="PrintPdfTickets" class="m-checkbox col-lg-12 mt-2">
+                        <input id="PrintPdfTickets" type="checkbox" name="PrintPdfTickets" value="true" checked="@(Model.PrintPdfTickets ? "checked" : null)">
+                        @L("PrintPdfTicketsSetting")
+                        <span></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,41 @@
+﻿@using DispatcherWeb.Features
+@model DispatcherWeb.Configuration.Tenants.Dto.LuckStoneSettingsEditDto
+
+
+<div class="tab-pane" id="SettingsLuckStoneTab">
+    <div class="row">
+        <div class="col-sm-6">
+            <h5>@L("LuckStone")</h5>
+            <form id="LuckStoneSettingsForm" class="m-form margin-top-20">
+                <div class="form-group">
+                    <label for="AllowImportingLuckStoneEarnings" class="m-checkbox col-lg-12">
+                        <input id="AllowImportingLuckStoneEarnings" type="checkbox" name="AllowImportingLuckStoneEarnings" value="true" checked=@(Model.AllowImportingLuckStoneEarnings ? "checked" : null)>
+                        @L("AllowImportingLuckStoneEarnings")
+                        <span></span>
+                    </label>
+                </div>
+                <div class="form-group" abp-hidden="@(!Model.AllowImportingLuckStoneEarnings)">
+                    <label for="LuckStoneCustomerId" class="required-label">@L("SelectLuckStoneCustomer")</label>
+                    <select class="form-control" id="LuckStoneCustomerId" name="LuckStoneCustomerId">
+                        <option value="">@L("SelectLuckStoneCustomer")</option>
+                        @if (Model.LuckStoneCustomerId > 0)
+                        {
+                            <option value="@Model.LuckStoneCustomerId" selected>@Model.LuckStoneCustomerName</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group" abp-hidden="@(!Model.AllowImportingLuckStoneEarnings)">
+                    <label for="HaulerRef" class="required-label">HaulerRef</label>
+                    <input type="text" class="form-control" asp-for="HaulerRef">
+                </div>
+                <div class="form-group" abp-hidden="@(!await FeatureChecker.IsEnabledAsync(AppFeatures.DriverProductionPayFeature))">
+                    <label for="UseLuckStoneEarningsForProductionPay" class="m-checkbox col-lg-12">
+                        <input id="UseLuckStoneEarningsForProductionPay" type="checkbox" name="UseForProductionPay" value="true" checked=@(Model.UseForProductionPay ? "checked" : null)>
+                        @L("UseForProductionPay")
+                        <span></span>
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

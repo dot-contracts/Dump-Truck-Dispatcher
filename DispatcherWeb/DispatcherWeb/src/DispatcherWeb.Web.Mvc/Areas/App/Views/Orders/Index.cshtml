@@ -1,0 +1,119 @@
+﻿@using Abp.Extensions
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Features
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.ViewOrders;
+}
+@section Styles {
+    <link href="~/lib/jQuery-contextMenu/dist/jquery.contextMenu.min.css" rel="stylesheet" asp-append-version="true" />
+}
+@section Scripts {
+    <environment names="Development">
+        <script src="~/lib/jQuery-contextMenu/dist/jquery.contextMenu.js" asp-append-version="true"></script>
+        <script src="~/lib/jQuery-contextMenu/dist/jquery.ui.position.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/Orders/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/lib/jQuery-contextMenu/dist/jquery.contextMenu.min.js" asp-append-version="true"></script>
+        <script src="~/lib/jQuery-contextMenu/dist/jquery.ui.position.min.js" asp-append-version="true"></script>
+        <script src="~/view-resources/Areas/app/Views/Orders/Index.min.js" asp-append-version="true"></script>
+    </environment>
+}
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-7 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("Orders")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("OrdersHeaderInfo")
+            </span>
+        </div>
+        <div class="col-5 col-md-6 text-right">
+            @if (await IsGrantedAsync(AppPermissions.Pages_Orders_Edit))
+            {
+                <button id="CreateNewOrderButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("AddNew")</button>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right">
+                <div class="row">
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="DateFilter">@L("Date")</label>
+                        <input class="form-control" id="DateFilter" type="text" autocomplete="off">
+                        <input type="hidden" class="filter" name="StartDate" id="DateStartFilter" />
+                        <input type="hidden" class="filter" name="EndDate" id="DateEndFilter" />
+                    </div>
+                    @if ((await FeatureChecker.GetValueAsync(AppFeatures.AllowMultiOfficeFeature)).To<bool>())
+                    {
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label">@L("Office")</label>
+                            <select class="form-control filter" name="OfficeId" id="OfficeIdFilter" data-display-name="OfficeName">
+                                <option value="">@L("SelectAnOffice")</option>
+                            </select>
+                        </div>
+                    }
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="CustomerIdFilter">@L("Customer")</label>
+                        <select class="form-control filter" name="CustomerId" id="CustomerIdFilter" data-display-name="CustomerName">
+                            <option value="">Select a customer</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="ItemIdFilter">@L("Item")</label>
+                        <select class="form-control filter" name="ItemId" id="ItemIdFilter" data-display-name="ItemName">
+                            <option value="">Select an item</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="JobNumberFilter">@L("JobNumber")</label>
+                        <input class="form-control filter" id="JobNumberFilter" name="JobNumber" type="text" placeholder="@L("JobNumber")">
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="MiscFilter">@L("QuoteChargeTo")</label>
+                        <input class="form-control filter" id="MiscFilter" name="Misc" placeholder="Search..." type="text">
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="LoadAtIdFilter">@L("LoadAt")</label>
+                        <select class="form-control filter" name="LoadAtId" id="LoadAtIdFilter" data-display-name="LoadAt">
+                            <option value="">@L("SelectALocation")</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="DeliverToIdFilter">@L("DeliverTo")</label>
+                        <select class="form-control filter" name="DeliverToId" id="DeliverToIdFilter" data-display-name="DeliverTo">
+                            <option value="">@L("SelectALocation")</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row m--margin-bottom-10 text-right justify-content-end">
+                    <div class="col-md-6 ">
+                        <div class="form-group checkbox-form-group checkbox-group-inline">
+                            <input type="checkbox" class="minimal filter" name="ShowPendingOrders" id="ShowPendingOrdersFilter">
+                            <label for="ShowPendingOrdersFilter">Show Pending Orders</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-12 text-center text-md-right action-buttons-wrapper">
+                        <button type="submit" id="SearchButton" class="btn btn-primary">
+                            <i class="fa fa-search"></i> @L("Search")
+                        </button>
+                        <button type="button" id="ClearSearchButton" class="btn btn-default">
+                            <i class="fa fa-times"></i> @L("Clear")
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="OrdersTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

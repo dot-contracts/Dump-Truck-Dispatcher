@@ -1,0 +1,23 @@
+﻿@using DispatcherWeb.PayStatements.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model GetDriverPayStatementReportInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("PrintDriverPayStatement")))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label class="control-label required-label">@L("HowWouldYouLikeThisPrinted")</label>
+        </div>
+        <div class="form-group">
+            <input type="radio" name="PrintOption" class="minimal" id="PrintSeparatePdfs" />
+            <label for="PrintSeparatePdfs">@L("SeparatePdfsForEachDriver")</label>
+        </div>
+        <div class="form-group">
+            <input type="radio" checked name="PrintOption" class="minimal" id="PrintSinglePdf" />
+            <label for="PrintSinglePdf">@L("OnePdfWithEachDriverOnASeparatePage")</label>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

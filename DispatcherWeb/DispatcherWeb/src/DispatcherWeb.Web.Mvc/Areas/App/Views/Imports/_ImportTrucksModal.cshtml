@@ -1,0 +1,22 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Trucks Import"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation m-form" id="ImportForm" asp-action="UploadFile">
+        <input type="hidden" id="ImportType" value="@ViewBag.ImportType" />
+        <div class="form-group fileUpload">
+            <div class="btn btn-primary browse_btn">
+                <span>@L("Browse")</span>
+                <input id="ImportFile" type="file" accept=".csv" class="upload">
+            </div>
+            <input class="form-control file-upload" placeholder="No File Selected." disabled="disabled">
+        </div>
+        <div class="col-xs-12 mt-1">
+            <span class="m-form__help">This should be a CSV file.</span>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+</div>

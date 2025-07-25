@@ -1,0 +1,13 @@
+﻿@using DispatcherWeb.Notifications.Dto
+@model PriorityNotificationDto
+
+    <div class="modal-body priority-notification-container">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Severity" />
+        <i class="priority-notification-icon"></i>
+        <span class="priority-notification-text">@Model.Message</span>
+    </div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary close-button" @*data-dismiss="modal"*@>@L("Dismiss")</button>
+</div>

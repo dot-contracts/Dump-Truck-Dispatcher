@@ -1,0 +1,98 @@
+﻿@using DispatcherWeb.Authorization
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.WorkOrders;
+}
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/WorkOrders/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/WorkOrders/Index.min.js" asp-append-version="true"></script>
+    </environment>
+
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-7">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("WorkOrdersHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("WorkOrdersHeaderInfo")
+            </span>
+        </div>
+        <div class="col-5 text-right">
+            @if (await IsGrantedAsync(AppPermissions.Pages_WorkOrders_Edit) || await IsGrantedAsync(AppPermissions.Pages_WorkOrders_EditLimited))
+            {
+                <button id="CreateNewWorkOrderButton" class="btn btn-primary" asp-action="Details"><i class="fa fa-plus"></i> @L("AddNew")</button>
+            }
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right">
+                <div class="row">
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="IssueDateFilter">@L("IssueDateRange")</label>
+                        <input class="form-control filter" name="IssueDateFilter" id="IssueDateFilter" type="text" autocomplete="off">
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="StartDateFilter">@L("StartDateRange")</label>
+                        <input class="form-control filter" name="StartDateFilter" id="StartDateFilter" type="text" autocomplete="off">
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="CompletionDateFilter">@L("CompletionDateRange")</label>
+                        <input class="form-control filter" name="CompletionDateFilter" id="CompletionDateFilter" type="text" autocomplete="off">
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="TruckFilter">@L("Vehicle")</label>
+                        <select class="form-control filter" name="TruckId" id="TruckFilter" data-display-name="TruckCode">
+                            <option value="">Select a truck</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="row m--margin-bottom-10">
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="AssignedToFilter">@L("AssignedTo")</label>
+                        <select class="form-control filter" name="AssignedToId" id="AssignedToFilter" data-display-name="AssignedToName">
+                            <option value="">Select Assigned To</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="StatusFilter">@L("Status")</label>
+                        <select class="form-control filter" name="Status" id="StatusFilter" for="StatusFilter" asp-items="@Html.GetEnumSelectListWithDefaults<DispatcherWeb.WorkOrderStatus>()">
+                            <option value="">Select a status</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label for="WorkOrderId">@L("WorkOrderId")</label>
+                        <input class="form-control m-input filter" id="WorkOrderId" name="WorkOrderId" placeholder="@L("SearchByWorkOrderId")" type="text">
+                    </div>
+                    <div class="col-lg-9 text-right margin-top-20">
+                        <button type="submit" id="SearchButton" class="btn btn-primary">
+                            <i class="fa fa-search"></i> @L("Search")
+                        </button>
+                        <button type="button" id="ClearSearchButton" class="btn btn-default">
+                            <i class="fa fa-times"></i> @L("Clear")
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table class="table table-striped table-bordered table-hover dt-responsive" id="WorkOrdersTable"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+

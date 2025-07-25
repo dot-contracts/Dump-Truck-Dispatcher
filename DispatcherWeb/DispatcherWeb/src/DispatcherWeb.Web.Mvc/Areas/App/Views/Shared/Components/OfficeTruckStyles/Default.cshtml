@@ -1,0 +1,33 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Layout
+@model OfficeTruckStylesViewModel
+@{
+    Layout = null;
+}
+
+@foreach (var office in Model.Offices)
+{
+    if (string.IsNullOrEmpty(office.TruckColor))
+    {
+        continue;
+    }
+    if (office.TruckColor[0] != '#') { continue; };
+    if (!office.TruckColor.Skip(1).All(Uri.IsHexDigit))
+    {
+        continue;
+    }
+
+    <style asp-add-nonce>
+        .truck-tag.schedule-dispatch-status-inactive.truck-office-@office.Id {
+            border-color: @office.TruckColor;
+        }
+
+        .truck-tag.schedule-dispatch-status-active.truck-office-@office.Id {
+            border-color: @office.TruckColor;
+        }
+
+        .schedule-truck-tiles .truck-tile.truck-office-@office.Id {
+            border: 3px solid @office.TruckColor;
+            padding: 7px 5px;
+        }
+    </style>
+}

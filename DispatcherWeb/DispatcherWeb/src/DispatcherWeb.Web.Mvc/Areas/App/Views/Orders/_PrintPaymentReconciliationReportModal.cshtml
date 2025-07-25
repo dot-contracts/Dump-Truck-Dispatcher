@@ -1,0 +1,30 @@
+﻿@using Abp.Extensions
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Orders.Dto
+@using DispatcherWeb.Features
+@model GetPaymentReconciliationReportInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Print Reconciliation"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="StartDate">
+        <input type="hidden" asp-for="EndDate">
+        <div class="form-group">
+            <label class="control-label" for="DateRange">Transaction Dates</label>
+            <input class="form-control" id="DateRange" type="text">
+        </div>
+        @if ((await FeatureChecker.GetValueAsync(AppFeatures.AllowMultiOfficeFeature)).To<bool>())
+        {
+            <div class="form-group">
+                <label for="AllOffices" class="m-checkbox">
+                    <input id="AllOffices" type="checkbox" name="AllOffices" value="true" />
+                    Show for all offices
+                    <span></span>
+                </label>
+            </div>
+        }
+
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

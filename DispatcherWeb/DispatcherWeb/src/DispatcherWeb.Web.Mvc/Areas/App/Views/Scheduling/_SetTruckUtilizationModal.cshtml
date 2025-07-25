@@ -1,0 +1,28 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Scheduling.Dto
+@model OrderLineTruckDetailsDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Truck Utilization"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderLineTruckId" />
+        <input type="hidden" asp-for="OrderLineId" />
+        <input type="hidden" asp-for="MaxUtilization" />
+        <input type="hidden" asp-for="TruckCode" />
+        <div class="form-group">
+            <label for="Utilization">Utilization </label><span class="pull-right">Max: @Model.MaxUtilization</span>
+            <input type="number" asp-for="Utilization" id="Utilization" class="form-control" data-initial-value="@Model.Utilization" data-rule-number="true" data-rule-min="0" data-rule-max="@Model.MaxUtilization" data-rule-step="0.01" step="0.1" required/>
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-default btn-md-4 SetUtilizationButton" data-utilization="0">Remove</button>
+            <button type="button" class="btn btn-default btn-md-4 SetUtilizationButton" data-utilization="0.5">Half</button>
+            <button type="button" class="btn btn-default btn-md-4 SetUtilizationButton" data-utilization="1">Full</button>
+        </div>
+        <div class="form-group">
+            <label for="TimeOnJob">@L("TimeOnJob")</label>
+            <input type="text" asp-for="TimeOnJob" class="form-control" />
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

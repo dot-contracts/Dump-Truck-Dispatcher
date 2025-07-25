@@ -1,0 +1,13 @@
+﻿@using DispatcherWeb.Items.Dto
+@model ProductLocationPriceDto
+@{
+    var namePrefix = "Price-";
+}
+
+<div class="form-group prices added">
+    <label>@Model.PricingTierName</label>
+    <input type="hidden" name="@(namePrefix)Id" value="@Model.Id" />
+    <input type="hidden" name="@(namePrefix)PricingTierId" value="@Model.PricingTierId" />
+    <input class="form-control" type="text" name="@(namePrefix)PricePerUnit" value="@Model.PricePerUnit"
+           data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+</div>

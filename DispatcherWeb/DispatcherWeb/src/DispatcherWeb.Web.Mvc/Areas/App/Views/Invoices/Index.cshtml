@@ -1,0 +1,152 @@
+﻿@using Abp.Extensions
+@using DispatcherWeb.Authorization;
+@using DispatcherWeb.Features
+@using DispatcherWeb.Configuration
+@using Abp.Configuration
+@using DispatcherWeb.Web.Areas.App.Startup
+@using DispatcherWeb.Web.Areas.App.Models.Invoices
+@model InvoiceIndexViewModel
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.Invoices;
+
+    var allowInvoiceApprovalFlow = await SettingManager.GetSettingValueAsync<bool>(AppSettings.Invoice.AllowInvoiceApprovalFlow);
+}
+
+@section Scripts {
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/Invoices/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/Invoices/Index.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-6 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("InvoicesHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+                @*@L("InvoicesHeaderInfo")*@
+            </span>
+        </div>
+        <div class="col-6 col-md-6 text-right">
+            @if (await FeatureChecker.IsEnabledAsync(AppFeatures.QuickbooksFeature) && await IsGrantedAsync(AppPermissions.Pages_Invoices))
+            {
+                var accountingIntegrationKind = (QuickbooksIntegrationKind)await SettingManager.GetSettingValueAsync<int>(AppSettings.Invoice.Quickbooks.IntegrationKind);
+                @if (accountingIntegrationKind.IsIn(
+                    QuickbooksIntegrationKind.Desktop,
+                    QuickbooksIntegrationKind.QboExport,
+                    QuickbooksIntegrationKind.TransactionProExport,
+                    QuickbooksIntegrationKind.SbtCsvExport,
+                    QuickbooksIntegrationKind.HollisExport,
+                    QuickbooksIntegrationKind.SageExport,
+                    QuickbooksIntegrationKind.JAndJExport
+                ))
+                {
+                    <button type="button" id="ExportButton" class="btn btn-primary" data-toggle="tooltip" title="@L("CreateExportFile")">@L("Export")</button>
+                }
+                @*
+                else if ((int)accountingIntegrationKind == (int)QuickbooksDeprecatedIntegrationKind.Online && await SettingManager.IsQuickbooksConnected())
+                {
+                    <button type="button" id="UpdateQboButton" class="btn btn-primary" data-toggle="tooltip" title="@L("UpdateInvoicesToQuickBooksOnline")">@L("UpdateQbo")</button>
+                }
+                *@
+            }
+            @if (await IsGrantedAsync(AppPermissions.Pages_Invoices))
+            {
+                @if (allowInvoiceApprovalFlow)
+                {
+                    <button type="button" class="btn btn-primary" id="EmailOrPrintApprovedInvoicesButton">
+                        <i class="fa fa-print"></i>@L("PrintSend")
+                    </button>
+                }
+                <button type="button" class="btn btn-primary" id="PrintDraftInvoicesButton">
+                    <i class="fa fa-print"></i>@L("PrintDraftInvoices")
+                </button>
+                <button type="button" id="CreateNewInvoiceButton" class="btn btn-primary" asp-action="Details"><i class="fa fa-plus"></i> @L("AddNew")</button>
+            }
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--fit m--margin-bottom-20">
+                <div>
+                    <div class="row m--margin-bottom-20">
+                        <div class="col-lg-3 m--margin-bottom-10-tablet-and-mobile">
+                            <label class="control-label" for="IssueDateFilter">@L("IssueDate")</label>
+                            <input class="form-control m-input" id="IssueDateFilter" type="text" autocomplete="off">
+                            <input type="hidden" class="filter" name="IssueDateStart" id="IssueDateStartFilter" />
+                            <input type="hidden" class="filter" name="IssueDateEnd" id="IssueDateEndFilter" />
+                        </div>
+                        <div class="col-lg-3 m--margin-bottom-10-tablet-and-mobile">
+                            <label class="control-label" for="InvoiceIdFilter">@L("InvoiceNumber")</label>
+                            <input class="form-control filter" name="InvoiceId" id="InvoiceIdFilter" type="number">
+                        </div>
+                        @if ((await FeatureChecker.GetValueAsync(AppFeatures.AllowMultiOfficeFeature)).To<bool>())
+                        {
+                            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                                <label class="control-label">@L("Office")</label>
+                                <select class="form-control m-input filter" name="OfficeId" id="OfficeIdFilter" data-display-name="OfficeName">
+                                    <option value="">Select an office</option>
+                                </select>
+                            </div>
+                        }
+                        <div class="col-lg-3 m--margin-bottom-10-tablet-and-mobile">
+                            <label class="control-label" for="CustomerIdFilter">@L("Customer")</label>
+                            <select class="form-control m-input filter" name="CustomerId" id="CustomerIdFilter" data-display-name="CustomerName">
+                                <option value="">Select a customer</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 m--margin-bottom-10-tablet-and-mobile">
+                            <label class="control-label" for="StatusFilter">@L("Status")</label>
+                            <select class="form-control m-input filter" name="Status" id="StatusFilter" asp-items="Html.GetEnumSelectList<InvoiceStatus>()">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 m--margin-bottom-10-tablet-and-mobile">
+                            <label class="control-label" for="BatchIdFilter">@L("BatchId")</label>
+                            <input class="form-control m-input filter" name="BatchId" id="BatchIdFilter" type="number" value="@Model.BatchId">
+                        </div>
+                        <div class="col-lg-3 m--margin-bottom-10-tablet-and-mobile" abp-hidden="@((QuickbooksIntegrationKind)await SettingManager.GetSettingValueAsync<int>(AppSettings.Invoice.Quickbooks.IntegrationKind) == QuickbooksIntegrationKind.None)">
+                            <label class="control-label" for="UploadBatchIdFilter">@L("ExportBatchId")</label>
+                            <input class="form-control m-input filter" name="UploadBatchId" id="UploadBatchIdFilter" type="number">
+                        </div>
+                        <div class="col-lg-3 m--margin-bottom-10-tablet-and-mobile">
+                            <label class="control-label" for="TicketNumberFilter">@L("TicketNumber")</label>
+                            <input class="form-control m-input filter" name="TicketNumber" id="TicketNumberFilter" type="text">
+                        </div>
+                    </div>
+
+                    <div class="row m--margin-bottom-10">
+                        <div class="mr-auto-btn col-sm-12 col-xl-12 text-center text-md-right">
+                            <button class="btn btn-primary btn-brand m-btn m-btn--icon" id="SearchButton">
+                                <span>
+                                    <i class="fa fa-search"></i>
+                                    <span>@L("Search")</span>
+                                </span>
+                            </button>
+
+                            <button class="btn btn-secondary m-btn m-btn--icon" id="ClearSearchButton">
+                                <span>
+                                    <i class="fa fa-close"></i>
+                                    <span>@L("Clear")</span>
+                                </span>
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center" id="TableParentDiv">
+                <table class="table table-striped table-bordered table-hover dt-responsive" id="InvoicesTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

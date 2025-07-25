@@ -1,0 +1,18 @@
+﻿@model DispatcherWeb.Configuration.Tenants.Dto.GpsIntegrationSettingsEditDto
+
+<div class="tab-pane" id="SettingsSamsaraTab" abp-hidden="@(Model.Platform != GpsPlatform.Samsara)">
+    <div class="row">
+        <div class="col-sm-6">
+            <form id="SamsaraSettingsForm" class="m-form">
+                <div class="form-group">
+                    <label for="SamsaraApiToken">@L("ApiToken")</label>
+                    <input id="SamsaraApiToken" type="text" name="ApiToken" class="form-control" value="@Model.Samsara.ApiToken" maxlength="256">
+                </div>
+                <div class="form-group">
+                    <label for="SamsaraBaseUrl">@L("BaseUrl")</label>
+                    <input id="SamsaraBaseUrl" type="text" name="BaseUrl" class="form-control" value="@Model.Samsara.BaseUrl" maxlength="256">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+﻿@using DispatcherWeb.Orders.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model SelectOrderLineToMoveTicketsByDriverToDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("SelectAJob")))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <div class="form-group">
+            <label class="required-label">@L("DeliveryDate")</label>
+            <input type="text" class="form-control order-field" asp-for="DeliveryDate" value="@Model.DeliveryDate.ToString("d")" required autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label class="required-label">@L("Customer")</label>
+            <select class="form-control order-field" asp-for="CustomerId" id="SelectOrderLineModal_CustomerId" required>
+                <option value="">Select a customer</option>
+                @if (Model.CustomerId != 0)
+                {
+                    <option selected value="@Model.CustomerId">@Model.CustomerName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="SelectOrderLineModal_OrderLineId" class="required-label">@L("Job")</label>
+            <select class="form-control" id="SelectOrderLineModal_OrderLineId" name="OrderLineId" required>
+                <option value="">@L("SelectAJob")</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" class="btn btn-primary save-button"><span>@L("Move")</span></button>
+</div>

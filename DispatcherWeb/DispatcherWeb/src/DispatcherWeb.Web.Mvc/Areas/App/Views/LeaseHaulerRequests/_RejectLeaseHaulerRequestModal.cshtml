@@ -1,0 +1,27 @@
+﻿@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.LeaseHaulerRequests.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model RejectLeaseHaulerRequestDto
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Reject Job"))
+
+<div class="modal-body">
+    <form role="form" class="form-validation" novalidate>
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <div class="d-flex justify-content-between">
+                <label class="required-label" for="Comments">@L("Comments")</label>
+                <label id="CommentsLength">@L("{0}chars", Model.Comments.Length)</label>
+            </div>
+            <textarea class="form-control" rows="6" asp-for="Comments" maxlength="@EntityStringFieldLengths.LeaseHaulerRequest.Comments" required></textarea>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-link pr-0" id="ClearCommentsBtn">@L("ClearText")</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" class="btn btn-primary save-button"><span>@L("Reject")</span></button>
+</div>

@@ -1,0 +1,36 @@
+﻿@using DispatcherWeb.TimeOffs.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model TimeOffEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Add Employee Time Entry"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation" name="EmployeeTimeEntryForm">
+
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="EmployeeId" />
+
+        <div class="form-group">
+            <label><span class="required-label">@L("Driver")</span></label>
+            <select class="form-control" asp-for="DriverId" required disabled>
+                <option value="@Model.DriverId" selected>@Model.DriverName</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="StartDate"><span class="required-label">@L("Date")</span></label>
+            <input class="form-control" type="text" asp-for="StartDate" required>
+        </div>
+        <div class="form-group">
+            <label for="RequestedHours"><span>@L("Hours")</span></label>
+            <input class="form-control" type="text" asp-for="RequestedHours">
+        </div>
+        <div class="form-group">
+            <label><span class="required-label">@L("TimeClassification")</span></label>
+            <select class="form-control" required id="TimeClassificationId" name="TimeClassificationId">
+                <option value="">Select a time classification</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

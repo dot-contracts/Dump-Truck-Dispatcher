@@ -1,0 +1,20 @@
+﻿using System.ComponentModel.DataAnnotations;
+using Abp.Runtime.Validation;
+using DispatcherWeb.Dto;
+
+namespace DispatcherWeb.Organizations.Dto
+{
+    public class GetOrganizationUnitRolesInput : PagedAndSortedInputDto, IShouldNormalize
+    {
+        [Range(1, long.MaxValue)]
+        public long Id { get; set; }
+
+        public void Normalize()
+        {
+            if (string.IsNullOrEmpty(Sorting))
+            {
+                Sorting = "DisplayName, Name";
+            }
+        }
+    }
+}

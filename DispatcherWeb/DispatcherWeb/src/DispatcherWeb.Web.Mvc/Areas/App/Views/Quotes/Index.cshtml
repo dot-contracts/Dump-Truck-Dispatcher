@@ -1,0 +1,88 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.Quotes;
+}
+
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/Quotes/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/Quotes/Index.min.js" asp-append-version="true"></script>
+    </environment>
+    
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-4">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("Quotes")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("QuotesHeaderInfo")
+            </span>
+        </div>
+        <div class="col-sm-12 col-md-8 text-right">
+            <button id="CreateNewQuoteButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("AddNew")</button>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right">
+                <div class="row">
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="QuoteIdFilter">@L("QuoteId")</label>
+                        <input class="form-control filter" name="QuoteId" id="QuoteIdFilter" placeholder="Quote Id" type="number">
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="CustomerIdFilter">@L("CustomerName")</label>
+                        <select class="form-control filter" name="CustomerId" id="CustomerIdFilter" data-display-name="CustomerName">
+                            <option value="">Select a customer name</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="SalesPersonIdFilter">@L("SalesRep")</label>
+                        <select class="form-control filter" name="SalesPersonId" id="SalesPersonIdFilter" data-display-name="SalesPersonName">
+                            <option value="">Select a sales rep</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="StatusFilter">@L("Status")</label>
+                        <select class="form-control filter" name="Status" id="StatusFilter" asp-items="Html.GetEnumSelectList<QuoteStatus>()">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <label class="control-label" for="MiscFilter">@L("Multisearch")</label>
+                        <input class="form-control filter" id="MiscFilter" name="Misc" placeholder="Search..." type="text">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 text-right">
+                        <button class="btn btn-primary btn-brand m-btn m-btn--icon" id="SearchButton">
+                            <span>
+                                <i class="fa fa-search"></i>
+                                <span>@L("Search")</span>
+                            </span>
+                        </button>
+                        <button class="btn btn-secondary m-btn m-btn--icon" id="ClearSearchButton">
+                            <span>
+                                <i class="fa fa-close"></i>
+                                <span>@L("Clear")</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="QuotesTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

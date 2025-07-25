@@ -1,0 +1,30 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Dashboard
+@model DonutChartViewModel
+@{
+    Layout = null;
+}
+<div class="col-lg-4 col-md-6 col-sm-12 dashboard-donut-chart-container" id="@Model.ContainerId">
+    <a href="@Model.Link">
+        <div class="m-portlet donut-chart-header">
+            <h3 class="m-portlet__head-text donut-chart-header-text">
+                @Model.Title
+            </h3>
+            <div class="m-portlet__body donut-chart-body row data-loading align-items-center justify-content-center">
+                <div class="m-blockui">
+                    <span>Loading...</span><span>
+                        <span class="m-loader m-loader--brand"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="m-portlet__body donut-chart-body has-data d-none">
+                <div class="donut-legend"></div>
+                <div class="portlet-body-morris-fit morris-chart dashboard-donut-chart"></div>
+            </div>
+            <div class="m-portlet__body donut-chart-body no-data d-none">
+                <div class="icon container"><i class="@Model.NoDataIconClass"></i></div>
+                <div><h5>@Model.NoDataTitle</h5></div>
+                <div><h6>@Model.NoDataSubtitle</h6></div>
+            </div>
+        </div>
+    </a>
+</div>

@@ -1,0 +1,95 @@
+﻿@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.JobSummary.Dto
+@using DispatcherWeb.Web.Areas.App.Startup
+
+@model JobSummaryHeaderDetailsDto
+
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.Schedule;
+}
+
+@section Styles {
+    @*Todo replace the uncommented code with commented out code after merging feature/131740-fix-abp-src*@
+    @*<link abp-href="~/lib/mobiscroll/mobiscroll.jquery.css" rel="stylesheet" asp-append-version="true" />
+    <link abp-href="~/view-resources/Areas/App/Views/JobSummary/Details.css" rel="stylesheet" asp-append-version="true" />*@
+    <link href="~/lib/mobiscroll/mobiscroll.jquery.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/view-resources/Areas/App/Views/JobSummary/Details.css" rel="stylesheet" asp-append-version="true" />
+}
+
+@section Scripts {
+    @*Todo replace the uncommented code with commented out code after merging feature/131740-fix-abp-src*@
+    @*<script abp-src="~/lib/mobiscroll/mobiscroll.jquery.js" asp-append-version="true"></script>
+    <script abp-src="~/view-resources/Areas/App/Views/JobSummary/Details.js" asp-append-version="true"></script>*@
+    <script src="~/lib/mobiscroll/mobiscroll.jquery.js" asp-append-version="true"></script>
+    <script src="~/view-resources/Areas/App/Views/JobSummary/Details.js" asp-append-version="true"></script>
+}
+
+<input type="hidden" asp-for="OrderLineId" />
+<input type="hidden" asp-for="UomName" />
+<input type="hidden" asp-for="DeliveryDate" value="@Model.DeliveryDate.ToString("s")"/>
+
+<div class="m-subheader ">
+    <div class="row align-items-center job-summary-header">
+        <div class="mr-auto col-8 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("JobSummary")</span>
+            </h3>
+            <span class="m-section__sub"></span>
+        </div>
+        <div class="col-4 col-md-6 text-right">
+            <h4>
+                <span class="float-right badge badge-light job-status" id="JobStatus" data-status="@Model.JobStatus.ToIntString()">@Model.JobStatus.GetDisplayName()</span>
+            </h4>
+        </div>
+    </div>
+</div>
+
+<div class="m-content job-summary-wrapper">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="m-form m-form--label-align-right">
+                <table class="trucks-timeline-header">
+                    <tbody>
+                        <tr>
+                            <td class="captions-column">@L("Customer")</td>
+                            <td class="values-column customer-cell">@Model.Customer</td>
+                            <td class="captions-column">@L("Job")</td>
+                            <td class="values-column">@Model.JobNumber</td>
+                        </tr>
+                        <tr>
+                            <td class="captions-column">@L("OrderDate")</td>
+                            <td class="values-column">@Model.DeliveryDate.ToString("d")</td>
+                            <td class="captions-column">@L("#ofTrucks")</td>
+                            <td class="values-column">@Model.NumberOfTrucks</td>
+                        </tr>
+                        <tr>
+                            <td class="captions-column">@L("LoadAt")</td>
+                            <td class="values-column">@Model.LoadAt</td>
+                            <td class="captions-column">@L("DeliverTo")</td>
+                            <td class="values-column">@Model.DeliverTo</td>
+                        </tr>
+                        <tr>
+                            <td class="captions-column">@L("Item")</td>
+                            <td class="values-column">@Model.Item</td>
+                            <td class="captions-column">@L("QtyOrdered")</td>
+                            <td class="values-column">@Model.QuantityOrdered?.ToString(Utilities.NumberFormatWithoutRounding) @Model.UomName</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="m-form m-form--label-align-right">
+                <div mbsc-page class="trucks-timeline">
+                    <div class="trucks-timeline-wrapper">
+                        <div id="trucks-timeline" class="md-trucks-timeline"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="m-form m-form--label-align-right job-summary-map-container">
+                <div id="job-summary-map"></div>
+            </div>
+            <div class="m-form m-form--label-align-right mt-4">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="job-summary-details"></table>
+            </div>
+        </div>
+    </div>
+</div>

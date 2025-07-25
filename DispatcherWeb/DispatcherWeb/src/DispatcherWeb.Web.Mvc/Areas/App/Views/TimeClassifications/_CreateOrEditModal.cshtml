@@ -1,0 +1,33 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.TimeClassifications.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model TimeClassificationEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Time Classification: " + Model.Name : "Create new time classification"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation" name="TimeClassificationDetailsForm">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label><span class="required-label">@L("TimeClassification")</span></label>
+            <input class="form-control" type="text" asp-for="Name" required>
+        </div>
+        <div class="m-checkbox-list" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.AllowProductionPay) || !await FeatureChecker.IsEnabledAsync(AppFeatures.DriverProductionPayFeature))">
+            <label class="custom-checkbox">
+                <input id="IsProductionBased" type="checkbox" name="IsProductionBased" value="true"
+                       checked="@(Model.IsProductionBased ? "checked" : null)"
+                       @*disabled="@(Model.HasRecordsAssociated ? "disabled" : null)"*@
+                       disabled>
+                @L("ProductionBased")
+                <span></span>
+            </label>
+        </div>
+        <div class="form-group">
+            <label><span>@L("DefaultRate")</span></label>
+            <input class="form-control" type="text" asp-for="DefaultRate" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

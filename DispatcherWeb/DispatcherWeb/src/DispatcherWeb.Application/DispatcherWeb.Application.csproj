@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props"></Import>
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AssemblyName>DispatcherWeb.Application</AssemblyName>
+    <PackageId>DispatcherWeb.Application</PackageId>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>DispatcherWeb</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'false'">
+    <PackageReference Include="Dtd.Abp.EntityFrameworkCore.EFPlus" Version="$(DtdAbpVersion)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseAbpSources)' == 'true'">
+    <ProjectReference Include="..\..\..\..\ABP\src\Abp.EntityFrameworkCore.EFPlus\Abp.EntityFrameworkCore.EFPlus.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
+    <PackageReference Include="Geotab.Checkmate.ObjectModel" Version="11.68.266" />
+    <PackageReference Include="GlobalPayments.Api" Version="2.0.1" />
+    <PackageReference Include="MigraDocCore.Rendering" Version="1.3.67" />
+    <PackageReference Include="PDFtoImage" Version="5.1.0" />
+    <PackageReference Include="Twilio" Version="7.11.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DispatcherWeb.Application.Shared\DispatcherWeb.Application.Shared.csproj" />
+    <ProjectReference Include="..\DispatcherWeb.Core\DispatcherWeb.Core.csproj" />
+    <ProjectReference Include="..\DispatcherWeb.EntityFrameworkCore\DispatcherWeb.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,21 @@
+﻿@using DispatcherWeb.Utils
+@using DispatcherWeb.Web.Resources
+@using DispatcherWeb.Web.Session
+@inject ScriptPaths ScriptPaths
+@inject IPerRequestSessionCache PerRequestSessionCache
+@{
+    var sessionObject = await PerRequestSessionCache.GetCurrentLoginInformationsAsync();
+    var session = CoreHtmlHelper.FormatInlineJsonObject(sessionObject);
+}
+
+<script type="text/javascript" asp-add-nonce>
+    var abp = abp || {}; abp.appPath = '@ApplicationPath';
+    abp.domain = '@ScriptPaths.CookieDomain';
+    abp.signalRPath = '@ScriptPaths.SignalRRootAddress';
+    abp.reportCenterPath = '@ScriptPaths.ReportCenter';
+    abp.signalr = abp.signalr || {};
+    abp.signalr.url = abp.signalRPath + 'signalr';
+    abp.signalr.heartbeatInterval = Number('@ScriptPaths.SignalRHeartbeatInterval');
+    var app = app || {};
+    app.session = @Html.Raw(session);
+</script>

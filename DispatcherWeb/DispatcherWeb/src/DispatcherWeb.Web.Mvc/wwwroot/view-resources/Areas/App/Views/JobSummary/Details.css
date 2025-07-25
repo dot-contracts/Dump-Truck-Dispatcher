@@ -1,0 +1,82 @@
+﻿.mbsc-timeline-resource-col,
+.mbsc-timeline-sidebar-col {
+  width: 18em;
+}
+
+.trucks-timeline-header {
+  width: 100%;
+  background: #f8f9fa;
+  border: lightgray;
+  border-style: solid;
+  border-width: 1px;
+  text-indent: 5px;
+}
+.trucks-timeline-header > tbody > tr > td {
+  border: lightgray;
+  border-width: 0px 1px;
+  border-style: solid;
+}
+.trucks-timeline-header > tbody > tr > td.captions-column {
+  vertical-align: middle;
+  width: 120px;
+  padding: 5px;
+  font-weight: bold;
+}
+.trucks-timeline-header > tbody > tr > td.values-column {
+  background: white;
+  text-indent: 10px;
+}
+.trucks-timeline-header > tbody > tr > td.values-column:not(:last-child) {
+  width: 30%;
+}
+.trucks-timeline-header > tbody > tr > td.customer-cell {
+  font-weight: bold;
+}
+
+.trucks-timeline .trucks-timeline-wrapper {
+  height: 100%;
+}
+.trucks-timeline .trucks-timeline-wrapper .mbsc-timeline-footer.mbsc-flex.mbsc-material.mbsc-ltr {
+  height: 60px;
+}
+.trucks-timeline .trucks-timeline-wrapper .mbsc-timeline-footer-sticky mbsc-flex.mbsc-material {
+  border-bottom-color: lightgray;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}
+.trucks-timeline .trucks-timeline-wrapper .mbsc-timeline-resource-footer .grid-item.grid-column-1 {
+  text-align: left;
+}
+.trucks-timeline .trucks-timeline-wrapper .trip {
+  font-weight: normal !important;
+}
+.trucks-timeline .grid-container {
+  display: grid;
+  min-width: 100%;
+}
+.trucks-timeline .grid-container .grid-item {
+  margin: 5px;
+  min-width: 30%;
+  position: relative;
+  text-align: center;
+}
+.trucks-timeline .grid-container .grid-column-1 {
+  grid-column: 1;
+  width: 9.8em;
+  text-align: left;
+}
+.trucks-timeline .grid-container .grid-column-2 {
+  grid-column: 2;
+  width: 4em;
+}
+.trucks-timeline .grid-container .grid-column-3 {
+  grid-column: 3;
+  width: 4em;
+}
+
+.job-summary-header .job-status {
+  color: #58A3DC;
+  padding: 15px;
+  background-color: white;
+  font-weight: 600 !important;
+}

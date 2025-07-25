@@ -1,0 +1,325 @@
+﻿@using DispatcherWeb.Authorization
+@using DispatcherWeb.Features
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Configuration.Tenants.Dto
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@inject IAppSettingAvailabilityProvider SettingAvailabilityProvider
+@model DispatchingAndMessagingSettingsEditDto
+
+<div class="tab-pane" id="DispatchingAndMessagingTab">
+    <div class="row">
+        <div class="col-sm-12">
+            <h5>@L("Settings_DispatchingAndMessaging")</h5>
+            <form id="DispatchingAndMessagingSettingsForm" class="m-form">
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.DispatchVia))
+                {
+                    <div class="form-group">
+                        <div class="m-radio-list">
+                            <label>Dispatch via</label>
+                            <label class="m-radio">
+                                <input type="radio" name="DispatchVia" value="@DispatchVia.None.ToIntString()" @(Model.DispatchVia == DispatchVia.None ? "checked=\"checked\"" : "")> None
+                                <span></span>
+                            </label>
+                            @if (await FeatureChecker.IsEnabledAsync(AppFeatures.SmsIntegrationFeature))
+                            {
+                                <label class="m-radio">
+                                    <input type="radio" name="DispatchVia" value="@DispatchVia.SimplifiedSms.ToIntString()" @(Model.DispatchVia == DispatchVia.SimplifiedSms ? "checked=\"checked\"" : "")> Simplified SMS
+                                    <span></span>
+                                </label>
+                            }
+                            <label class="m-radio">
+                                <input type="radio" id="radioDriverApplication" name="DispatchVia" value="@DispatchVia.DriverApplication.ToIntString()" @(Model.DispatchVia == DispatchVia.DriverApplication ? "checked=\"checked\"" : "")> Driver Application
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                }
+                <div id="AdditionalSettings">
+                    <div class="row">
+                        <div class="col-xl-6">
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.HideTicketControlsInDriverApp))
+                            {
+                                <div class="form-group margin-top-10">
+                                    <label for="HideTicketControlsInDriverApp" class="m-checkbox col-lg-12">
+                                        <input id="HideTicketControlsInDriverApp" type="checkbox" name="HideTicketControlsInDriverApp" value="true" @(Model.HideTicketControlsInDriverApp ? "checked=\"checked\"" : "")>
+                                        @L("Settings_HideTicketControlsInDriverApp")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.RequiredTicketEntry))
+                            {
+                                <div class="form-group">
+                                    <div class="m-radio-list">
+                                        <label>@L("Settings_RequireDriversToEnterTickets")</label>
+                                        <label class="m-radio">
+                                            <input type="radio" name="RequiredTicketEntry" value="@RequiredTicketEntryEnum.None.ToIntString()" @(Model.RequiredTicketEntry == RequiredTicketEntryEnum.None ? "checked=\"checked\"" : "")> None
+                                            <span></span>
+                                        </label>
+                                        <label class="m-radio">
+                                            <input type="radio" name="RequiredTicketEntry" value="@RequiredTicketEntryEnum.Always.ToIntString()" @(Model.RequiredTicketEntry == RequiredTicketEntryEnum.Always ? "checked=\"checked\"" : "")> Always
+                                            <span></span>
+                                        </label>
+                                        <label class="m-radio">
+                                            <input type="radio" name="RequiredTicketEntry" value="@RequiredTicketEntryEnum.ByJobDefaultingToRequired.ToIntString()" @(Model.RequiredTicketEntry == RequiredTicketEntryEnum.ByJobDefaultingToRequired ? "checked=\"checked\"" : "")> By Job Defaulting to Required
+                                            <span></span>
+                                        </label>
+                                        <label class="m-radio">
+                                            <input type="radio" name="RequiredTicketEntry" value="@RequiredTicketEntryEnum.ByJobDefaultingToNotRequired.ToIntString()" @(Model.RequiredTicketEntry == RequiredTicketEntryEnum.ByJobDefaultingToNotRequired ? "checked=\"checked\"" : "")> By Job Defaulting to Not Required
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.RequireSignature))
+                            {
+                                <div class="form-group margin-top-20">
+                                    <label for="RequireSignature" class="m-checkbox col-lg-12">
+                                        <input id="RequireSignature" type="checkbox" name="RequireSignature" value="true" @(Model.RequireSignature ? "checked=\"checked\"" : "")>
+                                        @L("Settings_RequireSignature")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.RequireTicketPhoto))
+                            {
+                                <div class="form-group margin-top-20">
+                                    <label for="RequireTicketPhoto" class="m-checkbox col-lg-12">
+                                        <input id="RequireTicketPhoto" type="checkbox" name="RequireTicketPhoto" value="true" @(Model.RequireTicketPhoto ? "checked=\"checked\"" : "")>
+                                        @L("Settings_RequireTicketPhoto")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.AllowLoadCountOnHourlyJobs))
+                            {
+                                <div class="form-group margin-top-20">
+                                    <label for="AllowLoadCountOnHourlyJobs" class="m-checkbox col-lg-12">
+                                        <input id="AllowLoadCountOnHourlyJobs" type="checkbox" name="AllowLoadCountOnHourlyJobs" value="true" @(Model.AllowLoadCountOnHourlyJobs ? "checked=\"checked\"" : "")>
+                                        @L("AllowLoadCountOnHourlyJobs")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.HideDriverAppTimeScreen))
+                            {
+                                <div class="form-group margin-top-20">
+                                    <label for="HideDriverAppTimeScreen" class="m-checkbox col-lg-12">
+                                        <input id="HideDriverAppTimeScreen" type="checkbox" name="HideDriverAppTimeScreen" value="true" @(Model.HideDriverAppTimeScreen ? "checked=\"checked\"" : "")>
+                                        @L("HideDriverAppTimeScreen")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-xl-6">
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.DispatchesLockedToTruck))
+                            {
+                                <div class="form-group margin-top-10">
+                                    <label for="DispatchesLockedToTruck" class="m-checkbox col-lg-12">
+                                        <input id="DispatchesLockedToTruck" type="checkbox" name="DispatchesLockedToTruck" value="true" @(Model.DispatchesLockedToTruck ? "checked=\"checked\"" : "")>
+                                        @L("Settings_DispatchesLockedToTruck")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.AllowCounterSalesForTenant))
+                            {
+                                <div class="form-group margin-top-20">
+                                    <label for="AllowCounterSalesForTenant" class="m-checkbox col-lg-12">
+                                        <input id="AllowCounterSalesForTenant" type="checkbox" name="AllowCounterSalesForTenant" value="true" @(Model.AllowCounterSalesForTenant ? "checked=\"checked\"" : "")>
+                                        @L("AllowCounterSales")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.AutoGenerateTicketNumbers))
+                            {
+                                <div class="form-group margin-top-20">
+                                    <label for="AutoGenerateTicketNumbers" class="m-checkbox col-lg-12">
+                                        <input id="AutoGenerateTicketNumbers" type="checkbox" name="AutoGenerateTicketNumbers" value="true" @(Model.AutoGenerateTicketNumbers ? "checked=\"checked\"" : "")>
+                                        @L("AutoGenerateTicketNumbers")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.AllowEditingTimeOnHourlyJobs))
+                            {
+                                <div class="form-group margin-top-20">
+                                    <label for="AllowEditingTimeOnHourlyJobs" class="m-checkbox col-lg-12">
+                                        <input id="AllowEditingTimeOnHourlyJobs" type="checkbox" name="AllowEditingTimeOnHourlyJobs" value="true" @(Model.AllowEditingTimeOnHourlyJobs ? "checked=\"checked\"" : "")>
+                                        @L("AllowEditingTimeOnHourlyJobs")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.AllowMultipleDispatchesToBeInProgressAtTheSameTime))
+                            {
+                                <div class="form-group margin-top-20">
+                                    <label for="AllowMultipleDispatchesToBeInProgressAtTheSameTime" class="m-checkbox col-lg-12">
+                                        <input id="AllowMultipleDispatchesToBeInProgressAtTheSameTime" type="checkbox" name="AllowMultipleDispatchesToBeInProgressAtTheSameTime" value="true" @(Model.AllowMultipleDispatchesToBeInProgressAtTheSameTime ? "checked=\"checked\"" : "")>
+                                        @L("AllowMultipleDispatchesToBeInProgressAtTheSameTime")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                            @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.DisableTicketNumberOnDriverApp))
+                            {
+                                <div class="form-group margin-top-20">
+                                    <label for="DisableTicketNumberOnDriverApp" class="m-checkbox col-lg-12">
+                                        <input id="DisableTicketNumberOnDriverApp" type="checkbox" name="DisableTicketNumberOnDriverApp" value="true" @(Model.DisableTicketNumberOnDriverApp ? "checked=\"checked\"" : "")>
+                                        @L("DisableTicketNumberOnDriverApp")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    @if (await PermissionChecker.IsGrantedAsync(AppPermissions.DebugDriverApp))
+                    {
+                        <div class="row">
+                            <div class="form-group col-8 margin-top-10">
+                                <label for="LoggingLevel">@L("LoggingLevel")</label>
+                                <select class="form-control" name="LoggingLevel" id="LoggingLevel" asp-items="@Html.GetEnumSelectList(Model.LoggingLevel)"></select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-6 margin-top-10">
+                                <label for="SyncDataOnButtonClicks" class="m-checkbox">
+                                    <input id="SyncDataOnButtonClicks" type="checkbox" name="SyncDataOnButtonClicks" value="true" checked="@(Model.SyncDataOnButtonClicks ? "checked" : null)">
+                                    @L("SyncDataOnButtonClicks")
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                    @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.SendSmsOnDispatching))
+                    {
+                        <div class="form-group">
+                            <div class="m-radio-list">
+                                <label>@L("Settings_SendSmsOnDispatching")</label>
+                                <label class="m-radio">
+                                    <input type="radio" name="SendSmsOnDispatching" value="@SendSmsOnDispatchingEnum.DontSend.ToIntString()" @(Model.SendSmsOnDispatching == SendSmsOnDispatchingEnum.DontSend ? "checked=\"checked\"" : "")> Don't send
+                                    <span></span>
+                                </label>
+                                <label class="m-radio">
+                                    <input type="radio" name="SendSmsOnDispatching" value="@SendSmsOnDispatchingEnum.SendWhenUserNotClockedIn.ToIntString()" @(Model.SendSmsOnDispatching == SendSmsOnDispatchingEnum.SendWhenUserNotClockedIn ? "checked=\"checked\"" : "")> Send when user not clocked in
+                                    <span></span>
+                                </label>
+                                <label class="m-radio">
+                                    <input type="radio" name="SendSmsOnDispatching" value="@SendSmsOnDispatchingEnum.SendForAllDispatches.ToIntString()" @(Model.SendSmsOnDispatching == SendSmsOnDispatchingEnum.SendForAllDispatches ? "checked=\"checked\"" : "")> Send for all dispatches
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                    @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.TextForSignatureView))
+                    {
+                        <div class="row">
+                            <div class="form-group col-8">
+                                <label asp-for="TextForSignatureView">@L("TextForSignatureView")</label>
+                                <textarea class="form-control" asp-for="TextForSignatureView" rows="3"></textarea>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.ShowTrailersOnSchedule))
+                {
+                    <div class="form-group margin-top-20">
+                        <label for="ShowTrailersOnSchedule" class="m-checkbox col-lg-12">
+                            <input id="ShowTrailersOnSchedule" type="checkbox" name="ShowTrailersOnSchedule" value="true" checked="@(Model.ShowTrailersOnSchedule ? "checked" : null)">
+                            @L("ShowTrailersOnSchedule")
+                            <span></span>
+                        </label>
+                    </div>
+                }
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.ShowStaggerTimes))
+                {
+                    <div class="form-group margin-top-20">
+                        <label for="ShowStaggerTimes" class="m-checkbox col-lg-12">
+                            <input id="ShowStaggerTimes" type="checkbox" name="ShowStaggerTimes" value="true" checked="@(Model.ShowStaggerTimes ? "checked" : null)">
+                            @L("ShowStaggerTimes")
+                            <span></span>
+                        </label>
+                    </div>
+                }
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.ValidateUtilization))
+                {
+                    <div class="form-group margin-top-20">
+                        <label for="ValidateUtilization" class="m-checkbox col-lg-12">
+                            <input id="ValidateUtilization" type="checkbox" name="ValidateUtilization" value="true" checked="@(Model.ValidateUtilization ? "checked" : null)">
+                            @L("ValidateUtilization")
+                            <span></span>
+                        </label>
+                    </div>
+                }
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.AllowSchedulingTrucksWithoutDrivers))
+                {
+                    <div class="form-group margin-top-20">
+                        <label for="AllowSchedulingTrucksWithoutDrivers" class="m-checkbox col-lg-12">
+                            <input id="AllowSchedulingTrucksWithoutDrivers" type="checkbox" name="AllowSchedulingTrucksWithoutDrivers" value="true" checked="@(Model.AllowSchedulingTrucksWithoutDrivers ? "checked" : null)">
+                            @L("AllowSchedulingTrucksWithoutDrivers")
+                            <span></span>
+                        </label>
+                    </div>
+                }
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.AllowSmsMessages))
+                {
+                    <div class="form-group margin-top-20">
+                        <label for="AllowSmsMessages" class="m-checkbox col-lg-12">
+                            <input id="AllowSmsMessages" type="checkbox" name="AllowSmsMessages" value="true" @(Model.AllowSmsMessages ? "checked=\"checked\"" : "")>
+                            @L("Settings_AllowSmsMessages")
+                            <span></span>
+                        </label>
+                    </div>
+                }
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.SmsPhoneNumber))
+                {
+                    <div class="row">
+                        <div class="form-group col-8">
+                            <label for="SmsPhoneNumber">@L("PhoneNumberToSendMessagesFrom") <i class="fa fa-info-circle text-primary" id="PhoneNumberToSendMessagesFromInfo" title="@L("ThisNumberMustBeTwilioNumber")"></i></label>
+                            <input type="text" id="SmsPhoneNumber" name="SmsPhoneNumber" class="form-control" value="@Model.SmsPhoneNumber" placeholder="Cell Phone Number (format: +15554321)" maxlength="15">
+                        </div>
+                        <div class="form-group col-4">
+                            <label class="col-12">&nbsp;</label>
+                            <button class="btn btn-primary" id="TestPhoneNumberButton" data-test="number">Test</button>
+                        </div>
+                    </div>
+                }
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.DriverDispatchSmsTemplate))
+                {
+                    <div class="row">
+                        <div class="form-group col-8">
+                            <label class="required-label" asp-for="DriverDispatchSms">@L("DriverDispatchSms")</label>
+                            <textarea class="form-control" asp-for="DriverDispatchSms" rows="3" maxlength="@(EntityStringFieldLengths.Dispatch.Message - 100)"></textarea>
+                        </div>
+                        <div class="form-group col-4">
+                            <label class="col-12">&nbsp;</label>
+                            <button class="btn btn-primary" id="SendTestMessageButton" data-test="message">Send Test Message</button>
+                        </div>
+                    </div>
+                }
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.DriverStartTimeTemplate))
+                {
+                    <div class="row">
+                        <div class="form-group col-8">
+                            <label class="required-label" asp-for="DriverStartTime">@L("DriverStartTime")</label>
+                            <textarea class="form-control" asp-for="DriverStartTime" rows="3" required></textarea>
+                        </div>
+                    </div>
+                }
+                @if (await SettingAvailabilityProvider.IsSettingAvailableAsync(AppSettings.DispatchingAndMessaging.DefaultStartTime))
+                {
+                    <div class="row">
+                        <div class="form-group col-8">
+                            <label class="required-label" asp-for="DefaultStartTime">@L("DefaultStartTime")</label>
+                            <input type="text" class="form-control" asp-for="DefaultStartTime" autocomplete="off" required>
+                        </div>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,58 @@
+﻿@using DispatcherWeb.Authorization.Roles;
+@using DispatcherWeb.Authorization.Roles.Dto;
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@inject IRoleAppService RoleAppService
+@model DispatcherWeb.HostEmails.Dto.SendHostEmailInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Send Host Email"))
+@{
+    var staticRoleNames = (await RoleAppService.GetStaticRoleNamesSelectListAsync(new GetStaticRoleNamesSelectListInput
+    {
+        MultiTenancySide = Abp.MultiTenancy.MultiTenancySides.Tenant,
+    })).ToSelectListItems();
+}
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <div class="form-group">
+            <label class="required-label">Subject</label>
+            <input class="form-control" type="text" name="Subject" maxlength="@EntityStringFieldLengths.HostEmail.Subject" required>
+        </div>
+        <div class="form-group">
+            <label>Body</label>
+            <textarea type="text" class="form-control" rows="5" name="Body" maxlength="@EntityStringFieldLengths.HostEmail.Body" required></textarea>
+        </div>
+        <div class="form-group">
+            <label>Editions</label>
+            <select class="form-control" asp-for="EditionIds" multiple="multiple"></select>
+        </div>
+        <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" asp-for="ActiveFilter">
+                <option selected value="">All</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Tenants</label>
+            <select class="form-control" asp-for="TenantIds" multiple="multiple"></select>
+        </div>
+        <div class="form-group">
+            <label class="required-label">Type</label>
+            <select class="form-control" asp-for="Type" asp-items="Html.GetEnumSelectList<HostEmailType>()">
+                <option>Select a type</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Roles</label>
+            <select class="form-control" asp-for="RoleNames" multiple="multiple" asp-items="staticRoleNames"></select>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-button" data-dismiss="modal">Cancel</button>
+    <button type="button" class="btn btn-primary save-button"><i class="fa fa-save"></i> <span>Send</span></button>
+</div>

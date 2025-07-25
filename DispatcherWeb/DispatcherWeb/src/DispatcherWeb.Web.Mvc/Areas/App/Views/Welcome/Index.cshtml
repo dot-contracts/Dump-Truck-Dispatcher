@@ -1,0 +1,19 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Welcome;
+@model WelcomeViewModel;
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="m-alert m-alert--icon m-alert--icon-solid m-alert--outline alert alert-brand fade show" role="alert">
+                <div class="m-alert__icon">
+                    <i class="fa fa-exclamation-circle" aria-label="@L("Welcome")"></i>
+                    <span></span>
+                </div>
+                <div class="m-alert__text">
+                    <h5>@L("WelcomePage_Title")</h5>
+                    @Model.HeaderMessage<br />
+                    @Model.DetailsMessage
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    

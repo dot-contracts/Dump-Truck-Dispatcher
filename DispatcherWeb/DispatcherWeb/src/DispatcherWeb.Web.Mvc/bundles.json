@@ -1,0 +1,333 @@
+{
+  "scripts": [
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/common-scripts.min.js",
+      "input": [
+        "wwwroot/Common/Scripts/**/*.js",
+        "!wwwroot/Common/Scripts/**/*min.js",
+        "!wwwroot/Common/Scripts/Chat/chat.signalr.js",
+        "!wwwroot/Common/Scripts/abp.signalr-client.js",
+        "!wwwroot/Common/Scripts/abp.overrides.js",
+        "!wwwroot/Common/Scripts/abp.proxies.overrides.js",
+        "wwwroot/view-resources/Areas/App/Views/Common/_OrganizationTree.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/scripts.bundle.min.js",
+      "input": [
+        "wwwroot/metronic/src/js/framework/base/app.js",
+        "wwwroot/metronic/src/js/framework/base/util.js",
+        "wwwroot/metronic/src/js/framework/components/general/animate.js",
+        "wwwroot/metronic/src/js/framework/components/general/dropdown.js",
+        "wwwroot/metronic/src/js/framework/components/general/header.js",
+        "wwwroot/metronic/src/js/framework/components/general/menu.js",
+        "wwwroot/metronic/src/js/framework/components/general/messenger.js",
+        "wwwroot/metronic/src/js/framework/components/general/offcanvas.js",
+        "wwwroot/metronic/src/js/framework/components/general/portlet.js",
+        "wwwroot/metronic/src/js/framework/components/general/toggle.js",
+        "wwwroot/metronic/src/js/framework/components/plugins/base/toastr.init.js",
+        "wwwroot/metronic/src/js/framework/components/plugins/forms/bootstrap-daterangepicker.init.js",
+        "wwwroot/metronic/src/js/framework/components/plugins/forms/jquery-validation.init.js",
+        "wwwroot/metronic/src/js/app/base/main.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/app-common-scripts.min.js",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/Common/Modals/_LookupModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Common/Modals/_EntityTypeHistoryModal.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/account-layout-libs.min.js",
+      "input": [
+        "node_modules/jquery/dist/jquery.js",
+        "node_modules/@popperjs/core/dist/umd/popper.js",
+        "node_modules/bootstrap/dist/js/bootstrap.js",
+        "node_modules/jquery-validation/dist/jquery.validate.js",
+        "wwwroot/lib/idb/umd.js",
+        "wwwroot/lib/block-ui/jquery.blockUI.js",
+        "node_modules/js-cookie/dist/js.cookie.js",
+        "wwwroot/lib/toastr/build/toastr.js",
+        "wwwroot/lib/spin.js/spin.umd.js",
+        "wwwroot/lib/spin.js/jquery.spin.js",
+        "wwwroot/lib/sweetalert/dist/sweetalert.js",
+        "node_modules/moment/min/moment-with-locales.js",
+        "node_modules/moment-timezone/builds/moment-timezone-with-data.js",
+        "node_modules/cookieconsent/build/cookieconsent.min.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/abp.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.jquery.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.toastr.js",
+        "wwwroot/Common/Scripts/abp.toastr.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.blockUI.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.spin.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.sweet-alert.js",
+        "wwwroot/Common/Scripts/abp.overrides.js",
+        "node_modules/localforage/dist/localforage.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/app-layout-libs.min.js",
+      "input": [
+        "node_modules/jquery/dist/jquery.js",
+        "node_modules/jquery-validation/dist/jquery.validate.js",
+        "node_modules/@popperjs/core/dist/umd/popper.js",
+        "node_modules/bootstrap/dist/js/bootstrap.bundle.js",
+        "node_modules/js-cookie/dist/js.cookie.js",
+        "node_modules/jquery-form/src/jquery.form.js",
+        "node_modules/jquery-color/dist/jquery.color.js",
+        "wwwroot/lib/jcrop/js/Jcrop.js",
+        "node_modules/timeago/jquery.timeago.js",
+        "node_modules/@microsoft/signalr/dist/browser/signalr.js",
+        "node_modules/localforage/dist/localforage.js",
+        "wwwroot/lib/morris.js/morris.js",
+        "node_modules/raphael/raphael.js",
+        "node_modules/jstree/dist/jstree.js",
+        "wwwroot/lib/spin.js/spin.umd.js",
+        "wwwroot/lib/spin.js/jquery.spin.js",
+        "wwwroot/lib/idb/umd.js",
+        "wwwroot/lib/block-ui/jquery.blockUI.js",
+        "wwwroot/lib/sweetalert/dist/sweetalert.js",
+        "wwwroot/lib/toastr/build/toastr.js",
+        "node_modules/moment/min/moment-with-locales.js",
+        "node_modules/moment-timezone/builds/moment-timezone-with-data.js",
+        "node_modules/bootstrap-daterangepicker/daterangepicker.js",
+        "node_modules/underscore/underscore.js",
+        "node_modules/mustache/mustache.js",
+        "node_modules/push.js/bin/push.js",
+        "node_modules/@websanova/url/src/url-tld.js",
+        "node_modules/cookieconsent/build/cookieconsent.min.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/abp.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.jquery.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.toastr.js",
+        "wwwroot/Common/Scripts/abp.toastr.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.blockUI.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.spin.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.sweet-alert.js",
+        "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.moment.js",
+        "wwwroot/Common/Scripts/abp.signalr-client.js",
+        "wwwroot/Common/Scripts/abp.overrides.js",
+        "node_modules/datatables.net/js/jquery.dataTables.js",
+        "node_modules/datatables.net-bs4/js/dataTables.bootstrap4.js",
+        "node_modules/datatables.net-select/js/dataTables.select.js",
+        "node_modules/datatables.net-responsive/js/dataTables.responsive.js",
+        "node_modules/datatables.net-responsive-bs4/js/responsive.bootstrap4.js",
+        "wwwroot/lib/select2/dist/js/select2.js",
+        "node_modules/bootstrap4-datetimepicker/build/js/bootstrap-datetimepicker.min.js",
+        "wwwroot/assets/bootstrap4-datetimepicker/defaults.js",
+        "node_modules/blueimp-file-upload/js/vendor/jquery.ui.widget.js",
+        "node_modules/blueimp-file-upload/js/jquery.iframe-transport.js",
+        "node_modules/blueimp-file-upload/js/jquery.fileupload.js",
+        "node_modules/jquery-serializejson/jquery.serializejson.js",
+        "node_modules/tooltip.js/dist/umd/tooltip.min.js",
+        "node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js",
+        "node_modules/jquery.dirtyforms/jquery.dirtyforms.js",
+        "node_modules/@dumptruckdispatcher/datatables-helper/dist/dataTablesHelper.js",
+        "node_modules/@dumptruckdispatcher/datatables-helper/dist/datetimepickerHelper.js",
+        "node_modules/@dumptruckdispatcher/datatables-helper/dist/miscHelpers.js",
+        "node_modules/@dumptruckdispatcher/datatables-helper/dist/select2Helper.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/tenant-index-libs.min.js",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/Common/_FeaturesTree.js",
+        "wwwroot/view-resources/Areas/App/Views/Tenants/_CreateModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Tenants/_EditModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Tenants/_FeaturesModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Tenants/Index.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/demo-ui-components.min.js",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/DemoUiComponents/DateAndTimePickers/DemoDateAndTimePickers.js",
+        "wwwroot/view-resources/Areas/App/Views/DemoUiComponents/FileUpload/FileUpload.js",
+        "wwwroot/view-resources/Areas/App/Views/DemoUiComponents/Selections/Selections.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/edition-list.min.js",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/Common/_FeaturesTree.js",
+        "wwwroot/view-resources/Areas/App/Views/Editions/Index.js",
+        "wwwroot/view-resources/Areas/App/Views/Editions/_CreateOrEditModal.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/language-list.min.js",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/Languages/_CreateOrEditModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Languages/Index.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/role-list.min.js",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/Common/_PermissionTree.js",
+        "wwwroot/view-resources/Areas/App/Views/Common/Modals/_PermissionTreeModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Roles/_CreateOrEditModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Roles/Index.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/user-list.min.js",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/Common/_PermissionTree.js",
+        "wwwroot/view-resources/Areas/App/Views/Common/Modals/_PermissionTreeModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Users/_CreateOrEditModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Users/_PermissionsModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Users/Index.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/dynamic-properties-manage-values.min.js",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/DynamicProperties/_ManageValuesModal.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/dynamic-entity-properties-manage-modal.min.js",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/DynamicEntityProperties/_CreateModal.js",
+        "wwwroot/view-resources/Areas/App/Views/DynamicEntityProperties/_ManageModal.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/host-dashboard-libs.min.js",
+      "input": [
+        "wwwroot/lib/morris.js/morris.js",
+        "node_modules/raphael/raphael.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/tenant-index-libs.js",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/Common/_FeaturesTree.js",
+        "wwwroot/view-resources/Areas/App/Views/Tenants/_CreateModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Tenants/_EditModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Tenants/_FeaturesModal.js",
+        "wwwroot/view-resources/Areas/App/Views/Tenants/Index.js"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/swagger-ui-libs.min.js",
+      "input": [
+        "node_modules/jquery/dist/jquery.js",
+        "node_modules/swagger-ui/dist/swagger-ui-bundle.js",
+        "node_modules/swagger-ui/dist/swagger-ui-standalone-preset.js"
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/common-styles.min.css",
+      "input": [
+        "wwwroot/Common/Styles/**/*.css",
+        "wwwroot/Common/Styles/core.less",
+        "wwwroot/fonts/fonts-poppins.css",
+        "wwwroot/fonts/fonts-roboto.css",
+        "wwwroot/Common/Styles/pwstrength-customize.less",
+        "!wwwroot/Common/Styles/**/*.min.css",
+        "!wwwroot/Common/Styles/Themes/**/*.css",
+        "!wwwroot/Common/Styles/metronic-customize-top-menu*.css"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/account-layout-libs.min.css",
+      "input": [
+        "node_modules/famfamfam-flags/dist/sprite/famfamfam-flags.css",
+        "node_modules/cookieconsent/build/cookieconsent.min.css",
+        "wwwroot/lib/spin.js/spin.css",
+        "wwwroot/lib/block-ui/jquery.blockUI.css",
+        "wwwroot/lib/toastr/build/toastr.css",
+        "wwwroot/lib/sweetalert/dist/sweetalert.css",
+        "wwwroot/Common/Styles/Themes/cookie-consent.less"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/app-layout-libs.min.css",
+      "input": [
+        "node_modules/datatables.net-bs4/css/dataTables.bootstrap4.css",
+        "node_modules/datatables.net-responsive-bs4/css/responsive.bootstrap4.css",
+        "node_modules/famfamfam-flags/dist/sprite/famfamfam-flags.css",
+        "wwwroot/lib/jcrop/css/Jcrop.css",
+        "wwwroot/lib/spin.js/spin.css",
+        "wwwroot/lib/block-ui/jquery.blockUI.css",
+        "wwwroot/lib/toastr/build/toastr.css",
+        "wwwroot/lib/sweetalert/dist/sweetalert.css",
+        "node_modules/blueimp-file-upload/css/jquery.fileupload.css",
+        "node_modules/cookieconsent/build/cookieconsent.min.css",
+        "wwwroot/metronic/assets/plugins/custom/datatables/datatables.bundle.css"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/vendors.bundle.min.css",
+      "input": [
+        "node_modules/bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css",
+        "node_modules/bootstrap-daterangepicker/daterangepicker.css",
+        "node_modules/select2/dist/css/select2.css",
+        "node_modules/animate.css/animate.min.css",
+        "wwwroot/lib/toastr/build/toastr.css",
+        "node_modules/jstree/dist/themes/default/style.css",
+        "wwwroot/lib/morris.js/morris.css",
+        "wwwroot/lib/fontawesome-pro-6.4.0-web/css/all.css",
+        "wwwroot/metronic/src/vendors/metronic/css/styles.css"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/demo-ui-components.min.css",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/DemoUiComponents/DateAndTimePickers/DemoDateAndTimePickers.css",
+        "wwwroot/view-resources/Areas/App/Views/DemoUiComponents/FileUpload/FileUpload.css",
+        "wwwroot/view-resources/Areas/App/Views/DemoUiComponents/Selections/Selections.css"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/edition-list.min.css",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/Common/_FeaturesTree.less",
+        "wwwroot/view-resources/Areas/App/Views/Editions/Index.css"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/tenant-list.min.css",
+      "input": [
+        "wwwroot/view-resources/Areas/App/Views/Common/_FeaturesTree.less",
+        "wwwroot/view-resources/Areas/App/Views/Tenants/index.less"
+      ]
+    },
+    {
+      "output": "Common/Styles/Themes/blue/metronic-customize.min.css",
+      "input": [
+        "wwwroot/Common/Styles/Themes/blue/metronic-customize.less"
+      ]
+    },
+    {
+      "output": "Common/Styles/metronic-customize.min.css",
+      "input": [
+        "wwwroot/Common/Styles/metronic-customize.less"
+      ]
+    },
+    {
+      "output": "Common/Styles/Themes/blue/datatables.min.css",
+      "input": [
+        "wwwroot/Common/Styles/Themes/blue/datatables.css"
+      ]
+    },
+    {
+      "output": "Common/Scripts/Datatables/datatables.min.css",
+      "input": [
+        "wwwroot/Common/Scripts/Datatables/datatables.css"
+      ]
+    },
+    {
+      "output": "view-resources/Areas/App/Views/_Bundles/swagger-ui.min.css",
+      "input": [
+        "node_modules/swagger-ui/dist/swagger-ui.css"
+      ]
+    }
+  ],
+  "scriptMappings": [
+  ]
+}

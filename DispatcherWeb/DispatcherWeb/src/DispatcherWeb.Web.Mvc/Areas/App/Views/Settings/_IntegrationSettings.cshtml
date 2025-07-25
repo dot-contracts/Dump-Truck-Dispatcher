@@ -1,0 +1,16 @@
+﻿@using DispatcherWeb.Features
+@model DispatcherWeb.Configuration.Tenants.Dto.IntegrationSettingsEditDto
+
+<div class="tab-pane" id="SettingsIntegrationTab">
+
+    @if (await FeatureChecker.IsEnabledAsync(AppFeatures.GpsIntegrationFeature))
+    {
+        <partial name="_GpsIntegrationSettings" model="Model.Gps" />
+    }
+
+    @if (await FeatureChecker.IsEnabledAsync(AppFeatures.FulcrumIntegration))
+    {
+        <partial name="_FulcrumSettings" model="Model.Fulcrum" />
+    }
+
+</div>

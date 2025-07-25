@@ -1,0 +1,428 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Orders.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@{
+    var currencyCulture = await SettingManager.GetCurrencyCultureAsync();
+}
+@model OrderEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Order" : "Add Order"))
+
+<div class="modal-body">
+    <form id="OrderForm" class="order-form m-form">
+        <div class="m-portlet__body">
+            <div class="box-body form-horizontal-custom">
+                <div>
+                    <div class="col-lg-12">
+                        <input type="hidden" asp-for="IsClosed" />
+                        <input type="hidden" asp-for="AuthorizationDateTime" />
+                        <input type="hidden" asp-for="AuthorizationCaptureDateTime" />
+                        <input type="hidden" asp-for="CanEditAnyOrderDirections" />
+                        <input type="hidden" asp-for="MaterialCompanyOrderId" />
+                        <input type="hidden" asp-for="CustomerIsTaxExempt" />
+                        <input type="hidden" asp-for="CustomerIsCod" />
+                        <input type="hidden" asp-for="QuoteIsTaxExempt" />
+
+                        <div class="m-form__group row">
+                            <div class="col-lg-6 form-group ">
+                                <div class="row">
+                                    <label for="Id" class="col-xl-4 col-form-label">@L("Id"):</label>
+                                    <div class="col-sm-8 col-12">
+                                        <input type="text" class="form-control m-input" asp-for="Id" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-12 form-group ">
+                                <div class="box-actions">
+                                    <button id="CopyOrderButton" class="btn btn-primary m-btn m-btn--icon m-btn--wide m-btn--md m--margin-right-10 mb-3">
+                                        <span>
+                                            <i class="fa fa-copy"></i>
+                                            <span>@L("Copy")</span>
+                                        </span>
+                                    </button>
+                                    @if (await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_PrintOrders))
+                                    {
+                                        <div class="btn-group dropdown  m--margin-right-10 mb-3">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                <span>
+                                                    <i class="fa fa-print"></i>
+                                                    <span>@L("Print")</span>
+                                                </span>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                                <a class="dropdown-item" href="#" id="PrintOrderWithNoPricesButton"><i class="fa fa-plus"></i>Order with no prices</a>
+                                                <a class="dropdown-item" href="#" id="PrintOrderWithCombinedPrices"><i class="fa-regular fa-folder"></i>Order with combined prices</a>
+                                                <a class="dropdown-item" href="#" id="PrintOrderWithSeparatePrices"><i class="fa fa-copy"></i>Order with separate prices</a>
+                                                <a class="dropdown-item" href="#" id="PrintOrderForBackOffice"><i class="fa fa-undo"></i>Order for Back Office</a>
+                                                <a class="dropdown-item" href="#" id="PrintOrderWithDeliveryInfo"><i class="fa-regular fa-truck"></i>@L("OrderWithDeliveryInfo")</a>
+                                            </div>
+                                        </div>
+                                    }
+                                    <button class="btn btn-primary m-btn m-btn--icon m-btn--wide m-btn--md m--margin-right-10 mb-3" id="EmailOrderButton">
+                                        <span>
+                                            <i class="fa-regular fa-envelope"></i>
+                                            <span>@L("EmailOrder")</span>
+                                        </span>
+                                    </button>
+                                    <div class="btn-group dropdown m--margin-right-10 mb-3 ml-1">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <span>
+                                                <i class="fa-regular fa-file-lines"></i>
+                                                <span>@L("Receipt")</span>
+                                            </span>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <a class="dropdown-item" id="CreateNewReceipt" href="#">
+                                                <i class="fa fa-plus"></i>Create New Receipt
+                                            </a>
+                                            @foreach (var receipt in Model.Receipts)
+                                            {
+                                                <a class="dropdown-item openReceiptButton" data-receiptId="@receipt.Id" asp-controller="Receipts" asp-action="Details" asp-route-id="@receipt.Id">
+                                                    @receipt.ReceiptDate.ToString("d")
+                                                    <span class="float-right">@receipt.Total.ToString("c2", currencyCulture)</span>
+                                                </a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-form__group row">
+                            <div class="col-sm-6 form-group">
+                                <div class="row">
+                                    <label for="Id" class="col-sm-4 col-form-label">@L("AccountNumber"):</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control m-input @(Model.CustomerIsCod ? "cod-account-number" : "")"
+                                               id="CustomerAccountNumber" value="@(Model.CustomerIsCod ? "COD" : Model.CustomerAccountNumber)" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12 form-group">
+                                <div class="m-checkbox-inline margin-top-10">
+                                    <label class="m-checkbox">
+                                        <input type="checkbox" asp-for="IsPending" id="IsPending">@L("PendingOrder")
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="m-form__group row">
+                            <div class="col-sm-6 col-12 form-group">
+                                <div class="row">
+                                    <label class="control-label col-sm-4 required-label">@L("DeliveryDate"):</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control m-input" asp-for="DeliveryDate" required autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-form__group row" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts))">
+                            <div class="col-sm-6 col-12 form-group">
+                                <div class="row">
+                                    <label class="control-label col-sm-4 required-label">@L("Shift"):</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" asp-for="Shift" id="OrderShift" asp-items="@(await SettingManager.GetShiftSelectList()).Select(x => new SelectListItem(x.Name, x.Id))" required>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12 form-group">
+                                <div class="row">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+                            <label class="control-label col-sm-2 col-12">@L("Office"):</label>
+                            <div class="col-sm-6 col-12">
+                                <select class="form-control" asp-for="OfficeId" id="OrderOfficeId" disabled="@(Model.IsSingleOffice ? "disabled" : null)">
+                                    <option value="">Select an office</option>
+                                    @if (Model.OfficeId != 0)
+                                    {
+                                        <option selected value="@Model.OfficeId">@Model.OfficeName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label class="control-label col-sm-2 col-12 required-label">@L("Customer"):</label>
+                            <div class="col-sm-6 col-12">
+                                <select class="form-control" asp-for="CustomerId" id="OrderCustomerId" required>
+                                    <option value="">Select a customer</option>
+                                    @if (Model.CustomerId != 0)
+                                    {
+                                        <option selected value="@Model.CustomerId">@Model.CustomerName</option>
+                                    }
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label class="control-label col-sm-2 col-12">@L("Quote"):</label>
+                            <div class="col-sm-6 col-12">
+                                <select class="form-control quote-dropdown" asp-for="QuoteId" id="OrderQuoteId">
+                                    <option value=""
+                                            data-placeholder-default="Not on a quote"
+                                            data-placeholder-no-items="No quotes defined for the selected customer"
+                                            data-placeholder-no-parent="Select a customer first">
+                                        Select a quote
+                                    </option>
+                                    @if (Model.QuoteId.HasValue)
+                                    {
+                                        <option selected value="@Model.QuoteId">@Model.QuoteName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label class="control-label col-sm-2 col-12">@L("Contact"):</label>
+                            <div class="col-sm-6 col-12 mb-2">
+                                <select class="form-control" asp-for="ContactId" id="OrderContactId">
+                                    <option value=""
+                                            data-placeholder-default="Select a contact"
+                                            data-placeholder-no-items="No contacts defined for the selected customer"
+                                            data-placeholder-no-parent="Select a customer first">
+                                        Select a contact
+                                    </option>
+                                    @if (Model.ContactId.HasValue)
+                                    {
+                                        <option selected value="@Model.ContactId" data-phoneNumber="@Model.ContactPhone">@Model.ContactName</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-4 col-12 mb-2">
+                                <input type="text" class="form-control" asp-for="ContactPhone" readonly>
+                            </div>
+                        </div>
+
+                        <div class="m-form__group row">
+                            <div class="col-sm-6 col-12">
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-4">@L("PONumber"):</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="PONumber">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group row">
+                            <label class="col-lg-2 col-sm-12 col-md-2"></label>
+                            <div class="col-lg-2 col-sm-12 col-md-3 col-xs-9">
+                                <label class="m-checkbox">
+                                    <input type="checkbox" asp-for="IsTaxExempt" id="OrderIsTaxExempt" disabled="@(Model.QuoteIsTaxExempt.HasValue ? "disabled" : null)">
+                                    @L("TaxExempt")
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        @{
+                            string userDefinedField1 = await SettingManager.GetSettingValueAsync(AppSettings.General.UserDefinedField1);
+                        }
+                        @if (!String.IsNullOrEmpty(userDefinedField1))
+                        {
+                            <div class="form-group m-form__group row">
+                                <label class="control-label col-2">@userDefinedField1:</label>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" asp-for="SpectrumNumber" data-val-length="The field @userDefinedField1 must be a string with a maximum length of 20.">
+                                </div>
+
+                            </div>
+                        }
+
+                        <div class="form-group m-form__group row"></div>
+                    </div>
+                    <div class="col-12">
+                        <div class="box-header-top clearfix">
+                            <div class="grid-caption pull-left">
+                                <label>@L("OrderItems")</label>
+                            </div>
+                            <div class="box-actions pull-right">
+                                <button type="button" class="btn btn-default" id="CreateNewOrderLineButton"><i class="fa fa-plus"></i>@L("AddOrderItem")</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive mb-1">
+                            <table class="display table table-striped table-bordered table-hover" id="OrderLinesTable"></table>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group m-form__group row"></div>
+                        <div class="m-form__group row" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.Fuel.ShowFuelSurcharge))">
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-4 col-md-6 col-sm-12 col-form-label" for="OrderFuelSurchargeCalculationId">@L("FuelSurchargeCalculation"):</label>
+                                    <div class="col-lg-8 col-md-6 col-sm-12">
+                                        <input type="hidden" id="DefaultFuelSurchargeCalculationName" value="@Model.DefaultFuelSurchargeCalculationName" />
+                                        <select class="form-control" asp-for="FuelSurchargeCalculationId" id="OrderFuelSurchargeCalculationId" disabled="@((Model.QuoteId.HasValue && !await IsGrantedAsync(AppPermissions.Pages_Orders_EditQuotedValues)) ? "disabled" : null)">
+                                            <option value="">@AppConsts.FuelSurchargeCalculationBlankName</option>
+                                            @if (Model.FuelSurchargeCalculationId > 0)
+                                            {
+                                                <option selected value="@Model.FuelSurchargeCalculationId">@Model.FuelSurchargeCalculationName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6" id="BaseFuelCostContainer" abp-hidden="@(Model.CanChangeBaseFuelCost != true)">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-sm-12 col-lg-4 col-md-6 col-form-label" for="BaseFuelCost">@L("BaseFuelCost"):</label>
+                                    <div class="col-sm-12 col-lg-8 col-md-6">
+                                        <input type="hidden" id="DefaultBaseFuelCost" value="@Model.DefaultBaseFuelCost" />
+                                        <input type="hidden" id="DefaultCanChangeBaseFuelCost" value="@Model.DefaultCanChangeBaseFuelCost.ToString()" />
+                                        <input type="text" class="form-control" asp-for="BaseFuelCost"
+                                               data-rule-number="true"
+                                               data-rule-min="0"
+                                               data-rule-max="@AppConsts.MaxDecimalDatabaseLength"
+                                               data-msg-number="Must be a numeric value"
+                                               disabled="@(Model.QuoteId.HasValue ? "disabled" : null)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-form__group row">
+                            <div class="col-sm-6 col-12">
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-4">@L("TaxName"):</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" asp-for="SalesTaxEntityId" id="OrderSalesTaxEntityId">
+                                            <option value="">Select a tax name</option>
+                                            @if (Model.SalesTaxEntityId > 0)
+                                            {
+                                                <option selected value="@Model.SalesTaxEntityId.Value">@Model.SalesTaxEntityName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-4">@L("SalesTaxRate"):</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="SalesTaxRate" data-rule-number="true" data-rule-min="0" data-rule-max="1000000000">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-form__group row">
+                            <div class="col-sm-6 col-12">
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-4">@L("SalesTax"):</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="SalesTax" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-form__group row">
+                            <div class="col-sm-6 col-12">
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-4">@L("Total"):</label>
+                                    <div class="col-sm-8">
+                                        <input type="hidden" asp-for="MaterialTotal" />
+                                        <input type="hidden" asp-for="FreightTotal" />
+                                        <input type="text" class="form-control" asp-for="CODTotal" readonly="readonly">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label class="control-label col-sm-2 col-12">@L("ChargeTo"):</label>
+                            <div class="col-sm-2 col-12">
+                                <input type="text" class="form-control" asp-for="ChargeTo">
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label class="control-label col-sm-2 col-12"></label>
+                            <div class="col-sm-2 col-12">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        @L("InsertCannedText") <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu insert-canned-text-list" data-target-id="Directions">
+                                        <li data-id="loading" abp-hidden><a href="#">Loading...</a></li>
+                                        <li data-id="no-items" abp-hidden><a href="#">No items</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label class="control-label col-sm-2 col-12">@L("Comments"):</label>
+                            <div class="col-sm-6 col-12">
+                                <textarea class="form-control" rows="5" asp-for="Directions"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row" abp-hidden>
+                            <div class="col-sm-2 col-12"></div>
+                            <div class="col-sm-6 col-12">
+                                <button type="button" id="SaveDirectionsButton" class="btn btn-primary">@L("Save") @L("Comments")</button>
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label class="control-label col-sm-2 col-12">@L("Priority")</label>
+                            <div class="col-sm-6 col-12">
+                                <select class="form-control" asp-for="Priority" id="OrderPriority" asp-items="Html.GetEnumSelectList<OrderPriority>()"></select>
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label class="control-label col-sm-2 col-12">@L("InternalNotes"):</label>
+                            <div class="col-sm-6 col-12">
+                                <button type="button" class="btn btn-primary" id="EditInternalNotesButton">@L("ViewEdit")</button>
+                            </div>
+                        </div>
+                        <div class="m-form__group row hidden-for-new-entity" abp-hidden="@(!(Model.Id > 0))">
+                            <div class="col-sm-6 col-12">
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-4">@L("Created"):</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="CreationTime" asp-format="{0:g}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-4">@L("CreatedBy"):</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="CreatorName" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-form__group row hidden-for-new-entity" abp-hidden="@(!(Model.Id > 0))">
+                            <div class="col-sm-6 col-12">
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-4">@L("LastModified"):</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="LastModificationTime" asp-format="{0:g}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-4">@L("LastModifiedBy"):</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="LastModifierName" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+            </div>
+        </div>
+        @*<div class="m-portlet__foot m-portlet__foot--fit">
+            <div class="m-form__actions m-form__actions">
+                <button type="button" id="SaveOrderButton" class="btn btn-primary">@L("Save")</button>
+            </div>
+        </div>*@
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" id="SaveOrderButton" class="btn btn-primary">@L("Save")</button>
+</div>

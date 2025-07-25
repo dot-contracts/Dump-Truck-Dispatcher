@@ -1,0 +1,70 @@
+﻿@using DispatcherWeb.PreventiveMaintenanceSchedule.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model PreventiveMaintenanceEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Preventive Maintenance" : "Create new Preventive Maintenance"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label class="required-label">@L("Truck")</label>
+            <select class="form-control" asp-for="TruckId" required>
+                <option value="">Select a truck</option>
+                @if(Model.TruckId != 0)
+                {
+                    <option selected value="@Model.TruckId">@Model.TruckCode</option>
+
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="required-label">@L("Service")</label>
+            <select class="form-control" asp-for="VehicleServiceId" required>
+                <option value="">Select Service</option>
+                @if(Model.VehicleServiceId != 0)
+                {
+                    <option selected value="@Model.VehicleServiceId">@Model.VehicleServiceName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="LastDate">@L("LastDate")</label>
+            <input class="form-control" type="text" asp-for="LastDate" required >
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="LastMileage">@L("LastMileage")</label>
+            <input type="text" class="form-control" asp-for="LastMileage" required data-rule-number="true" data-rule-min="0" data-rule-max="1000000000">
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="LastHour">@L("LastHour")</label>
+            <input type="text" class="form-control" asp-for="LastHour" required data-rule-number="true" data-rule-min="0" data-rule-max="1000000000">
+        </div>
+        <div class="form-group">
+            <label asp-for="DueDate">@L("DueDate")</label>
+            <input class="form-control" type="text" asp-for="DueDate">
+        </div>
+        <div class="form-group">
+            <label asp-for="DueMileage">@L("DueMileage")</label>
+            <input type="text" class="form-control" asp-for="DueMileage" data-rule-number="true" data-rule-min="0" data-rule-max="1000000000">
+        </div>
+        <div class="form-group">
+            <label asp-for="DueHour">@L("DueHours")</label>
+            <input type="text" class="form-control" asp-for="DueHour" data-rule-number="true" data-rule-min="0" data-rule-max="1000000000">
+        </div>
+        <div class="form-group">
+            <label asp-for="WarningDate">@L("WarningDate")</label>
+            <input class="form-control" type="text" asp-for="WarningDate">
+        </div>
+        <div class="form-group">
+            <label asp-for="WarningMileage">@L("WarningMileage")</label>
+            <input type="text" class="form-control" asp-for="WarningMileage" data-rule-number="true" data-rule-min="0" data-rule-max="1000000000">
+        </div>
+        <div class="form-group">
+            <label asp-for="WarningHour">@L("WarningHours")</label>
+            <input type="text" class="form-control" asp-for="WarningHour" data-rule-number="true" data-rule-min="0" data-rule-max="1000000000">
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

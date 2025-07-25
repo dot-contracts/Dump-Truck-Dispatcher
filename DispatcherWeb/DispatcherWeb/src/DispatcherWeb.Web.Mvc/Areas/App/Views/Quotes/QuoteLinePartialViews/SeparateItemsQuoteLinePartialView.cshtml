@@ -1,0 +1,277 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Quotes.Dto
+
+@model QuoteLineEditDto
+
+<div class="row">
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label class="required-label">Freight Item</label>
+            <select class="form-control" asp-for="FreightItemId" required>
+                <option value="">Select an item</option>
+                @if (Model.FreightItemId > 0)
+                {
+                    <option selected value="@Model.FreightItemId">@Model.FreightItemName</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="both">
+        <div class="form-group">
+            <label class="required-label">Material Item</label>
+            <select class="form-control" asp-for="MaterialItemId">
+                <option value="">Select an item</option>
+                @if (Model.MaterialItemId > 0)
+                {
+                    <option selected value="@Model.MaterialItemId">@Model.MaterialItemName</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label class="required-label">@L("FreightUom")</label>
+            <select class="form-control" asp-for="FreightUomId" required data-uombaseid="@((int?)Model.FreightUomBaseId)">
+                <option value=""
+                        data-placeholder-default="Select a Freight UOM"
+                        data-placeholder-no-items="No Prices defined for the selected Item"
+                        data-placeholder-no-parent="Select an Item first">
+                    Select a Freight UOM
+                </option>
+                @if (Model.FreightUomId > 0)
+                {
+                    <option selected value="@Model.FreightUomId">@Model.FreightUomName</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="both">
+        <div class="form-group">
+            <label class="required-label">@L("MaterialUom")</label>
+            <select class="form-control" asp-for="MaterialUomId" required>
+                <option value=""
+                        data-placeholder-default="Select a Material UOM"
+                        data-placeholder-no-items="No Prices defined for the selected Item"
+                        data-placeholder-no-parent="Select an Item first">
+                    Select a Material UOM
+                </option>
+                @if (Model.MaterialUomId > 0)
+                {
+                    <option selected value="@Model.MaterialUomId">@Model.MaterialUomName</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label>@L("FreightQuantity")</label>
+            <input class="form-control" type="text" asp-for="FreightQuantity" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+        </div>
+    </div>
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="both">
+        <div class="form-group">
+            <label>@L("MaterialQuantity")</label>
+            <input class="form-control" type="text" asp-for="MaterialQuantity" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group" abp-hidden>
+            <label>@L("AllowedTravelTimeInMinutes")</label>
+            <input class="form-control" type="text" asp-for="TravelTime" data-rule-number="true" data-rule-digits="true" data-rule-min="0" data-rule-max="@short.MaxValue" inputmode="numeric" pattern="[0-9]*">
+        </div>
+    </div>
+</div>
+
+<div class="row" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.AllowSpecifyingTruckAndTrailerCategoriesOnQuotesAndOrders))">
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label>@L("TruckTrailerCategory")</label>
+            <select class="form-control" name="VehicleCategories" id="VehicleCategories" multiple="multiple">
+                @if (Model.VehicleCategories != null)
+                {
+                    foreach (var category in Model.VehicleCategories)
+                    {
+                        <option value="@category.Id" selected>@category.Name</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label>@L("BedConstruction")</label>
+            <select class="form-control" asp-for="BedConstruction" asp-items="Html.GetEnumSelectListOrderedByName<BedConstructionEnum>()">
+                <option value="">&nbsp;</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label>@L("DeliverTo")</label>
+            <select class="form-control" asp-for="DeliverToId">
+                <option value="">@L("SelectALocation")</option>
+                @if (Model.DeliverToId.HasValue)
+                {
+                    <option selected value="@Model.DeliverToId">@Model.DeliverToName</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label>@L("LoadAt")</label>
+            <select class="form-control" asp-for="LoadAtId">
+                <option value="">@L("SelectALocation")</option>
+                @if (Model.LoadAtId.HasValue)
+                {
+                    <option selected value="@Model.LoadAtId">@Model.LoadAtName</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label>@L("FreightRate")</label>
+            <input class="form-control" type="text" asp-for="FreightRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+    </div>
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="material">
+        <div class="form-group">
+            <label>@L("MaterialRate")</label>
+            <input class="form-control" type="text" asp-for="PricePerUnit" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label>Freight Amount</label>
+            <input class="form-control" type="text" id="FreightPriceAmount" name="FreightPriceAmount" disabled="disabled" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+    </div>
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="material">
+        <div class="form-group">
+            <label>Material Amount</label>
+            <input class="form-control" type="text" id="MaterialPriceAmount" name="MaterialPriceAmount" disabled="disabled" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label>@L("LHRate")</label>
+            <input class="form-control" type="text" asp-for="LeaseHaulerRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+    </div>
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="both">
+        <div class="form-group">
+            <label>@L("JobNumber")</label>
+            <input class="form-control" type="text" asp-for="JobNumber" maxlength="@EntityStringFieldLengths.OrderLine.JobNumber">
+        </div>
+    </div>
+</div>
+
+@if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.BasePayOnHourlyJobRate))
+{
+    <div class="row" data-visible-for-designation="freight">
+        <div class="col-12 col-lg-6-for-modal-lg">
+            <div class="form-group">
+                <label>@L("DriverPayTimeCode")</label>
+                <select class="form-control" asp-for="DriverPayTimeClassificationId">
+                    <option value="">Select driver pay time code</option>
+                    @if (Model.DriverPayTimeClassificationId > 0)
+                    {
+                        <option value="@Model.DriverPayTimeClassificationId">@Model.DriverPayTimeClassificationName</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6-for-modal-lg">
+            <div class="form-group" abp-hidden>
+                <label>@L("HourlyDriverPayRate")</label>
+                <input class="form-control" type="text" asp-for="HourlyDriverPayRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    @if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.AllowProductionPay) && await FeatureChecker.IsEnabledAsync(AppFeatures.DriverProductionPayFeature))
+    {
+        <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+            <div class="form-group" abp-hidden>
+                <label asp-for="ProductionPay" class="m-checkbox mt-0 mt-md-3">
+                    <input type="checkbox" id="ProductionPay" name="ProductionPay" value="true" checked="@(Model.ProductionPay ? "checked" : null)">
+                    @L("ProductionPay")
+                    <span></span>
+                </label>
+            </div>
+
+            <div class="row" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.AllowDriverPayRateDifferentFromFreightRate))">
+                <div class="col-6 form-group">
+                    <label>@L("FreightRateToPayDrivers")</label>
+                    <input class="form-control" type="text" asp-for="FreightRateToPayDrivers" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+                </div>
+                <div class="col-6 form-group">
+                    <div class="d-flex align-items-end h-100">
+                        <label asp-for="LoadBased" class="m-checkbox">
+                            <input type="checkbox" id="LoadBased" name="LoadBased" value="true" checked="@(Model.LoadBased ? "checked" : null)">
+                            @L("LoadBased")
+                            <span></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @{
+        var requiredTicketEntry = await SettingManager.GetRequiredTicketEntry();
+    }
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group" abp-hidden="@(!requiredTicketEntry.IsRequireTicketInputVisible())">
+            <label asp-for="RequireTicket" class="m-checkbox mt-0 mt-md-3">
+                <input type="checkbox" id="RequireTicket" name="RequireTicket" value="true" checked="@(Model.RequireTicket ? "checked" : null)">
+                @L("RequireTicket")
+                <span></span>
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="row" data-visible-for-designation="material">
+    <div class="col-12 form-group" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.ShowAggregateCost))">
+        <label>@L("MaterialCostRate")</label>
+        <input class="form-control" type="text" asp-for="MaterialCostRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12" data-visible-for-designation="freight">
+        <div class="form-group">
+            <label>Note</label>
+            <textarea class="form-control" rows="5" asp-for="Note"></textarea>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+﻿@using DispatcherWeb.Designations
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Orders.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@inject IDesignationAppService DesignationAppService
+@model OrderLineEditDto
+
+@{
+    var separateItems = await FeatureChecker.IsEnabledAsync(AppFeatures.SeparateMaterialAndFreightItems);
+}
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit line" : "Add new line"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation order-line-form">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="OrderId" />
+        <input type="hidden" asp-for="QuoteId" />
+        <input type="hidden" asp-for="QuoteLineId" />
+        <input type="hidden" asp-for="PricingTierId" />
+        <input type="hidden" asp-for="CustomerIsCod" />
+        <input type="hidden" asp-for="UseZoneBasedRates" />
+        <input type="hidden" asp-for="IsMaterialPricePerUnitOverridden" />
+        <input type="hidden" asp-for="IsFreightPricePerUnitOverridden" />
+        <input type="hidden" asp-for="IsFreightRateToPayDriversOverridden" />
+        <input type="hidden" asp-for="IsLeaseHaulerPriceOverridden" />
+        <input type="hidden" asp-for="IsMaterialPriceOverridden" />
+        <input type="hidden" asp-for="IsFreightPriceOverridden" />
+        @if (separateItems)
+        {
+            <input type="hidden" asp-for="IsMaterialTaxable" />
+            <input type="hidden" asp-for="IsFreightTaxable" />
+        }
+        else
+        {
+            <input type="hidden" asp-for="IsTaxable" />
+        }
+        <input type="hidden" asp-for="StaggeredTimeKind" value="@((int)Model.StaggeredTimeKind)" />
+
+        <div class="row">
+            <div class="col-12 col-lg-6-for-modal-lg">
+                <div class="form-group">
+                    <label>Line #</label>
+                    <input class="form-control" type="text" asp-for="LineNumber" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-lg-6-for-modal-lg">
+                <div class="form-group" id="selectDesignation">
+                    <label class="required-label">Designation</label>
+                    <select class="form-control" required asp-for="Designation" asp-items="await DesignationAppService.GetDesignationSelectListItemsAsync(Model.Designation).ToSelectListItemsAsync()">
+                        <option value="">Select a designation</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        @if (separateItems)
+        {
+            @await Html.PartialAsync("OrderLinePartialViews/SeparateItemsOrderLinePartialView")
+        }
+        else
+        {
+            @await Html.PartialAsync("OrderLinePartialViews/OrderLinePartialView")
+        }
+
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

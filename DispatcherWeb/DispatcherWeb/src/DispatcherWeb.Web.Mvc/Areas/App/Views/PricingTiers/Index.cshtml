@@ -1,0 +1,39 @@
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.PricingTiers;
+}
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/PricingTiers/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/PricingTiers/Index.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-6 col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("PricingTiers")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("PricingTiersHeaderInfo")
+            </span>
+        </div>
+        <div class="mr-auto-btn col-6 col-sm-12 col-md-6 text-right">
+            <button title="title" disabled="disabled"  id="CreateNewPricingTierButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("AddNew")</button>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="row align-items-center">
+                <table id="PricingTiersTable" class="display table table-striped table-bordered table-hover dt-responsive nowrap"></table>
+            </div>
+        </div>
+    </div>
+</div>

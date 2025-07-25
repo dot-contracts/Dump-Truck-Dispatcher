@@ -1,0 +1,60 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Dashboard
+@using DispatcherWeb.Dashboard.Dto
+@inject IDashboardSettingManager DashboardSettingManager
+@model ScheduledTruckCountDto
+@{
+    Layout = null;
+}
+<div class="row align-items-stretch">
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.ScheduledTruckCounters.TrucksRequestedToday))
+    {
+        <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">@Math.Round(Model.TrucksRequestedTodayCount ?? 0, 1)</h3>
+                    <h5 class="card-text">@L("TrucksRequestedToday")</h5>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.ScheduledTruckCounters.TrucksScheduledToday)
+        && await SettingManager.GetSettingValueAsync<bool>(AppSettings.DispatchingAndMessaging.ValidateUtilization))
+    {
+        <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">@Math.Round(Model.TrucksScheduledForTodayCount ?? 0, 1)</h3>
+                    <h5 class="card-text">@L("TrucksScheduledToday")</h5>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.ScheduledTruckCounters.TrucksRequestedTomorrow))
+    {
+        <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">@Math.Round(Model.TrucksRequestedTomorrowCount ?? 0, 1)</h3>
+                    <h5 class="card-text">@L("TrucksRequestedTomorrow")</h5>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.ScheduledTruckCounters.TrucksScheduledTomorrow)
+        && await SettingManager.GetSettingValueAsync<bool>(AppSettings.DispatchingAndMessaging.ValidateUtilization))
+    {
+        <div class="col-sm-3 col-12 d-flex align-items-stretch mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">@Math.Round(Model.TrucksScheduledForTomorrowCount ?? 0, 1)</h3>
+                    <h5 class="card-text">@L("TrucksScheduledTomorrow")</h5>
+                </div>
+            </div>
+        </div>
+    }
+</div>

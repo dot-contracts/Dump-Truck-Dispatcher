@@ -1,0 +1,8 @@
+﻿@using DispatcherWeb.Dispatching.Dto
+@using HtmlHelper = DispatcherWeb.Web.Utils.HtmlHelper;
+@model DispatchInfoErrorAndRedirect
+@{
+    Layout = "_Layout";
+}
+
+<span>@Html.Raw(HtmlHelper.Sanitize(Model.Message).Replace("{URL}", $"<a href=\"{Model.RedirectUrl}\">{HtmlHelper.Sanitize(Model.UrlText)}</a>"))</span>

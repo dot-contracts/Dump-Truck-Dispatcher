@@ -1,0 +1,208 @@
+﻿@using DispatcherWeb.Infrastructure
+
+<!-- begin::Quick Sidebar -->
+<div id="m_quick_sidebar" class="m-quick-sidebar m-quick-sidebar--tabbed m-quick-sidebar--skin-light">
+    <div class="m-quick-sidebar__content m--hide">
+        <a href="#" id="m_quick_sidebar_back" class="d-none">
+            <i class="fa-regular fa-arrow-circle-left" aria-label="@L("Back")"></i>
+        </a>
+        <a class="page-quick-sidebar-pinner"></a>
+        <span id="m_quick_sidebar_close" class="m-quick-sidebar__close">
+            <i class="fa fa-close" aria-label="@L("Close")"></i>
+        </span>
+        <div class="m-messenger m-messenger-friends m-messenger--skin-light">
+            <div class="row">
+                <div class="col-md-12 chat-user-search-user-name-container">
+                    <div class="m-input-icon m-input-icon--right">
+                        <input type="text" id="ChatUserSearchUserName" class="form-control input-sm" placeholder="@L("FilterOrAddUser")">
+                    </div>
+                </div>
+                <div class="col-md-12 chat-button-container">
+                    <button id="SearchChatUserButton" type="button" class="btn btn-block btn-success">@L("AddFriend")</button>
+                </div>
+            </div>
+            <div class="m-list-search">
+                <div class="m-list-search__results">
+                    <span class="m-list-search__result-category">
+                        @L("Friends")
+                    </span>
+                    <div id="friendListFriends"></div>
+                    <p id="EmptyFriendListInfo">@L("YouDontHaveAnyFriend")</p>
+                </div>
+            </div>
+            <div class="m-list-search">
+                <div class="m-list-search__results">
+                    <span class="m-list-search__result-category">
+                        @L("BlockedUsers")
+                    </span>
+                    <div id="friendListBlockeds"></div>
+                    <p id="EmptyBlockedFriendListInfo">@L("YouDontHaveAnyBlockedFriend")</p>
+                </div>
+            </div>
+        </div>
+        <div class="m-scrollable m-messenger-conversation d-none">
+            <div class="selected-chat-user">
+                <div class="selected-chat-user-image">
+                    <img id="selectedChatUserImage" class="media-object">
+                    <span id="selectedChatUserStatus" class="contact-status2"></span>
+                </div>
+                <h6 id="selectedChatUserName"></h6>
+                <div class="actions">
+                    <a class="btn btn-metal m-btn m-btn--icon m-btn--icon-only m-btn--pill m-btn--air" data-toggle="dropdown" data-close-others="true" aria-expanded="false">
+                        <i class="fa fa-angle-down" aria-label="@L("Expand")"></i>
+                    </a>
+                    <ul class="dropdown-menu pull-right">
+                        <li id="liBanChatUser">
+                            <a>
+                                <i class="fa fa-ban"></i>
+                                @L("BlockUser")
+                            </a>
+                        </li>
+                        <li id="liUnbanChatUser">
+                            <a>
+                                <i class="fa fa-check"></i>
+                                @L("UnblockUser")
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+            <div class="m-messenger m-messenger--message-arrow m-messenger--skin-light">
+                <div class="m-messenger__messages chat-messages" id="UserChatMessages">
+                </div>
+                <div class="m-messenger__seperator"></div>
+                <form name="chatMessageForm" id="chatMessageForm" role="form">
+                    <div id="files" class="files"></div>
+                    <div class="col-md-12 chat-button-container">
+                        <button id="UnblockUserButton" type="button" class="btn btn-block btn-success">@L("UnblockUser")</button>
+                    </div>
+
+                    <div class="col-md-12 chat-progress-bar">
+                        <div id="chatFileUploadProgress" class="progress">
+                            <div class="progress-bar progress-bar-success"></div>
+                        </div>
+                    </div>
+
+                    <div class="m-messenger__form" id="ChatMessageWrapper">
+                        <div class="m-messenger__form-controls">
+                            <input id="ChatMessage" type="text" name="message" class="m-messenger__form-input" placeholder="@L("TypeAMessageHere")" required maxlength="@EntityStringFieldLengths.ChatMessage.Message" />
+                        </div>
+                        <div class="m-messenger__form-tools">
+                            <a id="btnSendChatMessenger" title="Send" class="m-messenger__form-attachment select-media">
+                                <i class="fa-regular fa-send"></i>
+                            </a>
+
+                        </div>
+                        <div class="m-messenger__form-tools">
+                            <a id="chatDropdownToggle" class="m-messenger__form-attachment select-media" data-toggle="dropdown" tabindex="-1" aria-expanded="false">
+                                <i class="fa fa-paperclip" aria-label="@L("Attach")"></i>
+                            </a>
+                            <ul class="dropdown-menu pull-right bottom-up" role="menu">
+                                @* <li> *@
+                                @*     <a> *@
+                                @*         <span class="fileinput-button"> *@
+                                @*             <i class="fa fa-camera" aria-hidden="true"></i> *@
+                                @*             <span>@L("Image")</span> *@
+                                @*             <!-- The file input field used as target for the file upload widget --> *@
+                                @*             <input id="chatImageUpload" type="file" name="files"> *@
+                                @*         </span> *@
+                                @*     </a> *@
+                                @* </li> *@
+                                @* <li> *@
+                                @*     <a> *@
+                                @*         <span class="fileinput-button"> *@
+                                @*             <i class="fa fa-file" aria-hidden="true"></i> *@
+                                @*             <span>@L("File")</span> *@
+                                @*             <!-- The file input field used as target for the file upload widget --> *@
+                                @*             <input id="chatFileUpload" type="file" name="files"> *@
+                                @*         </span> *@
+                                @*     </a> *@
+                                @* </li> *@
+                                <li>
+                                    <a id="btnLinkShare">
+                                        <i class="fa fa-link" aria-hidden="true"></i>
+                                        <span>@L("LinkToCurrentPage")</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="" id="SendFileHolder">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end::Quick Sidebar -->
+
+<script id="UserFriendTemplate" type="x-tmpl-mustache">
+    {{#.}}
+    <a href="#" class="m-list-search__result-item" data-friend-tenant-id="{{friendTenantId}}" data-friend-user-id="{{friendUserId}}">
+        <div class="m-list-search__result-item-pic">
+            <img class="m--img-rounded" src="{{profilePicturePath}}" title="">
+            {{#isOnline}}
+            <span class="contact-status1 online"></span>
+            {{/isOnline}}
+            {{^isOnline}}
+            <span class="contact-status1 offline"></span>
+            {{/isOnline}}
+        </div>
+        <span class="m-list-search__result-item-text">
+            {{shownUserName}}
+        </span>
+
+        {{#unreadMessageCount}}
+        <span class="m-badge m-badge--warning">
+            {{unreadMessageCount}}
+        </span>
+        {{/unreadMessageCount}}
+
+        {{^unreadMessageCount}}
+        <span class="m-badge m-badge--warning d-none">
+            {{unreadMessageCount}}
+        </span>
+        {{/unreadMessageCount}}
+
+
+    </a>
+    {{/.}}
+</script>
+
+<script id="UserChatMessageTemplate" type="x-tmpl-mustache">
+    {{#.}}
+    <div class="m-messenger__message {{cssClass}}" id="chat-message-{{id}}">
+        {{#isIn}}
+        <div class="m-messenger__message-pic">
+            <img src="{{profilePicturePath}}" alt="" class="mCS_img_loaded">
+        </div>
+        {{/isIn}}
+        <div class="m-messenger__message-body">
+            <div class="m-messenger__message-arrow"></div>
+            <div class="m-messenger__message-content">
+                <div class="m-messenger__message-username">
+                    <span>{{shownUserName}}</span>
+                    <time class="timeago" datetime="{{creationTime}}"></time> {{{readStateCheck}}}
+                </div>
+                <div class="m-messenger__message-text">
+                    {{{formattedMessage}}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/.}}
+</script>
+<script id="SendFileTemplate" type="x-tmpl-mustache">
+    <div class="row send-file" data-file-id="{{fileId}}" data-message="{{chatMessage}}">
+        <div class="col-10">
+            <div class="row"><div class="col-12"><strong>{{fileName}}</strong></div></div>
+            <div class="row"><div class="col-12">{{fileSize}}</div></div>
+        </div>
+        <div class="col-2">
+            <a href="@Url.Action("DeleteFile", "Chat")" class="btn btn-danger m-btn m-btn--icon m-btn--icon-only">
+                <i class="fa fa-trash"></i>
+            </a>
+        </div>
+    </div>
+</script>

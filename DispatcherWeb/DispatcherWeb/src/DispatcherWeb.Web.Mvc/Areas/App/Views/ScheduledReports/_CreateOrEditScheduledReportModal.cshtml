@@ -1,0 +1,40 @@
+﻿@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.ScheduledReports.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model ScheduledReportEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Scheduled Report: " + Model.ReportType.GetDisplayName() : "Create new Scheduled Report"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label class="required-label" asp-for="ReportType">Report Name</label>
+            <select class="form-control" asp-for="ReportType" asp-items="await Html.GetReportTypeSelectListAsync(PermissionChecker)" required></select>
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="SendTo">Send To</label>
+            <a data-toggle="tooltip" data-placement="rigth" title="Multiple email addresses may be added if separated by a semi-colon">
+                <i class="glyphicon glyphicon-info-sign"></i>
+            </a>
+            <input type="text" class="form-control" asp-for="SendTo" maxlength="@EntityStringFieldLengths.ScheduledReport.SendTo" required>
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="ReportFormat">Format</label>
+            <select class="form-control" asp-for="ReportFormat" asp-items="Html.GetEnumSelectList<ReportFormat>()" required></select>
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="ScheduleTime">Schedule Time</label>
+            <input type="text" class="form-control" asp-for="ScheduleTime" required autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label class="required-label" asp-for="SendOnDaysOfWeek">Send On</label>
+            <select class="form-control" asp-for="SendOnDaysOfWeek" asp-items="Html.GetEnumSelectList<DayOfWeek>()" required multiple="multiple"></select>
+        </div>
+
+    </form>
+
+
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")
+

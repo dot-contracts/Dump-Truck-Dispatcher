@@ -1,0 +1,31 @@
+﻿@model DispatcherWeb.Configuration.Tenants.Dto.HaulZoneSettingsEditDto
+
+<div class="tab-pane" id="SettingsHaulZoneTab">
+    <div class="row">
+        <div class="col-sm-6">
+            <h5>@L("HaulZone")</h5>
+            <form id="HaulZoneSettingsForm">
+                <div class="form-group">
+                    <label for="HaulRateCalculationBaseUomIdForCod" class="required-label">@L("HaulRateCalculationBaseUomIdForCod")</label>
+                    <select class="form-control" asp-for="HaulRateCalculationBaseUomIdForCod" required>
+                        <option value="">@L("SelectAUom")</option>
+                        @if (Model.HaulRateCalculationBaseUomIdForCod != 0)
+                        {
+                            <option value="@Model.HaulRateCalculationBaseUomIdForCod" selected>@Model.HaulRateCalculationBaseUomNameForCod</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="HaulRateCalculationBaseUomId" class="required-label">@L("HaulRateCalculationBaseUomId")</label>
+                    <select class="form-control" asp-for="HaulRateCalculationBaseUomId" required>
+                        <option value="">@L("SelectAUom")</option>
+                        @if (Model.HaulRateCalculationBaseUomId != 0)
+                        {
+                            <option value="@Model.HaulRateCalculationBaseUomId" selected>@Model.HaulRateCalculationBaseUomName</option>
+                        }
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

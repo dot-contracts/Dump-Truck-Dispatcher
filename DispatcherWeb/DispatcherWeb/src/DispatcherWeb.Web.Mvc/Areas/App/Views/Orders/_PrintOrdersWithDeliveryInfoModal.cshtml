@@ -1,0 +1,22 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Print Orders"))
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <div class="form-group">
+            <label class="control-label required-label">Date:</label>
+            <input type="text" class="form-control filter" name="Date" id="DateFilter" required autocomplete="off">
+        </div>
+        <div class="form-group">
+            <input type="checkbox" class="minimal" id="HidePrices">
+            <label for="HidePrices">Hide Prices</label>
+        </div>
+        <div class="form-group" id="IncludeTicketsBlock">
+            <input type="checkbox" class="minimal" id="IncludeTickets">
+            <label for="IncludeTickets">@L("IncludeTicketImages")</label>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary close-button" data-dismiss="modal">@L("Cancel")</button>
+    <button type="button" class="btn btn-primary save-button"><i class="fa fa-print"></i> <span>@L("Print")</span></button>
+</div>

@@ -1,0 +1,71 @@
+﻿@using DispatcherWeb.Charges.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Features
+@model ChargeOrderLineDetailsDto
+
+@{
+    var separateItems = await FeatureChecker.IsEnabledAsync(AppFeatures.SeparateMaterialAndFreightItems);
+}
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Add/Edit Charges"))
+
+<div class="modal-body">
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Delivery Date:</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" value="@Model.DeliveryDate.ToString("d")" readonly />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Customer:</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" value="@Model.CustomerName" readonly />
+        </div>
+    </div>
+    @if (separateItems)
+    {
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Freight:</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" value="@Model.ItemName" readonly />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Material:</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" value="@Model.MaterialItemName" readonly />
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Item:</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" value="@Model.ItemName" readonly />
+            </div>
+        </div>
+    }
+  
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Pick-up and Delivery Information:</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" value="Picked up at @(Model.LoadAtName ?? "-") and Delivered to @(Model.DeliverToName ?? "-")" readonly />
+        </div>
+    </div>
+    <div class="clearfix modal-subheader">
+        <div class="grid-caption pull-left">
+            <label>@L("Charges")</label>
+        </div>
+        <div class="box-actions pull-right">
+            <button type="button" class="btn btn-default" id="AddNewCharge"><i class="fa fa-plus"></i>@L("AddCharge")</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div id="ChargesDataList" class="mt-3"></div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

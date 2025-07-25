@@ -1,0 +1,88 @@
+﻿@using DispatcherWeb.Dashboard
+@using DispatcherWeb.Web.Areas.App.Models.Dashboard
+@inject IDashboardSettingManager DashboardSettingManager
+@{
+    Layout = null;
+}
+
+<div class="row align-items-stretch dot-requirement-charts">
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.TruckAvailabilityChart))
+    {
+        @await Html.PartialAsync("_DonutChart", new DonutChartViewModel
+        {
+            ContainerId = "truckAvailabilityContainer",
+            Link = Url.Action("Index", "Trucks"),
+            Title = L("TruckAvailability"),
+            NoDataIconClass = "fa fa-truck",
+            NoDataTitle = "No Trucks Yet",
+            NoDataSubtitle = "Click here to add your first truck",
+        })
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.ServiceStatusChart))
+    {
+        @await Html.PartialAsync("_DonutChart", new DonutChartViewModel
+        {
+            ContainerId = "serviceStatusContainer",
+            Link = Url.Action("Index", "PreventiveMaintenanceSchedule"),
+            Title = L("ServiceStatus"),
+            NoDataIconClass = "fa fa-calendar",
+            NoDataTitle = "No Preventive Maintenance Scheduled Yet",
+            NoDataSubtitle = "You must first add services and then you can create a Preventive Maintenance. Click here to add your first service",
+        })
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.LicensePlateStatusChart))
+    {
+        @await Html.PartialAsync("_DonutChart", new DonutChartViewModel
+        {
+            ContainerId = "licensePlateStatusContainer",
+            Link = Url.Action("Index", "Trucks"),
+            Title = L("LicensePlateStatus"),
+            NoDataIconClass = "fa fa-truck",
+            NoDataTitle = "No Trucks Yet",
+            NoDataSubtitle = "Click here to add your first truck",
+        })
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.DriverLicenseStatusChart))
+    {
+        @await Html.PartialAsync("_DonutChart", new DonutChartViewModel
+        {
+            ContainerId = "driverLicenseStatusContainer",
+            Link = Url.Action("Index", "Drivers"),
+            Title = L("DriverLicenseStatus"),
+            NoDataIconClass = "fa fa-address-card",
+            NoDataTitle = "No Drivers Yet",
+            NoDataSubtitle = "Click here to add your first driver",
+        })
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.PhysicalStatusChart))
+    {
+        @await Html.PartialAsync("_DonutChart", new DonutChartViewModel
+        {
+            ContainerId = "physicalStatusContainer",
+            Link = Url.Action("Index", "Drivers"),
+            Title = L("PhysicalStatus"),
+            NoDataIconClass = "fa fa-address-card",
+            NoDataTitle = "No Drivers Yet",
+            NoDataSubtitle = "Click here to add your first driver",
+        })
+    }
+
+    @if (await DashboardSettingManager.IsEnabledAsync(DashboardSettings.DriverMvrStatusChart))
+    {
+        @await Html.PartialAsync("_DonutChart", new DonutChartViewModel
+        {
+            ContainerId = "driverMVRStatusContainer",
+            Link = Url.Action("Index", "Drivers"),
+            Title = L("DriverMVRStatus"),
+            NoDataIconClass = "fa fa-address-card",
+            NoDataTitle = "No Drivers Yet",
+            NoDataSubtitle = "Click here to add your first driver",
+        })
+    }
+
+</div> 

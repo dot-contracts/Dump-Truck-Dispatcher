@@ -1,0 +1,21 @@
+﻿@using DispatcherWeb.TaxRates.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model TaxRateEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Tax Rate: " + Model.Name : "Create new tax rate"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation" name="TaxRateDetailsForm">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label><span class="required-label">@L("Name")</span></label>
+            <input class="form-control" type="text" asp-for="Name" required>
+        </div>
+
+        <div class="form-group">
+            <label><span class="required-label">@L("Rate")</span></label>
+            <input class="form-control" type="number" asp-for="Rate" required data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

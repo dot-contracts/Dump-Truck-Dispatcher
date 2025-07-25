@@ -1,0 +1,15 @@
+﻿@using DispatcherWeb.WorkOrders.Dto
+@model WorkOrderPictureEditDto
+
+<tr>
+    <td>
+        @Html.ActionLink(Model.FileName, "DownloadPicture",
+            new
+            {
+                workOrderId = Model.WorkOrderId,
+                fileId = Model.FileId,
+                fileName = Model.FileName,
+            })
+    </td>
+    <td><button class="btn btn-danger" data-id="@Model.Id">Delete</button></td>
+</tr>

@@ -1,0 +1,22 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Web.Areas.App.Models.Orders
+@model CreateOrEditTicketModalViewModel
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Add or Edit tickets"))
+<div class="modal-body">
+    <form role="form" name="TicketForm" novalidate class="form-validation">
+        <input type="hidden" asp-for="OrderLineId" />
+        <input type="hidden" asp-for="OrderLineDesignation" value="@((int)Model.OrderLineDesignation)" />
+        <input type="hidden" asp-for="OrderLineIsProductionPay" />
+        <input type="file" accept="image/jpeg,image/gif,image/png,application/pdf" capture class="upload" id="TicketPhoto" name="TicketPhoto" abp-hidden />
+        <div class="form-group">
+            <button class="btn btn-primary" type="button" id="AddTicketButton">Add</button>
+            @*<button class="btn btn-default" type="button" id="RefreshGridButton">Refresh</button>*@
+        </div>
+    </form>
+    
+    <table class="table table-striped table-bordered table-hover order-line-tickets-table" id="TicketsTable"></table>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default close-button" data-dismiss="modal">Close</button>
+</div>

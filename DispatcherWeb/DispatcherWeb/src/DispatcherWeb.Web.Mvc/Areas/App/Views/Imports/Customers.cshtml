@@ -1,0 +1,18 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    Layout = "../Imports/_ImportLayout";
+
+    ViewBag.CurrentPageName = AppPageNames.Tenant.ImportCustomers;
+    ViewBag.ImportType = ImportType.Customers;
+}
+
+
+@section H1
+    {
+    Customers Import
+}
+
+@section AboveUpload
+{
+    @*<input type="hidden" id="NoMapping" name="NoMapping" value="true" />*@
+}

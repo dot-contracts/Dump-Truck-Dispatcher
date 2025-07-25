@@ -1,0 +1,93 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Offices
+@using DispatcherWeb.Offices.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model OfficeEditDto
+@{
+    var paymentProcessor = (PaymentProcessor)(await SettingManager.GetSettingValueAsync<int>(AppSettings.General.PaymentProcessor));
+}
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Office: " + Model.Name : "Create new office"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation" id="OfficeForm">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label><span class="required-label">@L("Name")</span></label>
+            <input class="form-control" type="text" asp-for="Name" required>
+        </div>
+        <div class="form-group">
+            <label><span class="required-label">@L("TruckColor")</span></label>
+            <div id="TruckColorContainer" class="input-group colorpicker-component">
+                <input class="form-control" type="text" asp-for="TruckColor" required autocomplete="off">
+                <span class="input-group-addon"><i></i></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label><span>@L("FuelIds")</span></label>
+            <i class="fas fa-info-circle text-info" title="If you have multiple FuelIds for this office, separate the items with a pipe &quot;|&quot; symbol."></i>
+            <input class="form-control" type="text" asp-for="FuelIds" maxlength="@Office.MaxFuelIdsLength">
+        </div>
+        <div class="form-group">
+            <div class="m-checkbox-list">
+                <label class="custom-checkbox">
+                    <input id="CopyChargeTo" type="checkbox" name="CopyChargeTo" value="true" @Html.Raw(Model.CopyChargeTo ? "checked=\"checked\"" : "")>
+                    @L("CopyChargeTo")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>@L("DefaultStartTime"):</label>
+            <input type="text" class="form-control" asp-for="DefaultStartTime" autocomplete="off">
+        </div>
+        <div abp-hidden="@(paymentProcessor != PaymentProcessor.HeartlandConnect)">
+            <div class="form-group">
+                <label for="HeartlandPublicKey">@L("HeartlandPublicKey")</label>
+                <input type="text" asp-for="HeartlandPublicKey" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="HeartlandSecretKey">@L("HeartlandSecretKey")</label>
+                <input type="password" asp-for="HeartlandSecretKey" value="@Model.HeartlandSecretKey" class="form-control">
+            </div>
+        </div>
+    </form>
+    <form id="OfficeLogoUploadForm" method="POST" class="m-form mb-5" action="@Url.Action("UploadOfficeLogo", "TenantCustomization", new { area = string.Empty, LogoType = LogoType.ApplicationLogo })" abp-hidden>
+        <input type="hidden" asp-for="Id" id="OfficeLogoUploadForm_Id" />
+        <h5>@L("ApplicationLogo")</h5>
+        <div class="form-group fileUpload margin-top-20">
+            <div class="btn btn-primary browse_btn">
+                <span>@L("Browse")</span>
+                <input id="ApplicationLogoImage" name="ApplicationLogoImage" type="file" class="upload">
+            </div>
+            <input id="uploadApplicationLogoFile" class="form-control file-upload" placeholder="No File Selected." disabled="disabled">
+        </div>
+        <div class="col-xs-12 margin-bottom-10">
+            <span class="m-form__help">@L("UploadLogo_Info")</span>
+        </div>
+        <button class="btn btn-primary" type="submit" disabled="disabled"><i class="fa fa-upload"></i>@L("Upload")</button>
+        <button class="btn btn-default" type="reset" abp-hidden="@(Model.LogoId == null)">
+            <i class="fa fa-times"></i>@L("Clear")
+        </button>
+    </form>
+    <form id="OfficeReportsLogoUploadForm" method="POST" class="m-form mb-5" action="@Url.Action("UploadOfficeLogo", "TenantCustomization", new { area = string.Empty, LogoType = LogoType.ReportsLogo })">
+        <input type="hidden" asp-for="Id" id="OfficeReportsLogoUploadForm_Id" />
+        <h5>@L("ReportsLogo")</h5>
+        <div class="form-group fileUpload margin-top-20">
+            <div class="btn btn-primary browse_btn">
+                <span>@L("Browse")</span>
+                <input id="ReportsLogoImage" name="ReportsLogoImage" type="file" class="upload">
+            </div>
+            <input id="uploadReportsLogoFile" class="form-control file-upload" placeholder="No File Selected." disabled="disabled">
+        </div>
+        <div class="col-xs-12 margin-bottom-10">
+            <span class="m-form__help">@L("UploadReportsLogo_Info")</span>
+        </div>
+        <button class="btn btn-primary" type="submit" disabled="disabled"><i class="fa fa-upload"></i>@L("Upload")</button>
+        <button class="btn btn-default" type="reset" abp-hidden="@(Model.ReportsLogoId == null)">
+            <i class="fa fa-times"></i>@L("Clear")
+        </button>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

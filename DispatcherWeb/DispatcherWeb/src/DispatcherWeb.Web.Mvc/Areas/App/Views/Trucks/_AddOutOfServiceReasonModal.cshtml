@@ -1,0 +1,17 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Trucks.Dto
+@model SetTruckIsOutOfServiceInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Take out of service"))
+
+<div class="modal-body">
+    <form role="form" novalidate class="form-validation">
+        <input type="hidden" asp-for="TruckId" />
+        <input type="hidden" asp-for="Date" />
+        <div class="form-group">
+            <label class="required-label">Reason</label>
+            <textarea class="form-control" rows="2" asp-for="Reason" required maxlength="500"></textarea>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

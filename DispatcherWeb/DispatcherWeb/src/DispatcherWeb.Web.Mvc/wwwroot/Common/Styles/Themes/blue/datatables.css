@@ -1,0 +1,52 @@
+
+.dataTables_wrapper .dataTables_length {
+    border-left: 1px solid #ddd;
+}
+
+.dataTables_wrapper > div > div > table {
+    background-color: #fff;
+}
+
+    .dataTables_wrapper > div > div > table > thead {
+        background-color: #e6e6e6;
+    }
+
+    .dataTables_wrapper > div > div > table tbody tr.odd,
+    .dataTables_wrapper > div > div > table tbody tr.odd > .sorting_1,
+    .dataTables_wrapper > div > div > table tbody tr.odd > .sorting_2,
+    .dataTables_wrapper > div > div > table tbody tr.odd > .sorting_3 {
+        background-color: #F3F7FB !important;
+    }
+
+    .dataTables_wrapper > div > div > table tbody tr.even,
+    .dataTables_wrapper > div > div > table tbody tr.even > .sorting_1,
+    .dataTables_wrapper > div > div > table tbody tr.even > .sorting_2,
+    .dataTables_wrapper > div > div > table tbody tr.even > .sorting_3 {
+        background-color: #fff !important;
+    }
+
+.dataTables_wrapper div.bottom div.dataTables_paginate ul li.active a,
+.dataTables_wrapper div.bottom div.dataTables_paginate ul li.active a:hover {
+    background: #58A3DC;
+    color: #fff;
+}
+
+.dataTables_wrapper div.bottom div.dataTables_paginate ul li a:hover {
+    background-color: #DCE9F3;
+}
+
+.dataTables_wrapper div.bottom div.dataTables_paginate ul li a {
+    background-color: #ECF2F7;
+}
+.dataTables_wrapper div.bottom div.dataTables_paginate ul li.disabled a {
+    color:dimgrey;
+}
+table.dataTable {
+    border: 1px solid #EDF3F9 !important;
+    border-bottom: 1px solid #EDF3F9 !important;
+}
+
+.table-bordered > tbody > tr > td, .table-bordered > thead > tr > th {
+    border: 1px solid #ececec;
+}
+

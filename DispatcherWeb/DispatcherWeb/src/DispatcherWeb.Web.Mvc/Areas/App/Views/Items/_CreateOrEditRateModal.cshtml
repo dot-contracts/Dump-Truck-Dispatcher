@@ -1,0 +1,41 @@
+﻿@using DispatcherWeb.Items.Dto
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model ProductLocationEditDto;
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Rate" : "Create Rate"))
+
+<div class="modal-body box-wrap">
+    <form role="form" novalidate class="form-validation" name="ItemPriceInformationsForm">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ItemId" />
+        <div class="form-group">
+            <label>@L("Location")</label>
+            <select class="form-control" asp-for="LocationId">
+                <option value="">@L("SelectALocation")</option>
+                @if (Model.LocationId.HasValue)
+                {
+                    <option selected value="@Model.LocationId">@Model.LocationName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="required-label">@L("MaterialUom")</label>
+            <select class="form-control" required asp-for="MaterialUomId" id="ItemPrice_MaterialUomId">
+                <option value="">Select an option</option>
+                @if (Model.MaterialUomId > 0)
+                {
+                    <option value="@Model.MaterialUomId">@Model.MaterialUomName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>@L("Cost")</label>
+            <input class="form-control" type="text" asp-for="Cost" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+        @foreach (var tier in @Model.ProductLocationPrices)
+        {
+            <partial name="_Prices" model="tier" />
+        }
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

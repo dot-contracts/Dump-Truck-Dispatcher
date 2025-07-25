@@ -1,0 +1,124 @@
+﻿@using Abp.Application.Services.Dto
+@using Abp.Extensions
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Features
+@using DispatcherWeb.Web.Areas.App.Models.Users
+@using DispatcherWeb.Web.Areas.App.Startup
+@model UsersViewModel
+@{
+    ViewBag.CurrentPageName = AppPageNames.Common.Users;
+}
+
+@section Scripts {
+    <script src="/view-resources/Areas/App/Views/_Bundles/user-list.min.js" asp-append-version="true"></script>
+}
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("Users")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("UsersHeaderInfo")
+            </span>
+        </div>
+        <div class="mr-auto-btn col-sm-12 col-md-6 text-center text-md-right">
+            @if ((await AbpSession.GetTenantIdOrNullAsync()).HasValue
+                && await FeatureChecker.IsEnabledAsync(AppFeatures.QuickbooksImportFeature)
+                && await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_Imports_Employees))
+            {
+                <a asp-controller="Imports" asp-action="Employees" class="btn btn-primary"> @L("Import")</a>
+            }
+            <button id="ExportUsersToCsvButton" class="btn btn-primary"> Export</button>
+            @if (await IsGrantedAsync(AppPermissions.Pages_Administration_Users_Create))
+            {
+                <button id="CreateNewUserButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("CreateNewUser")</button>
+            }
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="m-form m-form--label-align-right">
+                <form role="form" id="UsersFormFilter">
+                    <div>
+                        <div class="row m--margin-bottom-20">
+                            <div class="col-xl-6">
+                                <label for="UsersTableFilter">@L("Name")</label>
+                                <input class="form-control m-input filter" id="UsersTableFilter" placeholder="@L("SearchWithThreeDot")" type="text">
+                            </div>
+                        </div>
+                        <div id="AdvacedAuditFiltersArea" abp-hidden>
+                            <div class="row">
+                                @if ((await AbpSession.GetTenantIdOrNullAsync()).HasValue
+                                    && await FeatureChecker.IsEnabledAsync(AppFeatures.AllowMultiOfficeFeature))
+                                {
+                                    <div class="col-xl-6 m--margin-bottom-10">
+                                        <label for="OfficeIdFilter">@L("Office")</label>
+                                        <select class="form-control filter" name="OfficeId" id="OfficeIdFilter">
+                                            <option value="">Filter by office</option>
+                                        </select>
+                                    </div>
+                                }
+                                @if (await IsGrantedAsync(AppPermissions.Pages_Administration_Roles))
+                                {
+                                    <div class="col-xl-6 m--margin-bottom-10">
+                                        <label for="RoleSelectionCombo">@L("Role")</label>
+                                        <select class="form-control filter" name="RoleSelectionCombo" id="RoleSelectionCombo" asp-items="Model.Roles.Select(i => i.ToSelectListItem())">
+                                            <option value="">@L("FilterByRole")</option>
+                                        </select>
+                                    </div>
+                                }
+                                @*<div class="@(await IsGrantedAsync(AppPermissions.Pages_Administration_Roles) ? "col-xl-6" : "col-xl-12")">
+                                    <div class="form-group">
+                                        @Html.DropDownList(
+                                                "PermissionSelectionCombobox", Model.Permissions.Select(i => i.ToSelectListItem()),
+                                                new
+                                                {
+                                                    @class = "form-control selectpicker",
+                                                    data_live_search = "true",
+                                                    data_none_selected_text = L("FilterByPermission"),
+                                                    id = "PermissionSelectionCombo"
+                                                })
+                                    </div>
+                                </div>*@
+                                <div class="col-xl-6 m--margin-bottom-10">
+                                    <div class="m-checkbox-list">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox"
+                                                   id="UsersTable_OnlyLockedUsers"
+                                                   name="OnlyLockedUsersCheckbox"
+                                                   value="true">
+                                            @L("OnlyLockedUsers")
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row m--margin-bottom-10">
+                            <div class="col-lg-6 margin-bottom-10">
+                                <span id="ShowAdvancedFiltersSpan" class="clickable-item text-muted"><i class="fa fa-angle-down"></i> Show Advanced Filters</span>
+                                <span id="HideAdvancedFiltersSpan" class="clickable-item text-muted" abp-hidden><i class="fa fa-angle-up"></i> Hide Advanced Filters</span>
+                            </div>
+                            <div class="col-xl-6 text-right">
+                                <button type="submit" id="SearchButton" class="btn btn-primary">
+                                    <i class="fa fa-search"></i> @L("Search")
+                                </button>
+                                <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                    <i class="fa fa-times"></i> @L("Clear")
+                                </button>
+                            </div>
+                        </div>
+                        <div class="m-separator m-separator--md m-separator--dashed"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="UsersTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

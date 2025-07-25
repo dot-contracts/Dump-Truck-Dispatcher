@@ -1,0 +1,24 @@
+﻿@using DispatcherWeb.Web.Resources
+@inject ScriptPaths ScriptPaths
+@{
+    var googleMapsApiKey = ScriptPaths.GoogleMapsApiKey;
+    if (string.IsNullOrEmpty(googleMapsApiKey))
+    {
+        <script asp-add-nonce>
+            console.error('GoogleMaps API key wasn\'t configured');
+            window.googleMapsApiKeyIsMissing = true;
+        </script>
+    }
+    else
+    {
+        <script asp-add-nonce>
+            window.googleMapsAreAvailable = false;
+            window.initGoogleMap = function () {
+                window.googleMapsAreAvailable = true;
+            }
+        </script>
+        <script async
+                src="https://maps.googleapis.com/maps/api/js?key=@(googleMapsApiKey)&libraries=places&loading=async&callback=initGoogleMap">
+        </script>
+    }
+}

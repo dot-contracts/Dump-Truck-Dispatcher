@@ -1,0 +1,30 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    Layout = "../Shared/Reports/_ReportLayout";
+    ViewBag.CurrentPageName = AppPageNames.Tenant.JobsMissingTickets;
+}
+@section Scripts {
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/JobsMissingTicketsReport/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/JobsMissingTicketsReport/Index.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+@section H1
+{
+    @L("JobsMissingTicketsHeader")
+}
+
+<form id="CreateReportForm" novalidate>
+    <div class="m-form m-form--label-align-right">
+        <div class="row">
+            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                <label class="required-label" for="DeliveryDateFilter">@L("DeliveryDate")</label>
+                <input class="form-control filter" id="DeliveryDateFilter" name="DeliveryDate" type="text" required autocomplete="off" />
+            </div>
+        </div>
+    </div>
+</form>

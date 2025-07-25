@@ -1,0 +1,91 @@
+﻿@using DispatcherWeb.Dispatching.Dto
+@using DispatcherWeb.Infrastructure
+@model DispatchLoadInfoDto
+@{
+    Layout = "_Layout";
+    var ticket = Model.LastLoad?.LastTicket;
+    var visibility = Model.VisibleTicketControls;
+}
+
+@section Scripts {
+    <environment names="Development">
+        <script src="~/view-resources/Areas/App/Views/Acknowledge/DispatchLoadInfo.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/App/Views/Acknowledge/DispatchLoadInfo.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+<form role="form" novalidate id="LoadDispatchForm">
+    <input type="hidden" asp-for="DispatchId" name="Id" />
+    <input type="hidden" asp-for="LoadId" />
+    <input type="hidden" asp-for="Designation" value="@((int)Model.Designation)" />
+    <input type="hidden" asp-for="RequireTicket" />
+    <input type="hidden" name="Version" value="2" />
+    @await Html.PartialAsync("_DispatchLoadInfoPartial", Model)
+
+    <div class="row form-group">
+        <div class="col-4">
+            <label class="required-label col-form-label text-bold" id="TicketNumberLabel">Ticket:</label>
+        </div>
+        <div class="col-8 d-flex align-items-start input-button">
+            <div>
+                <input type="hidden" asp-for="CreateNewTicket" />
+                <input type="text" class="form-control" id="TicketNumber" name="TicketNumber" value="@ticket?.TicketNumber" required maxlength="@EntityStringFieldLengths.Ticket.TicketNumber">
+            </div>
+            <button type="button" class="btn btn-default" id="CreateNewTicketButton"><i class="fa fa-plus"></i></button>
+        </div>
+    </div>
+
+    <input type="hidden" name="TicketPhotoBase64" id="TicketPhotoBase64" />
+    <input type="hidden" name="TicketPhotoFilename" id="TicketPhotoFilename" />
+    <div class="row form-group" abp-hidden="@(!visibility.MaterialItem)">
+        <div class="col-4">
+            <label class="col-form-label text-bold">Material Item:</label>
+        </div>
+        <div class="col-8 d-flex align-items-start margin-top-10">
+            <select id="MaterialItemId" name="MaterialItemId">
+                <option value="">Select a Material Item</option>
+                @if (ticket?.MaterialItemId > 0)
+                {
+                    <option value="@ticket.MaterialItemId" selected>@ticket.MaterialItemName</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="row form-group" abp-hidden="@(!visibility.MaterialQuantity)">
+        <div class="col-4">
+            <label class="required-label col-form-label text-bold">@(visibility.FreightQuantity ? "Material Quantity" : "Quantity"):</label>
+        </div>
+        <div class="col-8 d-flex align-items-start input-button margin-top-10">
+            <div>
+                <input type="text" class="form-control" id="MaterialQuantity" name="MaterialQuantity" value="@ticket?.MaterialQuantity" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+            </div>
+            <button type="button" class="btn btn-default TakeTicketPhotoButton"><i class="fa fa-camera" aria-hidden="true"></i></button>
+        </div>
+    </div>
+    <div class="row form-group" abp-hidden="@(!visibility.FreightQuantity)">
+        <div class="col-4">
+            <label class="required-label col-form-label text-bold">@(visibility.MaterialQuantity ? "Freight Quantity" : "Quantity"):</label>
+        </div>
+        <div class="col-8 d-flex align-items-start input-button margin-top-10">
+            <div>
+                <input type="text" class="form-control" id="FreightQuantity" name="FreightQuantity" value="@ticket?.FreightQuantity" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+            </div>
+        </div>
+    </div>
+    <div class="row form-group mb-2 d-none" id="TicketPhotoSelectedMessage">
+        <div class="col-12">
+            <div class="alert alert-success" role="alert">
+                <div class="alert-text">Ticket Photo is selected. Please, complete the Load to save the photo.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <div class="col-12 text-right margin-top-10">
+            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <span>@L("LoadCompleted")</span></button>
+        </div>
+    </div>
+</form>

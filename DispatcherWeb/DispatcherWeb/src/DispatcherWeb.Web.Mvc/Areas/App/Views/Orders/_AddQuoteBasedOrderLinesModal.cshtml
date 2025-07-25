@@ -1,0 +1,45 @@
+﻿@using DispatcherWeb.Dispatching.Dto;
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Authorization
+@model QuoteBasedOrderLinesModalInput
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.TitleText ?? "Check all of the quoted line items you want to have added to this order"))
+
+<div class="modal-body">
+    <form role="form" novalidate>
+        @if (await IsGrantedAsync(AppPermissions.Pages_Quotes_Items_Create))
+        {
+            <div class="row mb-3">
+                <div class="col-lg-12 text-right">
+                    <button type="button" class="btn btn-primary" id="CreateNewQuoteLineButton"><i class="fa fa-plus"></i>@L("AddItemToQuote")</button>
+                </div>
+            </div>
+        }
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <label class="control-label" for="QuoteBasedLoadAtIdFilter">@L("LoadAt")</label>
+                <select class="form-control filter" name="LoadAtId" id="QuoteBasedLoadAtIdFilter" data-display-name="LoadAt">
+                    <option value="">@L("SelectALocation")</option>
+                </select>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <label class="control-label" for="QuoteBasedDeliverToIdFilter">@L("DeliverTo")</label>
+                <select class="form-control filter" name="DeliverToId" id="QuoteBasedDeliverToIdFilter" data-display-name="DeliverTo">
+                    <option value="">@L("SelectALocation")</option>
+                </select>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <label class="control-label" for="QuoteBasedItemIdFilter">@L("Item")</label>
+                <select class="form-control filter" name="ItemId" id="QuoteBasedItemIdFilter" data-display-name="ItemName">
+                    <option value="">Select an item</option>
+                </select>
+            </div>
+        </div>
+    </form>
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="display table table-striped table-bordered table-hover dt-responsive" id="QuoteItemsTable"></table>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

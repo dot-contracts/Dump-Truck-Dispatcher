@@ -1,0 +1,409 @@
+﻿@using Abp.Configuration
+@using DispatcherWeb.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Orders.Dto
+@using DispatcherWeb.Authorization
+
+@model JobEditDto
+@{
+    var hasEditOrderAccess = await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_Orders_Edit);
+}
+
+<div class="row">
+    <div class="col-6 form-group" data-visible-for-designation="freight">
+        <label class="required-label" id="itemName">@L("FreightItem")</label>
+        <select class="form-control order-line-field" asp-for="FreightItemId" id="JobFreightItemId" required>
+            <option value="">Select an item</option>
+            @if (Model.FreightItemId > 0)
+            {
+                <option selected value="@Model.FreightItemId">@Model.FreightItemName</option>
+            }
+        </select>
+    </div>
+    <div class="col-6 form-group" data-visible-for-designation="both">
+        <label class="required-label" id="materialItemName">@L("MaterialItem")</label>
+        <select class="form-control order-line-field" asp-for="MaterialItemId" id="JobMaterialItemId" required>
+            <option value="">Select an item</option>
+            @if (Model.MaterialItemId > 0)
+            {
+                <option selected value="@Model.MaterialItemId">@Model.MaterialItemName</option>
+            }
+        </select>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 form-group" data-visible-for-designation="freight">
+        <label class="required-label" for="FreightUomId">@L("FreightUom")</label>
+        <select class="form-control order-line-field" asp-for="FreightUomId" data-uombaseid="@((int?)Model.FreightUomBaseId)">
+            <option value=""
+                    data-placeholder-default="Select a UOM"
+                    data-placeholder-no-items="No Prices defined for the selected Item"
+                    data-placeholder-no-parent="Select an Item first">
+                Select Freight UOM
+            </option>
+            @if (Model.FreightUomId != 0)
+            {
+                <option selected value="@Model.FreightUomId">@Model.FreightUomName</option>
+            }
+        </select>
+    </div>
+    <div class="col-6 form-group" data-visible-for-designation="both">
+        <label class="required-label" for="MaterialUomId">@L("MaterialUom")</label>
+        <select class="form-control order-line-field" asp-for="MaterialUomId">
+            <option value=""
+                    data-placeholder-default="Select a UOM"
+                    data-placeholder-no-items="No Prices defined for the selected Item"
+                    data-placeholder-no-parent="Select an Item first">
+                Select Material UOM
+            </option>
+            @if (Model.MaterialUomId != 0)
+            {
+                <option selected value="@Model.MaterialUomId">@Model.MaterialUomName</option>
+            }
+        </select>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 form-group" data-visible-for-designation="freight">
+        <label>@L("FreightQuantity")</label>
+        <input class="form-control order-line-field" type="text" asp-for="FreightQuantity" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+    </div>
+    <div class="col-6 form-group" data-visible-for-designation="both">
+        <label>@L("MaterialQuantity")</label>
+        <input class="form-control order-line-field" type="text" asp-for="MaterialQuantity" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 col-lg-6-for-modal-lg" data-visible-for-designation="freight">
+        <div class="form-group" abp-hidden>
+            <label>@L("AllowedTravelTimeInMinutes")</label>
+            <input class="form-control" type="text" asp-for="TravelTime" data-rule-number="true" data-rule-digits="true" data-rule-min="0" data-rule-max="@short.MaxValue" inputmode="numeric" pattern="[0-9]*">
+        </div>
+    </div>
+</div>
+<div class="row" data-visible-for-designation="freight">
+    <div class="col-6 form-group">
+        <label>@L("TruckTrailerCategory")</label>
+        <select class="form-control" name="VehicleCategories" id="VehicleCategories" multiple="multiple">
+            @if (Model.VehicleCategories != null)
+            {
+                foreach (var category in Model.VehicleCategories)
+                {
+                    <option value="@category.Id" selected>@category.Name</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-6 form-group" abp-hidden="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.Job.HideBedConstruction))">
+        <label>@L("BedConstruction")</label>
+        <select class="form-control" asp-for="BedConstruction" asp-items="Html.GetEnumSelectListOrderedByName<BedConstructionEnum>()">
+            <option value="">&nbsp;</option>
+        </select>
+    </div>
+</div>
+<div class="row" data-visible-for-designation="freight">
+    <div class="col-6 form-group">
+        <label>@L("DeliverTo")</label>
+        <select class="form-control order-line-field" asp-for="DeliverToId">
+            <option value="">@L("SelectALocation")</option>
+            @if (Model.DeliverToId.HasValue)
+            {
+                <option selected value="@Model.DeliverToId">@Model.DeliverToName</option>
+            }
+        </select>
+    </div>
+    <div class="col-6 form-group">
+        <label>@L("LoadAt")</label>
+        <select class="form-control order-line-field" asp-for="LoadAtId">
+            <option value="">@L("SelectALocation")</option>
+            @if (Model.LoadAtId.HasValue)
+            {
+                <option selected value="@Model.LoadAtId">@Model.LoadAtName</option>
+            }
+        </select>
+    </div>
+</div>
+
+@if (hasEditOrderAccess)
+{
+    <div class="row">
+        <div class="col-6 form-group" data-visible-for-designation="freight">
+            <label>@L("FreightRate")</label>
+            <input class="form-control order-line-field" type="text" asp-for="FreightPricePerUnit" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+        <div class="col-6 form-group" data-visible-for-designation="material">
+            <label>@L("MaterialRate")</label>
+            <input class="form-control order-line-field" type="text" asp-for="MaterialPricePerUnit" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+    </div>
+}
+<div class="row" data-visible-for-designation="both">
+    @if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.AllowProductionPay) && await FeatureChecker.IsEnabledAsync(AppFeatures.DriverProductionPayFeature))
+    {
+        <div class="col-6 form-group" abp-hidden>
+            <div class="d-flex align-items-end h-100">
+                <label asp-for="ProductionPay" class="m-checkbox">
+                    <input type="checkbox" class="order-line-field" id="ProductionPay" name="ProductionPay" value="true" checked="@(Model.ProductionPay ? "checked" : null)">
+                    @L("ProductionPay")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+    }
+</div>
+@if (hasEditOrderAccess && await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.AllowProductionPay) && await FeatureChecker.IsEnabledAsync(AppFeatures.DriverProductionPayFeature))
+{
+    <div class="row" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.AllowDriverPayRateDifferentFromFreightRate))">
+        <div class="col-6 form-group">
+            <label>@L("FreightRateToPayDrivers")</label>
+            <input class="form-control" type="text" asp-for="FreightRateToPayDrivers" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+        <div class="col-6 form-group">
+            <div class="d-flex align-items-end h-100">
+                <label asp-for="LoadBased" class="m-checkbox">
+                    <input type="checkbox" id="LoadBased" name="LoadBased" value="true" checked="@(Model.LoadBased ? "checked" : null)">
+                    @L("LoadBased")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+    </div>
+}
+<div class="row" data-visible-for-designation="material">
+    <div class="col-6 form-group" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.ShowAggregateCost))">
+        <label>@L("MaterialCostRate")</label>
+        <input class="form-control" type="text" asp-for="MaterialCostRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+    </div>
+</div>
+@if (hasEditOrderAccess)
+{
+    <div class="row">
+        <div class="col-6 form-group" data-visible-for-designation="freight">
+            <label>Freight</label>
+            <div class="input-group">
+                <input class="form-control order-line-field" type="text" asp-for="FreightPrice" disabled="@(Model.CanOverrideTotals && Model.IsFreightPriceOverridden ? null : "disabled")" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength" required>
+                <span class="input-group-btn" abp-hidden="@(!Model.CanOverrideTotals)">
+                    <button type="button" class="btn btn-default order-line-field" id="UnlockFreightTotalButton"><span class="fas fa-unlock"></span></button>
+                </span>
+            </div>
+        </div>
+        <div class="col-6 form-group" data-visible-for-designation="material">
+            <label>Material Amount</label>
+            <div class="input-group">
+                <input class="form-control order-line-field" type="text" asp-for="MaterialPrice" disabled="@(Model.CanOverrideTotals && Model.IsMaterialPriceOverridden ? null : "disabled")" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength" required>
+                <span class="input-group-btn" abp-hidden="@(!Model.CanOverrideTotals)">
+                    <button type="button" class="btn btn-default order-line-field" id="UnlockMaterialTotalButton"><span class="fas fa-unlock"></span></button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    @if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.TimeAndPay.BasePayOnHourlyJobRate))
+    {
+        <div class="row" data-visible-for-designation="freight">
+            <div class="col-12 col-lg-6-for-modal-lg">
+                <div class="form-group">
+                    <label>@L("DriverPayTimeCode")</label>
+                    <select class="form-control" asp-for="DriverPayTimeClassificationId">
+                        <option value="">Select driver pay time code</option>
+                        @if (Model.DriverPayTimeClassificationId > 0)
+                        {
+                            <option value="@Model.DriverPayTimeClassificationId">@Model.DriverPayTimeClassificationName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6-for-modal-lg">
+                <div class="form-group" abp-hidden>
+                    <label>@L("HourlyDriverPayRate")</label>
+                    <input class="form-control" type="text" asp-for="HourlyDriverPayRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div abp-hidden="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.Job.HideSubContractorRate))">
+    <div class="row" id="subcontractorBlock" data-visible-for-designation="freight">
+        <div class="col-6 form-group">
+            <label>@L("SubContractorRate")</label>
+            <input class="form-control order-line-field" type="text" asp-for="LeaseHaulerRate" data-rule-number="true" data-rule-min="0" data-rule-max="@AppConsts.MaxDecimalDatabaseLength">
+        </div>
+    </div>
+</div>
+@if (hasEditOrderAccess)
+{
+    <div abp-hidden="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.Job.HideTaxInformation))">
+        <div class="row" data-visible-for-designation="both">
+            <div class="col-6 form-group">
+                <label class="control-label">@L("TaxName"):</label>
+                <select class="form-control" asp-for="SalesTaxEntityId" id="JobSalesTaxEntityId">
+                    <option value="">Select a tax name</option>
+                    @if (Model.SalesTaxEntityId > 0)
+                    {
+                        <option selected value="@Model.SalesTaxEntityId.Value">@Model.SalesTaxEntityName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-6 form-group" data-visible-for-designation="both">
+                <label>@L("TaxRate"):</label>
+                <input type="text" class="form-control" asp-for="SalesTaxRate" data-rule-number="true" data-rule-min="0" data-rule-max="1000000000">
+            </div>
+        </div>
+    </div>
+    <div class="row" data-visible-for-designation="both">
+        <div class="col-6 form-group" abp-hidden="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.Job.HideTaxInformation))">
+            <label>@L("TaxAmount")</label>
+            <input type="text" class="form-control order-field" asp-for="OrderLineSalesTax" disabled>
+        </div>
+        <div class="col-6 form-group">
+            <label>@L("Total")</label>
+            <input type="text" class="form-control order-field" asp-for="OrderLineTotal" disabled>
+        </div>
+    </div>
+}
+<div class="row" data-visible-for-designation="freight">
+    <div class="col-6 form-group">
+        <label>@L("RequestedNumberOfTrucks")</label>
+        <input class="form-control order-line-field" type="text" asp-for="NumberOfTrucks" data-rule-number="true" data-rule-min="0" data-rule-max="1000000">
+    </div>
+    @if (await SettingManager.DispatchViaAny())
+    {
+        <div class="col-6 form-group">
+            <div class="d-flex align-items-end h-100">
+                <label asp-for="IsMultipleLoads" class="m-checkbox">
+                    <input type="checkbox" class="order-line-field" id="IsMultipleLoads" name="IsMultipleLoads" value="true" @Html.Raw(!Model.IsMultipleLoads ? "" : "checked=\"checked\"")>
+                    @L("RunUntilStopped")
+                    <span></span>
+                </label>
+            </div>
+        </div>
+    }
+</div>
+<div class="row" data-visible-for-designation="freight">
+    <div class="col-6 form-group">
+        <label>@L("TimeOnJob")</label>
+        <div class="input-group">
+            <input type="text" class="form-control order-line-field" asp-for="TimeOnJob">
+            <span class="input-group-btn" abp-hidden="@(!(Model.NumberOfTrucks > 0))">
+                <button type="button" class="btn btn-default order-line-field" id="SetStaggeredTimeButton" title="@L("SetStaggeredTimes")"><span class="far fa-clock"></span></button>
+            </span>
+        </div>
+    </div>
+    <div class="col-6" abp-hidden="@(await SettingManager.GetSettingValueAsync<bool>(AppSettings.Job.HideChargeTo))">
+        <div class="form-group">
+            <label>@L("ChargeTo")</label>
+            <input type="text" class="form-control order-field" asp-for="ChargeTo">
+        </div>
+    </div>
+</div>
+<div class="row" data-visible-for-designation="freight">
+    <div class="col-6 form-group">
+        <label>@L("Priority")</label>
+        <select class="form-control order-field" asp-for="Priority" id="JobPriority" asp-items="Html.GetEnumSelectList<OrderPriority>()"></select>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 form-group" data-visible-for-designation="freight">
+        <label>@L("Note")</label>
+        <textarea class="form-control order-line-field" rows="5" asp-for="Note"></textarea>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 form-group" data-visible-for-designation="both">
+        <label>@L("JobNumber")</label>
+        <input class="form-control order-line-field" type="text" asp-for="JobNumber" maxlength="@EntityStringFieldLengths.OrderLine.JobNumber">
+    </div>
+    <div class="col-6 form-group" data-visible-for-designation="both">
+        <label>@L("PONumber")</label>
+        <input class="form-control order-line-field" type="text" asp-for="PONumber" maxlength="@EntityStringFieldLengths.Order.PoNumber">
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 form-group" abp-hidden="@(!await FeatureChecker.AllowMultiOfficeFeature())">
+        <label>@L("Office"):</label>
+        <select class="form-control" asp-for="OfficeId" id="JobOfficeId" disabled="@(Model.IsSingleOffice ? "disabled" : null)">
+            <option value="">Select an office</option>
+            @if (Model.OfficeId != 0)
+            {
+                <option selected value="@Model.OfficeId">@Model.OfficeName</option>
+            }
+        </select>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 form-group mt-2 mb-1">
+        <label asp-for="RequiresCustomerNotification" class="m-checkbox">
+            <input type="checkbox" class="order-line-field" id="RequiresCustomerNotification" name="RequiresCustomerNotification" value="true" checked="@(Model.RequiresCustomerNotification ? "checked" : null)">
+            @L("RequiresNotification")
+            <span></span>
+        </label>
+    </div>
+
+    @{
+        var requiredTicketEntry = await SettingManager.GetRequiredTicketEntry();
+    }
+    <div class="col-6 form-group mt-2 mb-1" abp-hidden="@(!requiredTicketEntry.IsRequireTicketInputVisible())">
+        <label asp-for="RequireTicket" class="m-checkbox">
+            <input type="checkbox" id="RequireTicket" name="RequireTicket" value="true" checked="@(Model.RequireTicket ? "checked" : null)">
+            @L("RequireTicket")
+            <span></span>
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 form-group" abp-hidden>
+        <label asp-for="CustomerNotificationContactName" class="required-label">@L("ContactName")</label>
+        <input class="form-control" type="text" asp-for="CustomerNotificationContactName" maxlength="@EntityStringFieldLengths.OrderLine.CustomerNotificationContactName">
+    </div>
+    <div class="col-6 form-group" abp-hidden>
+        <label asp-for="CustomerNotificationPhoneNumber" class="required-label">@L("PhoneNumber")</label>
+        <input class="form-control" type="text" asp-for="CustomerNotificationPhoneNumber" pattern="\+1\d{10}" placeholder="+1##########" maxlength="@EntityStringFieldLengths.OrderLine.CustomerNotificationPhoneNumber">
+    </div>
+</div>
+<div class="row" abp-hidden="@(!await SettingManager.GetSettingValueAsync<bool>(AppSettings.Fuel.ShowFuelSurcharge))">
+    <div class="col-6 form-group">
+        <label for="JobFuelSurchargeCalculationId">@L("FuelSurchargeCalculation"):</label>
+        <input type="hidden" id="DefaultFuelSurchargeCalculationName" value="@Model.DefaultFuelSurchargeCalculationName" />
+        <select class="form-control" asp-for="FuelSurchargeCalculationId" id="JobFuelSurchargeCalculationId" disabled="@((Model.QuoteId.HasValue && !await IsGrantedAsync(AppPermissions.Pages_Orders_EditQuotedValues)) ? "disabled" : null)">
+            <option value="">@AppConsts.FuelSurchargeCalculationBlankName</option>
+            @if (Model.FuelSurchargeCalculationId > 0)
+            {
+                <option selected value="@Model.FuelSurchargeCalculationId">@Model.FuelSurchargeCalculationName</option>
+            }
+        </select>
+    </div>
+    <div class="col-6" id="BaseFuelCostContainer" abp-hidden="@(Model.CanChangeBaseFuelCost != true)">
+        <label for="BaseFuelCost">@L("BaseFuelCost"):</label>
+        <input type="hidden" id="DefaultBaseFuelCost" value="@Model.DefaultBaseFuelCost" />
+        <input type="hidden" id="DefaultCanChangeBaseFuelCost" value="@Model.DefaultCanChangeBaseFuelCost.ToString()" />
+        <input type="text" class="form-control" asp-for="BaseFuelCost"
+               data-rule-number="true"
+               data-rule-min="0"
+               data-rule-max="@AppConsts.MaxDecimalDatabaseLength"
+               data-msg-number="Must be a numeric value"
+               disabled="@(Model.QuoteId.HasValue ? "disabled" : null)">
+    </div>
+</div>
+<div class="row" abp-hidden="@(!await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_Charges))">
+    <div class="col-6 form-group">
+        <button type="button" class="btn btn-primary" id="EditChargesButton">@L("AddOrEditCharges")</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 form-group mt-2 mb-1">
+        <label asp-for="AutoGenerateTicketNumber" class="m-checkbox">
+            <input type="checkbox" id="AutoGenerateTicketNumber" name="AutoGenerateTicketNumber" value="true" @Html.Raw(!Model.AutoGenerateTicketNumber ? "" : "checked=\"checked\"")>
+            @L("AutoGenerateTicketNumber")
+            <span></span>
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 form-group" abp-hidden>
+        <label asp-for="TicketNumber">@L("TicketNumber")</label>
+        <input class="form-control" type="text" asp-for="TicketNumber" maxlength="@EntityStringFieldLengths.Ticket.TicketNumber">
+    </div>
+</div>

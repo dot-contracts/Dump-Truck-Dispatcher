@@ -1,0 +1,184 @@
+﻿@using Abp.Authorization.Users
+@using Abp.Configuration
+@using Abp.MultiTenancy
+@using Abp.Zero.Configuration
+@using DispatcherWeb.Features
+@using DispatcherWeb.Authorization.Users
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.Web.Areas.App.Models.Users
+@model CreateOrEditUserModalViewModel
+
+@{
+    var allowMultiOfficeFeature = await AbpSession.GetMultiTenancySideAsync() == MultiTenancySides.Tenant && await FeatureChecker.IsEnabledAsync(AppFeatures.AllowMultiOfficeFeature);
+}
+
+@await Html.PartialAsync("~/Areas/App/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.IsEditMode ? (L("EditUser") + ": " + Model.User.UserName) : L("CreateNewUser")))
+
+<div class="modal-body">
+    <ul class="nav nav-tabs  m-tabs-line" role="tablist">
+        <li class="nav-item m-tabs__item">
+            <a href="#UserInformationsTab" class="nav-link m-tabs__link active" data-toggle="tab" role="tab">
+                @L("UserInformations")
+            </a>
+        </li>
+        <li class="nav-item m-tabs__item">
+            <a href="#RolesTab" data-toggle="tab" role="tab" class="nav-link m-tabs__link">
+                @L("Roles") <b class="badge badge-primary"><span id="assigned-role-count">@Model.AssignedRoleCount</span></b>
+            </a>
+        </li>
+        <li class="nav-item m-tabs__item" abp-hidden="@(!allowMultiOfficeFeature)">
+            <a href="#OrganizationUnitsTab" data-toggle="tab" role="tab" class="nav-link m-tabs__link">
+                @L("OrganizationUnits")
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="UserInformationsTab" role="tabpanel">
+            <form name="UserInformationsForm" role="form" novalidate class="form-validation">
+
+                @if (Model.IsEditMode)
+                {
+                    <input type="hidden" name="Id" value="@Model.User.Id" />
+                    <input type="hidden" id="LeaseHaulerId" name="LeaseHaulerId" value="@Model.User.LeaseHaulerId" />
+                }
+
+                <div class="row">
+                    <div class="col-sm-3 text-center margin-top-15 margin-bottom-15">
+                        @if (Model.User.ProfilePictureId.HasValue)
+                        {
+                            <img src="@Url.Action("GetProfilePictureById", "Profile", new { area = string.Empty })?id=@(Model.User.ProfilePictureId.Value)" width="128" height="128" class="img-thumbnail img-rounded user-edit-dialog-profile-image" />
+                        }
+                        else
+                        {
+                            <img src="@Url.Content("~/Common/Images/default-profile-picture.png")" width="128" height="128" class="img-thumbnail img-rounded user-edit-dialog-profile-image" />
+                        }
+                        @if (Model.IsEditMode)
+                        {
+                            <a href="#" id="ChangePictureLink" class="d-inline-block mt-2">
+                                @L("Change")
+                            </a>
+                        }
+                    </div>
+                    <div class="col-sm-9">
+                        <div class="form-group">
+                            <label class="required-label" for="Name">@L("FirstName")</label>
+                            <input id="Name" class="form-control" value="@Model.User.Name" type="text" name="Name" required maxlength="@DispatcherWeb.Authorization.Users.User.MaxNameLength">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required-label" for="Surname">@L("Surname")</label>
+                            <input id="Surname" type="text" name="Surname" class="form-control" value="@Model.User.Surname" required maxlength="@DispatcherWeb.Authorization.Users.User.MaxSurnameLength">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required-label" for="EmailAddress">@L("EmailAddress")</label>
+                    <input id="EmailAddress" type="text" name="EmailAddress" class="form-control" value="@Model.User.EmailAddress" required maxlength="@AbpUserBase.MaxEmailAddressLength" autocomplete="new-password">
+                </div>
+
+                <div class="form-group">
+                    <label for="PhoneNumber">@L("PhoneNumber")</label>
+                    <input id="PhoneNumber" type="text" name="PhoneNumber" class="form-control" value="@Model.User.PhoneNumber" maxlength="@UserConsts.MaxPhoneNumberLength">
+                </div>
+
+                @if ((await AbpSession.GetTenantIdOrNullAsync()).HasValue)
+                {
+                    <div class="form-group" abp-hidden="@(!allowMultiOfficeFeature)">
+                        <label>Office</label>
+                        <select class="form-control" name="OfficeId" asp-for="User.OfficeId">
+                            <option value="">Select an option</option>
+                            @if (Model.User.OfficeId > 0)
+                            {
+                                <option value="@Model.User.OfficeId">@Model.User.OfficeName</option>
+                            }
+                        </select>
+                    </div>
+                }
+
+                <div class="form-group form-md-line-input form-md-floating-label">
+                    <label class="required-label" for="UserName">@L("UserName")</label>
+                    <input id="UserName" type="text" @Html.Raw(!Model.CanChangeUserName ? "disabled=\"disabled\"" : "") name="UserName" class="form-control" value="@Model.User.UserName" required maxlength="@AbpUserBase.MaxUserNameLength">
+                    @if (!Model.CanChangeUserName)
+                    {
+                        <span class="help-block">@L("CanNotChangeAdminUserName")</span>
+                    }
+                </div>
+
+                <div class="m-checkbox-list">
+                    <label for="EditUser_SetRandomPassword" class="m-checkbox">
+                        <input id="EditUser_SetRandomPassword" type="checkbox" name="SetRandomPassword" value="true" checked="@(!Model.IsEditMode)" />
+                        @L("SetRandomPassword")
+                        <span></span>
+                    </label>
+                </div>
+
+                <div class="form-group user-password" abp-hidden="@(!Model.IsEditMode)">
+                    <label for="EditUser_Password">@L("Password")</label>
+                    <input id="EditUser_Password" type="password" name="Password" class="form-control" maxlength="@DispatcherWeb.Authorization.Users.User.MaxPlainPasswordLength" autocomplete="new-password">
+                </div>
+
+                <div class="form-group user-password" abp-hidden="@(!Model.IsEditMode)">
+                    <label for="PasswordRepeat">@L("PasswordRepeat")</label>
+                    <input id="PasswordRepeat" type="password" name="PasswordRepeat" class="form-control" maxlength="@DispatcherWeb.Authorization.Users.User.MaxPlainPasswordLength" equalto="#EditUser_Password" autocomplete="new-password">
+                </div>
+
+                <div class="m-checkbox-list">
+                    <label for="EditUser_ShouldChangePasswordOnNextLogin" class="m-checkbox">
+                        <input id="EditUser_ShouldChangePasswordOnNextLogin" type="checkbox" name="ShouldChangePasswordOnNextLogin" value="true" checked="@Model.User.ShouldChangePasswordOnNextLogin">
+                        @L("ShouldChangePasswordOnNextLogin")
+                        <span></span>
+                    </label>
+                    <label for="EditUser_SendActivationEmail" class="m-checkbox">
+                        <input id="EditUser_SendActivationEmail" type="checkbox" name="SendActivationEmail" value="true" checked="@(!Model.IsEditMode)">
+                        @L("SendActivationEmail")
+                        <span></span>
+                    </label>
+                    <label for="EditUser_IsActive" class="m-checkbox">
+                        <input id="EditUser_IsActive" type="checkbox" name="IsActive" value="true" checked="@Model.User.IsActive">
+                        @L("Active")
+                        <span></span>
+                    </label>
+                    @if (await SettingManager.GetSettingValueAsync<bool>(AbpZeroSettingNames.UserManagement.TwoFactorLogin.IsEnabled))
+                    {
+                        <label for="EditUser_IsTwoFactorEnabled" class="m-checkbox">
+                            <input id="EditUser_IsTwoFactorEnabled" type="checkbox" name="IsTwoFactorEnabled" value="true" checked="@Model.User.IsTwoFactorEnabled">
+                            @L("IsTwoFactorEnabled")
+                            <span></span>
+                        </label>
+                    }
+                    @if (await SettingManager.GetSettingValueAsync<bool>(AbpZeroSettingNames.UserManagement.UserLockOut.IsEnabled))
+                    {
+                        <label for="EditUser_IsLockoutEnabled" data-toggle="tooltip" title="@L("IsLockoutEnabled_Hint")" class="m-checkbox" abp-hidden>
+                            <input id="EditUser_IsLockoutEnabled" type="checkbox" name="IsLockoutEnabled" value="true" checked="@Model.User.IsLockoutEnabled">
+                            @L("IsLockoutEnabled")
+                            <span></span>
+                        </label>
+                    }
+                </div>
+
+            </form>
+        </div>
+        <div class="tab-pane" id="RolesTab" role="tabpanel">
+            <div class="user-role-checkbox-list">
+                @foreach (var role in Model.Roles)
+                {
+                    <div class="m-checkbox-list">
+                        <label for="EditUser_@(role.RoleName)" class="m-checkbox">
+                            <input id="EditUser_@(role.RoleName)" type="checkbox" name="@(role.RoleName)" value="true" checked="@role.IsAssigned">
+                            @role.RoleDisplayName
+                            <span></span>
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="tab-pane" id="OrganizationUnitsTab" role="tabpanel" abp-hidden="@(!allowMultiOfficeFeature)">
+            <div class="list-group">
+                @await Html.PartialAsync("~/Areas/App/Views/Common/_OrganizationTree.cshtml", Model)
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Areas/App/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

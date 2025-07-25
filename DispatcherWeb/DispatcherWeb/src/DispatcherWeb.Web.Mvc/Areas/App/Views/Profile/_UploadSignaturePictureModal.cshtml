@@ -1,0 +1,20 @@
+﻿@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Upload signature picture"))
+
+<div class="modal-body">
+    <form id="UploadSignaturePictureModalForm" class="m-form" method="POST" action="@(ApplicationPath + "Profile/UploadSignaturePicture")">
+        <div class="form-group fileUpload">
+            <div class="btn btn-primary browse_btn">
+                <span>@L("Browse")</span>
+                <input class="upload" type="file" name="SignaturePicture"/>
+            </div>
+            <input id="FileNamePlaceholder" class="form-control file-upload" placeholder="No File Selected." disabled="disabled">
+        </div>
+        <div class="col-xs-12 mt-1 mb-4">
+            <span class="m-form__help">@L("ProfileSignature_Change_Info", AppConsts.MaxSignaturePictureBytesUserFriendlyValue)</span>
+        </div>
+    </form>
+    <img class="col-12" id="SignaturePictureResize" src="" />
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

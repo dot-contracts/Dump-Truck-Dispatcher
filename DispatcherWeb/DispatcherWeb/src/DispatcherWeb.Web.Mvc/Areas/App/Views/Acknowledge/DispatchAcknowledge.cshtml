@@ -1,0 +1,27 @@
+﻿@using DispatcherWeb.Dispatching.Dto
+@model DispatchLoadInfoDto
+@{
+    Layout = "_Layout";
+}
+
+@section Scripts {
+    <environment names="Development">
+        <script src="~/view-resources/Areas/App/Views/Acknowledge/DispatchAcknowledge.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/App/Views/Acknowledge/DispatchAcknowledge.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+
+<form role="form" novalidate>
+    <input type="hidden" asp-for="DispatchId" />
+    @await Html.PartialAsync("_DispatchLoadInfoPartial", Model)
+
+    <div class="row form-group">
+        <div class="col-12 text-right">
+            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <span>@L("Acknowledge")</span></button>
+        </div>
+    </div>
+</form>

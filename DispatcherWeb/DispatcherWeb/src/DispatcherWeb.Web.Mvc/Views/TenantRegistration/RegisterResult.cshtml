@@ -1,0 +1,68 @@
+﻿@model DispatcherWeb.Web.Models.TenantRegistration.TenantRegisterResultViewModel
+@{
+    ViewBag.DisableTenantChange = true;
+    Layout = "_RegisterResultLayout";
+}
+<div class="steps-header">
+    <h4>@L("PleaseCheckYourEmail")</h4>
+    <p>An email with a link to verify your email and login to Dump Truck Dispatcher is on its way to you. Follow the below 3 steps to get started.</p>
+</div>
+<div class="steps row">
+    <div class="col-md-4">
+        <div class="step">
+            <h6>Step 1</h6>
+            <img class="img-responsive" src="~/Common/Images/closed-envelope.png" alt="" />
+            <h5>Check your email</h5>
+            <p>Go to the inbox of your @Model.EmailAddress email account</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="step">
+            <h6>Step 2</h6>
+            <img class="img-responsive" src="~/Common/Images/open-envelope.png" alt="" />
+            <h5>Open our Email</h5>
+            <p>Our email has the subject line</p>
+            <p class="text-bold mb-3"><span>Dump Truck Dispatcher account email activation*</span></p>
+            <p>sent from</p>
+            <a href="#">joe@dumptruckdispatcher.com</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="step">
+            <h6>Step 3</h6>
+            <img class="img-responsive" src="~/Common/Images/click.png" alt="" />
+            <h5>Click the link</h5>
+            <p>Click the link in the email to verify your email address and login to Dump Truck Dispatcher.</p>
+        </div>
+    </div>
+</div>
+<div class="steps-footer pb-5">
+    <p>
+        <span>*</span>If you're not seeing it, check your "spam" folder. Gmail users, you might find it in your "promotions" tab.
+        If you drag that email into your primary tab and tell Gmail to do that for all future messages from us, you won't have this problem in the future.
+    </p>
+    <div>
+        @if (Model.IsEmailConfirmationRequired)
+        {
+            <div class="alert alert-warning" role="alert">
+                @L("ConfirmationMailSentPleaseClickLinkInTheEmail", Model.EmailAddress)
+            </div>
+        }
+        @if (!Model.IsActive)
+        {
+            <div class="alert alert-warning" role="alert">
+                @L("YourAccountIsWaitingToBeActivatedByAdmin")
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.TenantLoginAddress))
+        {
+            <div class="alert alert-info" role="alert">
+                @L("TenantRegistrationLoginInfo")<br />
+                <a href="@Model.TenantLoginAddress">@Model.TenantLoginAddress</a>
+            </div>
+        }
+    </div>
+    @*<div class="d-flex justify-content-center mt-5 pt-4">
+        <button type="button" class="btn btn-secondary">Done checking my email</button>
+    </div>*@
+</div>

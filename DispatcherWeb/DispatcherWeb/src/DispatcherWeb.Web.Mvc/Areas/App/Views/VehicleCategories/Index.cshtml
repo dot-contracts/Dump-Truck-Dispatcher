@@ -1,0 +1,71 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Host.VehicleCategories;
+}
+
+@section Scripts{
+    <script src="~/view-resources/Areas/App/Views/VehicleCategories/_CreateOrEditVehicleCategoryModal.js" asp-append-version="true"></script>
+    <script src="~/view-resources/Areas/app/Views/VehicleCategories/Index.js" asp-append-version="true"></script>
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-sm-12 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("VehicleCategories")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("VehicleCategoriesHeaderInfo")
+            </span>
+        </div>
+        <div class="col-sm-12 col-md-6 text-right">
+            <button id="CreateNewVehicleCategoryButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("AddNew")</button>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="m-form m-form--label-align-right">
+                <form role="form" id="VehicleCategoriesFormFilter">
+                    <div>
+                        <div class="row m--margin-bottom-20">
+                            <div class="col-xl-6">
+                                <label for="NameFilter">@L("Name")</label>
+                                <input class="form-control m-input filter" id="NameFilter" name="Name" placeholder="@L("SearchWithThreeDot")" type="text">
+                            </div>
+                            <div class="col-xl-6 m--margin-bottom-10">
+                                <label for="AssetTypeFilter">@L("AssetType")</label>
+                                <select class="form-control filter" id="AssetTypeFilter" name="AssetType" placeholder="@L("AssetType")" asp-items="Html.GetEnumSelectList<AssetType>()">
+                                    <option value="">Select asset type</option>
+                                </select>
+                            </div>
+                            <div class="col-xl-6 m--margin-bottom-10">
+                                <label for="IsPoweredFilter">@L("IsPowered")</label>
+                                <select class="form-control filter" id="IsPoweredFilter" name="IsPowered" placeholder="@L("IsPowered")">
+                                    <option value="">All</option>
+                                    <option value="true">Powered</option>
+                                    <option value="false">Not powered</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row m--margin-bottom-10">
+                            <div class="col-xl-12 text-right">
+                                <button type="submit" id="SearchButton" class="btn btn-primary">
+                                    <i class="fa fa-search"></i> @L("Search")
+                                </button>
+                                <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                    <i class="fa fa-times"></i> @L("Clear")
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="VehicleCategoriesTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

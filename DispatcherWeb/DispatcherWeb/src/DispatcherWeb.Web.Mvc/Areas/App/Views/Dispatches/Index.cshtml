@@ -1,0 +1,99 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@using DispatcherWeb.Web.Areas.App.Models.Dispatches;
+@model DispatchListViewModel
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.Dispatches;
+}
+
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/Dispatches/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/Dispatches/Index.min.js" asp-append-version="true"></script>
+    </environment>
+
+}
+
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-8 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("DispatchesHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("DispatchesHeaderInfo")
+            </span>
+        </div>
+        <div class="col-4 col-md-6 text-right">
+            <button id="ExportDispatchesToCsvButton" class="btn btn-primary"> Export</button>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form>
+                <input type="hidden" class="filter" asp-for="OrderLineId" />
+                <div class="m-form m-form--label-align-right">
+                    <div class="row m--margin-bottom-10">
+                        <div class="form-group col-lg-3 col-md-3 col-sm-6">
+                            <label class="control-label" for="DateFilter">@L("Date")</label>
+                            <input class="form-control filter" id="DateFilter" name="DateFilter" type="text" autocomplete="off">
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-6">
+                            <label class="control-label" for="TruckFilter">@L("Truck")</label>
+                            <select class="form-control filter" id="TruckFilter" name="TruckIds" placeholder="@L("Truck")" multiple="multiple">
+                                @if (Model.TruckId.HasValue)
+                                {
+                                    <option value="@Model.TruckId" selected>@Model.TruckCode</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-6">
+                            <label class="control-label" for="DriverFilter">@L("Driver")</label>
+                            <select class="form-control filter" id="DriverFilter" name="DriverIds" placeholder="@L("Driver")" multiple="multiple">
+                                @if (Model.DriverId.HasValue)
+                                {
+                                    <option value="@Model.DriverId" selected>@Model.DriverName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-6">
+                            <label class="control-label" for="CustomerIdFilter">@L("Customer")</label>
+                            <select class="form-control filter" name="CustomerId" id="CustomerIdFilter" data-display-name="CustomerName">
+                                <option value="">Select a customer</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-6">
+                            <label class="control-label" for="OfficeIdFilter">@L("Office")</label>
+                            <select class="form-control filter" name="OfficeId" id="OfficeIdFilter" data-display-name="Office">
+                                <option value="">Select an office</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-6">
+                            <label for="MissingTicketsFilter" class="m-checkbox mt-35px">
+                                <input id="MissingTicketsFilter" class="filter" type="checkbox" name="MissingTickets" />
+                                @L("MissingTickets")
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-xl-12 text-right">
+                            <button type="submit" id="SearchButton" class="btn btn-primary"><i class="fa fa-search"></i> @L("Search")</button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default"><i class="fa fa-times"></i> @L("Clear")</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="DispatchesTable"></table>
+            </div>
+        </div>
+    </div>
+</div>

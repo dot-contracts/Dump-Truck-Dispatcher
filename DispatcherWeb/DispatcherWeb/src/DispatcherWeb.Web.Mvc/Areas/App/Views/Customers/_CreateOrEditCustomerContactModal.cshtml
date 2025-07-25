@@ -1,0 +1,55 @@
+﻿@using DispatcherWeb.Customers.Dto
+@using DispatcherWeb.Features
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@model CustomerContactEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Contact: " + Model.Name : "Create new contact"))
+
+<div class="modal-body">
+    <form role="form" class="m-form form-validation" name="CustomerContactInformationsForm" id="CustomerContactInformationsForm" novalidate="novalidate">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CustomerId" />
+        <div class="form-group m-form__group">
+            <label class="required-label">@L("Name")</label>
+            <input class="form-control" type="text" asp-for="Name" required>
+        </div>
+        <div class="form-group m-form__group">
+            <label>@L("Title")</label>
+            <input class="form-control" type="text" asp-for="Title">
+        </div>
+        <div class="form-group m-form__group">
+            <label>@L("PhoneNumber")</label>
+            <input class="form-control" type="text" asp-for="PhoneNumber">
+        </div>
+        <div class="form-group m-form__group">
+            <label>@L("Fax")</label>
+            <input class="form-control" type="text" asp-for="Fax">
+        </div>
+        <div class="form-group m-form__group">
+            <label>@L("Email")</label>
+            <input class="form-control" type="text" asp-for="Email">
+            @if (await FeatureChecker.IsEnabledAsync(AppFeatures.CustomerPortal))
+            {
+                <small>(@L("RequiredToAllowPortalAccess"))</small>
+            }
+        </div>
+        <div class="m-form__group form-group">
+            <label class="m-checkbox">
+                <input id="IsActive" type="checkbox" name="IsActive" value="true" checked="@(Model.IsActive ? "checked" : null)">
+                @L("Active")
+                <span></span>
+            </label>
+        </div>
+        @if (await FeatureChecker.IsEnabledAsync(AppFeatures.CustomerPortal))
+        {
+            <div class="m-form__group form-group" id="HasCustomerPortalAccessContainer" abp-hidden="@string.IsNullOrEmpty(Model.Email)">
+                <label class="m-checkbox">
+                    <input id="HasCustomerPortalAccess" type="checkbox" name="HasCustomerPortalAccess" value="true" checked="@(Model.HasCustomerPortalAccess ? "checked" : null)">
+                    @L("HasCustomerPortalAccess")
+                    <span></span>
+                </label>
+            </div>
+        }
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")

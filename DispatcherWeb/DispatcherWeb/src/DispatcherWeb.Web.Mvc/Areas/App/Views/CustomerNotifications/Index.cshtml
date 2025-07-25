@@ -1,0 +1,86 @@
+﻿@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Host.CustomerNotifications;
+}
+@section Scripts {
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/CustomerNotifications/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/CustomerNotifications/Index.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
+
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("CustomerNotifications")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("CustomerNotificationsHeaderInfo")
+            </span>
+        </div>
+        <div class="col-6 text-right">
+            <button id="CreateNewNotificationButton" class="btn btn-primary"><i class="fa fa-plus"></i> @L("CreateNewNotification")</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <div class="box-container">
+                <form class="m-form m-form--label-align-right">
+
+                    <div class="row m--margin-bottom-10">
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="TypeFilter">Type</label>
+                            <select class="form-control filter" name="Type" id="TypeFilter" data-display-name="TypeName" asp-items="Html.GetEnumSelectList<HostEmailType>()">
+                                <option value="">Select a type</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="EditionIdFilter">Edition</label>
+                            <select class="form-control filter" name="EditionId" id="EditionIdFilter" data-display-name="EditionName">
+                                <option value="">Select an edition</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="TenantIdFilter">Tenant</label>
+                            <select class="form-control filter" name="TenantId" id="TenantIdFilter" data-display-name="TenantName">
+                                <option value="">Select a tenant</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="CreatedByUserIdFilter">Created by</label>
+                            <select class="form-control filter" name="CreatedByUserId" id="CreatedByUserIdFilter" data-display-name="CreatedByUserName">
+                                <option value="">Select a user</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-lg-12 text-right">
+                            <button type="submit" id="SearchButton" class="btn btn-primary">
+                                <i class="fa fa-search"></i> Search
+                            </button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                <i class="fa fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="m-separator m-separator--md m-separator--dashed"></div>
+                <div class="row align-items-center">
+                    <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="CustomerNotificationsTable"></table>
+                </div>
+            </div>
+        </div>
+        </div>
+</div>
+

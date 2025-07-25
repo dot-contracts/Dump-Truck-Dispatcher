@@ -1,0 +1,110 @@
+﻿@using DispatcherWeb.Authorization
+@using DispatcherWeb.VehicleServiceTypes.Dto
+@using DispatcherWeb.Web.Areas.App.Startup
+@model IList<VehicleServiceTypeDto>
+@{
+    ViewBag.CurrentPageName = AppPageNames.Host.ServiceType;
+    bool canEdit = await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_VehicleServiceTypes_Edit);
+}
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/VehicleServiceTypes/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/VehicleServiceTypes/Index.min.js" asp-append-version="true"></script>
+    </environment>
+    
+}
+
+<div class="m-subheader ">
+    <div class="row align-items-center">
+        <div class="mr-auto col-6 col-md-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("ServiceTypeHeader")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("ServiceTypeHeaderInfo")
+            </span>
+        </div>
+        <div class="col-6 col-md-6 text-right">
+
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            @if (canEdit)
+            {
+                <form class="m-form m-form--label-align-right">
+                    <div class="form-group">
+                        <div class="row">
+
+                            <input class="form-control" id="Id" name="Id" type="hidden" value="0">
+                            <label class="control-label" for="Name">Name:</label>
+                            <div class="input-group">
+                                <input class="form-control" id="Name" name="Name" placeholder="Name" type="text" required maxlength="100">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary" type="submit" id="AddButton">Add</button>
+                                    <button class="btn btn-primary" type="button" id="CancelButton" abp-hidden>Cancel</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            }
+            <div class="row align-items-center">
+                <table class="display table table-striped table-bordered table-hover dt-responsive nowrap" id="ServiceTypesTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var serviceType in Model)
+                        {
+                            <tr data-id="@serviceType.Id">
+                                <td>@serviceType.Name</td>
+                                <td>
+                                    @if (canEdit)
+                                    {
+                                        <div class="dropdown action-button">
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li><a class="btnEdit">Edit</a></li>
+                                                <li><a class="btnDelete">Delete</a></li>
+                                            </ul>
+                                            <button class="btn btn-primary btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa fa-ellipsis-h"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+                <script id="serviceTypeTemplate" type="x-tmpl-mustache">
+                    <tr data-id="{{id}}">
+                        <td>{{name}}</td>
+                        <td>
+                            <div class="dropdown action-button">
+                                <ul class="dropdown-menu">
+                                    <li><a class="btnEdit">Edit</a></li>
+                                    <li><a class="btnDelete">Delete</a></li>
+                                </ul>
+                                <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa fa-cog"></i> Actions <span class="caret"></span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </script>
+            </div>
+        </div>
+    </div>
+</div>

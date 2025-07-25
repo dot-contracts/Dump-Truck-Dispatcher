@@ -1,0 +1,91 @@
+﻿@using Abp.Extensions
+@using DispatcherWeb.Authorization
+@using DispatcherWeb.Features
+@using DispatcherWeb.Infrastructure.Extensions
+@using DispatcherWeb.Web.Areas.App.Startup
+@{
+    ViewBag.CurrentPageName = AppPageNames.Tenant.LeaseHaulerRequests;
+}
+@section Scripts{
+    <environment names="Development">
+        <script src="~/view-resources/Areas/app/Views/LeaseHaulerRequests/Index.js" asp-append-version="true"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Areas/app/Views/LeaseHaulerRequests/Index.min.js" asp-append-version="true"></script>
+    </environment>
+
+}
+
+<div class="m-subheader">
+    <div class="row align-items-center">
+        <div class="mr-auto col-6">
+            <h3 class="m-subheader__title m-subheader__title--separator">
+                <span>@L("LeaseHaulerRequests")</span>
+            </h3>
+            <span class="m-section__sub">
+                @L("LeaseHaulerRequestsHeaderInfo")
+            </span>
+        </div>
+        <div class="col-6 text-right">
+            @if (await IsGrantedAsync(AppPermissions.Pages_LeaseHaulerRequests_Edit))
+            {
+                <button id="SendRequestsButton" class="btn btn-primary">@L("SendRequests")</button>
+                <button id="CreateNewButton" class="btn btn-primary"><i class="fa fa-plus"></i>@L("AddNew")</button>
+            }
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__body">
+            <form class="m-form m-form--label-align-right" novalidate>
+                <div id="CustomersFormFilter">
+                    <div class="row m--margin-bottom-10">
+                        <div class="form-group col-xl-3 col-md-4 col-sm-6">
+                            <label class="control-label required-label" for="DateRangeFilter">@L("Date")</label>
+                            <input class="form-control m-input filter" id="DateRangeFilter" name="DateRangeFilter" type="text" autocomplete="off">
+                        </div>
+                        @if (await SettingManager.UseShifts())
+                        {
+                            <div class="form-group col-xl-3 col-md-4 col-sm-6">
+                                <label class="control-label required-label" for="ShiftFilter">@L("Shift")</label>
+                                <select class="form-control filter" id="ShiftFilter" name="Shift" asp-items="@((await SettingManager.GetShiftSelectList()).WithNoShift(L("NoShift")).Select(x => new SelectListItem(x.Name, x.Id, false)))" required></select>
+                            </div>
+                        }
+                        <div class="form-group col-xl-3 col-md-4 col-sm-6">
+                            <label class="control-label" for="LeaseHaulerIdFilter">@L("LeaseHauler")</label>
+                            <select class="form-control filter" name="LeaseHaulerId" id="LeaseHaulerIdFilter" data-display-name="LeaseHaulerName">
+                                <option value="">Select a Lease Hauler</option>
+                            </select>
+                        </div>
+                        @if ((await FeatureChecker.GetValueAsync(AppFeatures.AllowMultiOfficeFeature)).To<bool>())
+                        {
+                            <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                                <label class="control-label">@L("Office")</label>
+                                <select class="form-control filter" name="OfficeId" id="OfficeIdFilter" data-display-name="OfficeName">
+                                    <option value="">Select an Office</option>
+                                </select>
+                            </div>
+                        }
+
+                    </div>
+                    <div class="row m--margin-bottom-10">
+                        <div class="col-xl-12 text-right margin-top-20">
+                            <button type="submit" id="SearchButton" class="btn btn-primary">
+                                <i class="fa fa-search"></i> @L("Search")
+                            </button>
+                            <button type="button" id="ClearSearchButton" class="btn btn-default">
+                                <i class="fa fa-times"></i> @L("Clear")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="m-separator m-separator--md m-separator--dashed"></div>
+            <div class="row align-items-center">
+                <table id="LeaseHaulerRequestsTable" class="display table table-striped table-bordered table-hover dt-responsive nowrap"></table>
+            </div>
+        </div>
+    </div>
+</div>

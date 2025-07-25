@@ -1,0 +1,26 @@
+﻿@using DispatcherWeb.Infrastructure
+@using DispatcherWeb.Web.Areas.App.Models.Common.Modals
+@using DispatcherWeb.PricingTiers.Dto
+@model PricingTierEditDto
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(Model.Id > 0 ? "Edit Pricing Tier: " + Model.Name : "Create new pricing tier"))
+
+<div class="modal-body">
+    <form class="form-validation" name="PricingTierForm" role="form" novalidate>
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label>
+                <span class="required-label">@L("PricingTier")</span>
+            </label>
+            <input class="form-control" type="text" asp-for="Name" maxlength="@EntityStringFieldLengths.PricingTier.Name" required />
+        </div>
+        <div class="form-group">
+            <label class="m-checkbox">
+                <input id="IsDefault" type="checkbox" name="IsDefault" value="true" checked="@(Model.IsDefault ? "checked" : null)">
+                @L("Default")
+                <span></span>
+            </label>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Areas/app/Views/Common/Modals/_ModalFooterWithSaveAndCancel.cshtml")
