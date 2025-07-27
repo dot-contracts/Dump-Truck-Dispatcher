@@ -14,7 +14,6 @@ using DispatcherWeb.CustomerNotifications;
 using DispatcherWeb.DashboardCustomization;
 using DispatcherWeb.Designations;
 using DispatcherWeb.Dispatching;
-using DispatcherWeb.DriverApp.Logs;
 using DispatcherWeb.DriverApp.Settings;
 using DispatcherWeb.DriverApplication;
 using DispatcherWeb.DriverAssignments;
