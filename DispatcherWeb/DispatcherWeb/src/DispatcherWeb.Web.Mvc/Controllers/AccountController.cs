@@ -54,6 +54,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Microsoft.ApplicationInsights;
 
 namespace DispatcherWeb.Web.Controllers
 {
@@ -225,62 +226,77 @@ namespace DispatcherWeb.Web.Controllers
         [AllowAnonymous]
         public virtual async Task<JsonResult> Login(LoginViewModel loginModel, string returnUrl = "", string returnUrlHash = "", string ss = "")
         {
-            returnUrl = NormalizeReturnUrl(returnUrl);
-            if (!string.IsNullOrWhiteSpace(returnUrlHash))
+            var telemetry = new TelemetryClient();
+            var startTime = DateTime.UtcNow;
+            
+            try
             {
-                returnUrl += returnUrlHash;
-            }
-
-            var loginResult = await GetLoginResultAsync(loginModel.UsernameOrEmailAddress.Trim(), loginModel.Password, await GetTenancyNameOrNullAsync(), loginModel.ForceHostLogin);
-
-            loginResult.User.LastLoginTime = Clock.Now;
-
-            if (!string.IsNullOrEmpty(ss) && ss.Equals("true", StringComparison.OrdinalIgnoreCase) && loginResult.Result == AbpLoginResultType.Success)
-            {
-                loginResult.User.SetSignInToken();
-                returnUrl = AddSingleSignInParametersToReturnUrl(returnUrl, loginResult.User.SignInToken, loginResult.User.Id, loginResult.User.TenantId);
-            }
-
-            if (loginResult.User.ShouldChangePasswordOnNextLogin)
-            {
-                loginResult.User.SetNewPasswordResetCode();
-                await _userManager.UpdateAsync(loginResult.User);
-
-                return Json(new AjaxResponse
+                returnUrl = NormalizeReturnUrl(returnUrl);
+                if (!string.IsNullOrWhiteSpace(returnUrlHash))
                 {
-                    TargetUrl = Url.Action(
-                        "ResetPassword",
-                        new ResetPasswordViewModel
-                        {
-                            TenantId = await AbpSession.GetTenantIdOrNullAsync(),
-                            UserId = loginResult.User.Id,
-                            ResetCode = loginResult.User.PasswordResetCode,
-                            ReturnUrl = returnUrl,
-                            SingleSignIn = ss,
-                        }),
-                });
-            }
+                    returnUrl += returnUrlHash;
+                }
 
-            var signInResult = await _signInManager.SignInOrTwoFactorAsync(loginResult, loginModel.RememberMe);
-            if (signInResult.RequiresTwoFactor)
-            {
-                return Json(new AjaxResponse
+                var loginResult = await GetLoginResultAsync(loginModel.UsernameOrEmailAddress.Trim(), loginModel.Password, await GetTenancyNameOrNullAsync(), loginModel.ForceHostLogin);
+
+                loginResult.User.LastLoginTime = Clock.Now;
+
+                if (!string.IsNullOrEmpty(ss) && ss.Equals("true", StringComparison.OrdinalIgnoreCase) && loginResult.Result == AbpLoginResultType.Success)
                 {
-                    TargetUrl = Url.Action(
-                        "SendSecurityCode",
-                        new
-                        {
-                            returnUrl = returnUrl,
-                            rememberMe = loginModel.RememberMe,
-                        }),
-                });
+                    loginResult.User.SetSignInToken();
+                    returnUrl = AddSingleSignInParametersToReturnUrl(returnUrl, loginResult.User.SignInToken, loginResult.User.Id, loginResult.User.TenantId);
+                }
+
+                if (loginResult.User.ShouldChangePasswordOnNextLogin)
+                {
+                    loginResult.User.SetNewPasswordResetCode();
+                    await _userManager.UpdateAsync(loginResult.User);
+
+                    telemetry.TrackMetric("Account_Login_PasswordChangeRequired", (DateTime.UtcNow - startTime).TotalMilliseconds);
+                    return Json(new AjaxResponse
+                    {
+                        TargetUrl = Url.Action(
+                            "ResetPassword",
+                            new ResetPasswordViewModel
+                            {
+                                TenantId = await AbpSession.GetTenantIdOrNullAsync(),
+                                UserId = loginResult.User.Id,
+                                ResetCode = loginResult.User.PasswordResetCode,
+                                ReturnUrl = returnUrl,
+                                SingleSignIn = ss,
+                            }),
+                    });
+                }
+
+                var signInResult = await _signInManager.SignInOrTwoFactorAsync(loginResult, loginModel.RememberMe);
+                if (signInResult.RequiresTwoFactor)
+                {
+                    telemetry.TrackMetric("Account_Login_TwoFactorRequired", (DateTime.UtcNow - startTime).TotalMilliseconds);
+                    return Json(new AjaxResponse
+                    {
+                        TargetUrl = Url.Action(
+                            "SendSecurityCode",
+                            new
+                            {
+                                returnUrl = returnUrl,
+                                rememberMe = loginModel.RememberMe,
+                            }),
+                    });
+                }
+
+                Debug.Assert(signInResult.Succeeded);
+
+                await UnitOfWorkManager.Current.SaveChangesAsync();
+
+                telemetry.TrackMetric("Account_Login_Success", (DateTime.UtcNow - startTime).TotalMilliseconds);
+                return Json(new AjaxResponse { TargetUrl = returnUrl });
             }
-
-            Debug.Assert(signInResult.Succeeded);
-
-            await UnitOfWorkManager.Current.SaveChangesAsync();
-
-            return Json(new AjaxResponse { TargetUrl = returnUrl });
+            catch (Exception ex)
+            {
+                telemetry.TrackException(ex);
+                telemetry.TrackMetric("Account_Login_Error", (DateTime.UtcNow - startTime).TotalMilliseconds);
+                throw;
+            }
         }
 
         [HttpPost]
