@@ -360,3 +360,14 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Large backup files and ETL files
+*.etl
+OneDrive_*/
+dispatcherqa4sprint*/
+*.dacpac
+*.bak
+*.trn
+*.log
+*.ldf
+*.mdf
