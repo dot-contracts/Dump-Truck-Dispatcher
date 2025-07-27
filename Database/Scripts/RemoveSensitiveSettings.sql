@@ -1,0 +1,5 @@
+delete from AbpSettings where Name like 'App.GpsIntegration%'
+delete from AbpSettings where Name like 'App.Heartland%'
+delete from AbpSettings where Name like 'App.Invoice.Quickbooks%'
+delete from AbpSettings where Name like 'Abp.Net.Mail.Smtp.Password'
+delete from AbpSettings where Name like 'App.Sms%'

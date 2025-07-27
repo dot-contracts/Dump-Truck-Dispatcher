@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DacOrigin xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <PackageProperties>
+    <Version>3.1.0.0</Version>
+    <ContainsExportedData>true</ContainsExportedData>
+    <StreamVersions>
+      <Version StreamName="Data">2.0.0.0</Version>
+      <Version StreamName="DeploymentContributors">1.0.0.0</Version>
+    </StreamVersions>
+  </PackageProperties>
+  <Operation>
+    <Identity>53a4fe9f-d8f2-415d-aece-336cce38c505</Identity>
+    <Start>2025-06-17T08:42:30.7734622+00:00</Start>
+    <End>0001-01-01T00:00:00.0000000</End>
+    <ProductName>Microsoft.SqlServer.Dac, Version=162.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</ProductName>
+    <ProductVersion>162.5.57.1</ProductVersion>
+    <ProductSchema>http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02</ProductSchema>
+  </Operation>
+  <Server>
+    <ServerVersion>Microsoft SQL Azure (RTM) - 12.0.2000.8 
+	May  9 2025 16:08:04 
+	Copyright (C) 2025 Microsoft Corporation
+</ServerVersion>
+    <ObjectCounts>
+      <ComputedColumn>86</ComputedColumn>
+      <DatabaseOptions>1</DatabaseOptions>
+      <DefaultConstraint>115</DefaultConstraint>
+      <ForeignKeyConstraint>280</ForeignKeyConstraint>
+      <Index>367</Index>
+      <Login>3</Login>
+      <PermissionStatement>6</PermissionStatement>
+      <PrimaryKeyConstraint>177</PrimaryKeyConstraint>
+      <Procedure>11</Procedure>
+      <Role>1</Role>
+      <RoleMembership>8</RoleMembership>
+      <Schema>1</Schema>
+      <SimpleColumn>2360</SimpleColumn>
+      <SubroutineParameter>15</SubroutineParameter>
+      <Table>177</Table>
+      <User>4</User>
+    </ObjectCounts>
+  </Server>
+  <ExportStatistics>
+    <SourceDatabaseSize>2039936</SourceDatabaseSize>
+    <TableRowCountTotalTag>2906743</TableRowCountTotalTag>
+  </ExportStatistics>
+  <Checksums>
+    <Checksum Uri="/model.xml">FB8F3D5212F277B6BAA79B27199633CD46CAED8E90663BFDDCFEA6D94C70334E</Checksum>
+  </Checksums>
+  <ModelSchemaVersion>3.3</ModelSchemaVersion>
+  <DataPhaseTables>HangFire.AggregatedCounter,dbo.OrderLineTruck,dbo.Ticket,dbo.AbpSettings,dbo.ProductLocation,dbo.AbpUserClaims,dbo.AbpWebhookSubscriptions,dbo.InvoiceUploadBatch,dbo.OrderLineVehicleCategory,dbo.CustomerContact,dbo.LeaseHaulerUser,dbo.FcmRegistrationToken,dbo.LuckStoneLocation,HangFire.List,dbo.Item,dbo.HostEmails,dbo.AbpUserAccounts,dbo.AbpNotificationSubscriptions,HangFire.State,dbo.Dispatch,dbo.AbpAuditLogs,dbo.ScheduledReport,dbo.PayStatementTime,dbo.ReceiptLine,dbo.LeaseHaulerContact,dbo.WorkOrderPicture,dbo.DeferredBinaryObject,dbo.BackgroundJobHistory,dbo.AppInvoices,dbo.OutOfServiceHistory,dbo.OrderLine,dbo.Load,dbo.HaulingCategoryPrice,dbo.AppChatMessages,dbo.QuoteHistory,dbo.AbpUserLogins,dbo.Office,HangFire.JobQueue,dbo.AbpUserRoles,dbo.TruckFile,dbo.DismissedCustomerNotification,dbo.HaulingCategory,dbo.DriverPushSubscription,dbo.UnitOfMeasure,dbo.Customer,dbo.PricingTier,dbo.DriverMessage,dbo.PreventiveMaintenance,dbo.Location,dbo.EmployeeTimeClassification,dbo.PushSubscriptions,dbo.EmployeeTime,dbo.Truck,dbo.DailyFuelCost,dbo.CustomerNotificationTenant,dbo.AbpLanguageTexts,dbo.UserDailyHistory,dbo.VehicleService,dbo.LeaseHaulerRequest,dbo.CustomerNotificationRole,dbo.TransactionDailyHistory,dbo.LeaseHauler,dbo.Order,dbo.AvailableLeaseHaulerTruck,dbo.AbpUsers,dbo.AbpPermissions,dbo.LeaseHaulerDriver,dbo.TenantDailyHistory,dbo.SecureFileDefinitions,dbo.ActiveReport,HangFire.Counter,dbo.FuelSurchargeCalculation,dbo.TimeOff,dbo.TimeClassification,dbo.AbpDynamicPropertyValues,dbo.AbpDynamicProperties,dbo.BilledOrder,dbo.TruxEarningsBatch,dbo.AbpEntityChangeSets,dbo.AbpWebhookEvents,dbo.RequestedLeaseHaulerTruck,dbo.TaxRate,dbo.OrderEmails,HangFire.JobParameter,dbo.AbpFeatures,dbo.AbpDynamicEntityPropertyValues,dbo.QuoteEmails,dbo.Payment,dbo.LeaseHaulerStatement,dbo.AbpUserLoginAttempts,dbo.AbpBackgroundJobs,dbo.CustomerNotificationEdition,dbo.AbpUserTokens,dbo.HaulZone,dbo.QuoteLine,dbo.ProductLocationPrice,dbo.ActiveReportCategory,dbo.AbpRoleClaims,dbo.VehicleCategory,dbo.Invoice,dbo.ImportedEarningsBatch,dbo.VehicleUsage,dbo.CannedText,dbo.AppSubscriptionPaymentsExtensionData,dbo.InsuranceType,HangFire.Server,dbo.FcmPushMessage,dbo.AbpEntityPropertyChanges,dbo.AbpNotifications,dbo.AbpWebhookSendAttempts,dbo.AbpRoles,dbo.LeaseHaulerTruck,dbo.DriverApplicationDevice,dbo.DriverAssignment,dbo.MobileDevice,dbo.AppUserDelegations,dbo.EmployeeTimePayStatementTime,dbo.LocationContact,dbo.VehicleServiceDocument,HangFire.Set,dbo.UnitOfMeasureBase,dbo.AbpEditions,dbo.__EFMigrationsHistory,dbo.DriverApplicationLog,dbo.AbpTenants,dbo.FuelPurchase,dbo.AbpLanguages,dbo.TrackableEmails,dbo.AppFriendships,dbo.Charge,dbo.AbpUserNotifications,dbo.VehicleServiceType,dbo.PayStatement,dbo.AbpOrganizationUnits,HangFire.Job,dbo.AbpPersistedGrants,dbo.ImportedEarnings,dbo.WorkOrderLine,dbo.Quote,dbo.TrackableEmailEvents,dbo.HostEmailTenants,dbo.AbpEntityChanges,dbo.TruxEarnings,dbo.HostEmailReceivers,dbo.HostEmailEditions,dbo.PayStatementDetail,dbo.AbpDynamicEntityProperties,dbo.InvoiceLine,dbo.Receipt,dbo.CustomerNotification,dbo.PaymentHeartlandKey,HangFire.Schema,dbo.QuoteLineVehicleCategory,dbo.AbpOrganizationUnitRoles,dbo.OrderPayment,dbo.WialonDeviceType,dbo.PayStatementTicket,dbo.OneTimeLogin,dbo.SentSms,dbo.TrackableEmailReceivers,dbo.AppSubscriptionPayments,dbo.InvoiceBatch,dbo.LocationCategory,dbo.WorkOrder,dbo.HostEmailRoles,dbo.LeaseHaulerStatementTicket,dbo.PayStatementDriverDateConflict,dbo.AppBinaryObjects,dbo.OrderTruck,dbo.Driver,HangFire.Hash,dbo.AbpTenantNotifications,dbo.Insurance,dbo.InvoiceEmails,dbo.AbpUserOrganizationUnits,dbo.OfficeItemPrice,dbo.QuoteFieldDiff</DataPhaseTables>
+</DacOrigin>
