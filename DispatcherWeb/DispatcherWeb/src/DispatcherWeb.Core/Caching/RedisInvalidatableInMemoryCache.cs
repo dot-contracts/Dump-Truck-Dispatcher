@@ -138,7 +138,16 @@ namespace DispatcherWeb.Caching
             }
             catch (Exception ex)
             {
-                Logger.Error(ex.ToString(), ex);
+                Logger.Error($"Failed to get cached value for key '{key}': {ex.Message}", ex);
+                // Clear the problematic cache entry
+                try
+                {
+                    base.Remove(key);
+                }
+                catch (Exception clearEx)
+                {
+                    Logger.Error($"Failed to clear problematic cache entry '{key}': {clearEx.Message}", clearEx);
+                }
             }
 
             if (result.HasValue)
@@ -154,7 +163,16 @@ namespace DispatcherWeb.Caching
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex.ToString(), ex);
+                    Logger.Error($"Failed to get cached value for key '{key}' in lock: {ex.Message}", ex);
+                    // Clear the problematic cache entry
+                    try
+                    {
+                        base.Remove(key);
+                    }
+                    catch (Exception clearEx)
+                    {
+                        Logger.Error($"Failed to clear problematic cache entry '{key}' in lock: {clearEx.Message}", clearEx);
+                    }
                 }
 
                 if (result.HasValue)
@@ -162,21 +180,30 @@ namespace DispatcherWeb.Caching
                     return result.Value;
                 }
 
-                var generatedValue = await factory(key);
-                if (IsDefaultValue(generatedValue))
-                {
-                    return generatedValue;
-                }
-
                 try
                 {
-                    await SetAsync(key, generatedValue);
+                    var generatedValue = await factory(key);
+                    if (IsDefaultValue(generatedValue))
+                    {
+                        return generatedValue;
+                    }
+
+                    try
+                    {
+                        await SetAsync(key, generatedValue);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed to set cached value for key '{key}': {ex.Message}", ex);
+                    }
+                    return generatedValue;
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex.ToString(), ex);
+                    Logger.Error($"Failed to generate value for key '{key}': {ex.Message}", ex);
+                    // Return null or default value to prevent application crash
+                    return null;
                 }
-                return generatedValue;
             }
         }
 

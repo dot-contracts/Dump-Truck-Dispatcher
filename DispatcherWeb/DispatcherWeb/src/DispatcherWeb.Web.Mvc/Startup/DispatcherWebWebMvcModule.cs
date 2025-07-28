@@ -20,6 +20,9 @@ using DispatcherWeb.Web.Timing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Linq;
+using Abp.Runtime.Caching;
 
 namespace DispatcherWeb.Web.Startup
 {
@@ -50,7 +53,18 @@ namespace DispatcherWeb.Web.Startup
 
         public override void Initialize()
         {
-            IocManager.RegisterAssemblyByConvention(typeof(DispatcherWebWebMvcModule).GetAssembly());
+            // Clear all caches to handle cryptographic exceptions from restored database
+            try
+            {
+                var cacheManager = IocManager.Resolve<ICacheManager>();
+                cacheManager.GetAllCaches().ToList().ForEach(cache => cache.Clear());
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failed to clear caches on startup", ex);
+            }
+
+            base.Initialize();
         }
 
         public override void PostInitialize()
