@@ -84,12 +84,41 @@ namespace DispatcherWeb.Caching
             SignalRCommunicator = listCacheBaseDependency.SignalRCommunicator;
             Logger = NullLogger.Instance;
 
+            // Validate dependencies during construction
+            ValidateDependencies();
+
             if (CacheManager is RedisInvalidatableInMemoryCacheManager inMemoryCacheManager)
             {
                 inMemoryCacheManager.RegisterListCache(this);
             }
         }
 
+        private void ValidateDependencies()
+        {
+            var issues = new List<string>();
+            
+            if (CacheManager == null)
+                issues.Add("CacheManager is null");
+            
+            if (SettingManager == null)
+                issues.Add("SettingManager is null");
+            
+            if (UnitOfWorkManager == null)
+                issues.Add("UnitOfWorkManager is null");
+            
+            if (DateKeyLookup == null)
+                issues.Add("DateKeyLookup is null");
+            
+            if (SignalRCommunicator == null)
+                issues.Add("SignalRCommunicator is null");
+
+            if (issues.Any())
+            {
+                var message = $"ListCacheBase dependencies validation failed for {CacheName}: {string.Join(", ", issues)}";
+                Logger?.Error(message);
+                // Don't throw here, just log the issue
+            }
+        }
 
 
         #region GetList
@@ -381,6 +410,7 @@ namespace DispatcherWeb.Caching
         {
             try
             {
+                // Defensive check for all dependencies
                 if (SettingManager == null)
                 {
                     Logger?.Warn($"SettingManager is null for cache {CacheName}");
@@ -393,7 +423,39 @@ namespace DispatcherWeb.Caching
                     return false;
                 }
 
-                return await SettingManager.GetSettingValueAsync<bool>(AppSettings.ListCaches.IsEnabled(CacheName, ListCacheSide.Backend));
+                // Check global cache enabled setting first
+                try
+                {
+                    var globalCacheEnabled = await SettingManager.GetSettingValueAsync<bool>("App.ListCaches.GlobalCacheEnabled");
+                    if (!globalCacheEnabled)
+                    {
+                        Logger?.Info($"Global cache is disabled, skipping cache {CacheName}");
+                        return false;
+                    }
+                }
+                catch (Exception globalEx)
+                {
+                    Logger?.Warn($"Failed to check global cache setting: {globalEx.Message}");
+                    // Continue with individual cache check
+                }
+
+                // Try to get the setting value with additional error handling
+                try
+                {
+                    var settingKey = AppSettings.ListCaches.IsEnabled(CacheName, ListCacheSide.Backend);
+                    if (string.IsNullOrEmpty(settingKey))
+                    {
+                        Logger?.Warn($"Setting key is null or empty for cache {CacheName}");
+                        return false;
+                    }
+
+                    return await SettingManager.GetSettingValueAsync<bool>(settingKey);
+                }
+                catch (Exception settingEx)
+                {
+                    Logger?.Error($"Failed to get setting value for cache {CacheName}: {settingEx.Message}", settingEx);
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -416,6 +478,22 @@ namespace DispatcherWeb.Caching
                 {
                     Logger?.Warn("CacheName is null or empty for frontend cache");
                     return false;
+                }
+
+                // Check global cache enabled setting first
+                try
+                {
+                    var globalCacheEnabled = await SettingManager.GetSettingValueAsync<bool>("App.ListCaches.GlobalCacheEnabled");
+                    if (!globalCacheEnabled)
+                    {
+                        Logger?.Info($"Global cache is disabled, skipping frontend cache {CacheName}");
+                        return false;
+                    }
+                }
+                catch (Exception globalEx)
+                {
+                    Logger?.Warn($"Failed to check global cache setting for frontend: {globalEx.Message}");
+                    // Continue with individual cache check
                 }
 
                 return await SettingManager.GetSettingValueAsync<bool>(AppSettings.ListCaches.IsEnabled(CacheName, ListCacheSide.Frontend));

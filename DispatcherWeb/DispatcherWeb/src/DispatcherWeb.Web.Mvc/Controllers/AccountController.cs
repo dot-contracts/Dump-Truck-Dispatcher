@@ -753,11 +753,33 @@ namespace DispatcherWeb.Web.Controllers
                 throw new InvalidOperationException();
             }
 
-            return await SettingManager.GetSettingValueAsync<bool>(AppSettings.UserManagement.UseCaptchaOnRegistration);
+            // Defensive check for SettingManager
+            if (SettingManager == null)
+            {
+                Logger?.Warn("SettingManager is null in UseCaptchaOnRegistration");
+                return false;
+            }
+
+            try
+            {
+                return await SettingManager.GetSettingValueAsync<bool>(AppSettings.UserManagement.UseCaptchaOnRegistration);
+            }
+            catch (Exception ex)
+            {
+                Logger?.Error($"Failed to get captcha setting: {ex.Message}", ex);
+                return false;
+            }
         }
 
         private async Task CheckSelfRegistrationIsEnabled()
         {
+            // Defensive check for SettingManager
+            if (SettingManager == null)
+            {
+                Logger?.Warn("SettingManager is null in CheckSelfRegistrationIsEnabled");
+                throw new UserFriendlyException(L("SelfUserRegistrationIsDisabledMessage_Detail"));
+            }
+
             if (!await IsSelfRegistrationEnabled())
             {
                 throw new UserFriendlyException(L("SelfUserRegistrationIsDisabledMessage_Detail"));
@@ -771,7 +793,22 @@ namespace DispatcherWeb.Web.Controllers
                 return false; //No registration enabled for host users!
             }
 
-            return await SettingManager.GetSettingValueAsync<bool>(AppSettings.UserManagement.AllowSelfRegistration);
+            // Defensive check for SettingManager
+            if (SettingManager == null)
+            {
+                Logger?.Warn("SettingManager is null in IsSelfRegistrationEnabled");
+                return false;
+            }
+
+            try
+            {
+                return await SettingManager.GetSettingValueAsync<bool>(AppSettings.UserManagement.AllowSelfRegistration);
+            }
+            catch (Exception ex)
+            {
+                Logger?.Error($"Failed to get user self registration setting: {ex.Message}", ex);
+                return false;
+            }
         }
 
         private async Task<bool> IsTenantSelfRegistrationEnabled()
@@ -781,7 +818,22 @@ namespace DispatcherWeb.Web.Controllers
                 return false;
             }
 
-            return await SettingManager.GetSettingValueAsync<bool>(AppSettings.TenantManagement.AllowSelfRegistration);
+            // Defensive check for SettingManager
+            if (SettingManager == null)
+            {
+                Logger?.Warn("SettingManager is null in IsTenantSelfRegistrationEnabled");
+                return false;
+            }
+
+            try
+            {
+                return await SettingManager.GetSettingValueAsync<bool>(AppSettings.TenantManagement.AllowSelfRegistration);
+            }
+            catch (Exception ex)
+            {
+                Logger?.Error($"Failed to get tenant self registration setting: {ex.Message}", ex);
+                return false;
+            }
         }
 
         #endregion
