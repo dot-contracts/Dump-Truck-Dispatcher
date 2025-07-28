@@ -383,8 +383,16 @@ namespace DispatcherWeb.Caching
             {
                 if (SettingManager == null)
                 {
+                    Logger?.Warn($"SettingManager is null for cache {CacheName}");
                     return false;
                 }
+
+                if (string.IsNullOrEmpty(CacheName))
+                {
+                    Logger?.Warn("CacheName is null or empty");
+                    return false;
+                }
+
                 return await SettingManager.GetSettingValueAsync<bool>(AppSettings.ListCaches.IsEnabled(CacheName, ListCacheSide.Backend));
             }
             catch (Exception ex)
@@ -400,8 +408,16 @@ namespace DispatcherWeb.Caching
             {
                 if (SettingManager == null)
                 {
+                    Logger?.Warn($"SettingManager is null for frontend cache {CacheName}");
                     return false;
                 }
+
+                if (string.IsNullOrEmpty(CacheName))
+                {
+                    Logger?.Warn("CacheName is null or empty for frontend cache");
+                    return false;
+                }
+
                 return await SettingManager.GetSettingValueAsync<bool>(AppSettings.ListCaches.IsEnabled(CacheName, ListCacheSide.Frontend));
             }
             catch (Exception ex)
