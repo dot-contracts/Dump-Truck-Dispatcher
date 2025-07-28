@@ -56,9 +56,6 @@ namespace DispatcherWeb.Web.Startup
             // Register the current assembly
             IocManager.RegisterAssemblyByConvention(typeof(DispatcherWebWebMvcModule).GetAssembly());
 
-            // Register feature dependencies
-            IocManager.Register<DispatchSettingFeatureDependency>(DependencyLifeStyle.Transient);
-
             // Clear all caches to handle cryptographic exceptions from restored database
             try
             {
