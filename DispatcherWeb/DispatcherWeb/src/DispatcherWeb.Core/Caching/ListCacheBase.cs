@@ -379,12 +379,36 @@ namespace DispatcherWeb.Caching
 
         public async Task<bool> IsEnabled()
         {
-            return await SettingManager.GetSettingValueAsync<bool>(AppSettings.ListCaches.IsEnabled(CacheName, ListCacheSide.Backend));
+            try
+            {
+                if (SettingManager == null)
+                {
+                    return false;
+                }
+                return await SettingManager.GetSettingValueAsync<bool>(AppSettings.ListCaches.IsEnabled(CacheName, ListCacheSide.Backend));
+            }
+            catch (Exception ex)
+            {
+                Logger?.Error($"Failed to check if cache {CacheName} is enabled: {ex.Message}", ex);
+                return false;
+            }
         }
 
         public async Task<bool> IsFrontendCacheEnabled()
         {
-            return await SettingManager.GetSettingValueAsync<bool>(AppSettings.ListCaches.IsEnabled(CacheName, ListCacheSide.Frontend));
+            try
+            {
+                if (SettingManager == null)
+                {
+                    return false;
+                }
+                return await SettingManager.GetSettingValueAsync<bool>(AppSettings.ListCaches.IsEnabled(CacheName, ListCacheSide.Frontend));
+            }
+            catch (Exception ex)
+            {
+                Logger?.Error($"Failed to check if frontend cache {CacheName} is enabled: {ex.Message}", ex);
+                return false;
+            }
         }
 
         private async Task<TimeSpan> GetSlidingExpirationTime()
