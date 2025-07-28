@@ -44,6 +44,7 @@ namespace DispatcherWeb.Web.Startup
         public override void PreInitialize()
         {
             Configuration.Modules.AbpWebCommon().MultiTenancy.DomainFormat = _appConfiguration["App:WebSiteRootAddress"] ?? "https://localhost:44332/";
+            Configuration.Navigation.Providers.Add<AppNavigationProvider>();
 
             Configuration.ReplaceService<ISessionScriptManager, DispatcherWebSessionScriptManager>();
             Configuration.ReplaceService<ITimingScriptManager, DispatcherWebTimingScriptManager>();
@@ -52,8 +53,8 @@ namespace DispatcherWeb.Web.Startup
 
         public override void Initialize()
         {
-            // Register navigation provider after DI container is initialized
-            Configuration.Navigation.Providers.Add<AppNavigationProvider>();
+            // Register the current assembly
+            IocManager.RegisterAssemblyByConvention(typeof(DispatcherWebWebMvcModule).GetAssembly());
 
             // Register feature dependencies
             IocManager.Register<DispatchSettingFeatureDependency>(DependencyLifeStyle.Transient);

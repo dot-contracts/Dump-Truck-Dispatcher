@@ -126,6 +126,9 @@ namespace DispatcherWeb
         public override void Initialize()
         {
             IocManager.RegisterAssemblyByConvention(typeof(DispatcherWebCoreModule).GetAssembly());
+
+            // Register feature dependencies
+            IocManager.Register<DispatchSettingFeatureDependency>(DependencyLifeStyle.Transient);
         }
 
         public override void PostInitialize()
