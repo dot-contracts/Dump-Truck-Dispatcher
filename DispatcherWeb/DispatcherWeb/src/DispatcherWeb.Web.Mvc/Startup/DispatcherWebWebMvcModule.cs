@@ -67,7 +67,27 @@ namespace DispatcherWeb.Web.Startup
             try
             {
                 var cacheManager = IocManager.Resolve<ICacheManager>();
-                cacheManager.GetAllCaches().ToList().ForEach(cache => cache.Clear());
+                if (cacheManager != null)
+                {
+                    var allCaches = cacheManager.GetAllCaches();
+                    if (allCaches != null)
+                    {
+                        foreach (var cache in allCaches)
+                        {
+                            try
+                            {
+                                if (cache != null)
+                                {
+                                    cache.Clear();
+                                }
+                            }
+                            catch (Exception cacheEx)
+                            {
+                                Logger.Error($"Failed to clear cache {cache?.Name ?? "unknown"}: {cacheEx.Message}", cacheEx);
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
