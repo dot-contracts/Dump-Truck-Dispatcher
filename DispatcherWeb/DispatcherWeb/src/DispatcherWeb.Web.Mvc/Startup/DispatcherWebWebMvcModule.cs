@@ -56,6 +56,13 @@ namespace DispatcherWeb.Web.Startup
             // Register the current assembly
             IocManager.RegisterAssemblyByConvention(typeof(DispatcherWebWebMvcModule).GetAssembly());
 
+            base.Initialize();
+        }
+
+        public override void PostInitialize()
+        {
+            SetAppFolders();
+
             // Clear all caches to handle cryptographic exceptions from restored database
             try
             {
@@ -66,13 +73,6 @@ namespace DispatcherWeb.Web.Startup
             {
                 Logger.Error("Failed to clear caches on startup", ex);
             }
-
-            base.Initialize();
-        }
-
-        public override void PostInitialize()
-        {
-            SetAppFolders();
 
             using (var scope = IocManager.CreateScope())
             {
