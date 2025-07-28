@@ -114,8 +114,6 @@ namespace DispatcherWeb.Tests.Security.AnonymousAccess
             })
             .AddExceptions(AssemblyNames.DriverAppApi, new List<(string className, string methodName, string justification)>
             {
-                (nameof(LogAppService), nameof(LogAppService.Post), "Deprecated, empty body kept for backwards compatibility"),
-                (nameof(LogAppService), nameof(LogAppService.GetMinLevelToUpload), "Deprecated, kept for backwards compatibility, static body poses no security risk"),
                 (nameof(DriverApp.Account.AccountAppService), nameof(DriverApp.Account.AccountAppService.SendPasswordResetCode), "Used to reset password from RN app"),
                 (nameof(DriverApp.Account.AccountAppService), nameof(DriverApp.Account.AccountAppService.ResetPassword), "Used to reset password from RN app"),
                 (nameof(DriverApp.Account.AccountAppService), nameof(DriverApp.Account.AccountAppService.ValidateTenant), "Used to validate the tenant name before logging in"),

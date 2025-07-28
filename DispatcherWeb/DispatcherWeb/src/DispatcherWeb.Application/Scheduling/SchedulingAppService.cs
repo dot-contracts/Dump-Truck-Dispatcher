@@ -1536,7 +1536,6 @@ namespace DispatcherWeb.Scheduling
         [AbpAuthorize(AppPermissions.Pages_Schedule, AppPermissions.LeaseHaulerPortal_Schedule)]
         public async Task SetOrderLineIsComplete(SetOrderLineIsCompleteInput input)
         {
-            var telemetry = new TelemetryClient();
             var startTime = DateTime.UtcNow;
             
             try
@@ -1631,12 +1630,14 @@ namespace DispatcherWeb.Scheduling
                 await CurrentUnitOfWork.SaveChangesAsync(); //save deleted OrderLineTrucks first
                 await orderLineUpdater.SaveChangesAsync();
                 
-                telemetry.TrackMetric("SetOrderLineIsComplete_Success", (DateTime.UtcNow - startTime).TotalMilliseconds);
+                // Track performance metric
+                var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                Logger.Info($"SetOrderLineIsComplete completed in {duration}ms");
             }
             catch (Exception ex)
             {
-                telemetry.TrackException(ex);
-                telemetry.TrackMetric("SetOrderLineIsComplete_Error", (DateTime.UtcNow - startTime).TotalMilliseconds);
+                var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                Logger.Error($"SetOrderLineIsComplete failed after {duration}ms", ex);
                 throw;
             }
         }

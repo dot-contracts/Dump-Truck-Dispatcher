@@ -226,7 +226,6 @@ namespace DispatcherWeb.Web.Controllers
         [AllowAnonymous]
         public virtual async Task<JsonResult> Login(LoginViewModel loginModel, string returnUrl = "", string returnUrlHash = "", string ss = "")
         {
-            var telemetry = new TelemetryClient();
             var startTime = DateTime.UtcNow;
             
             try
@@ -252,7 +251,8 @@ namespace DispatcherWeb.Web.Controllers
                     loginResult.User.SetNewPasswordResetCode();
                     await _userManager.UpdateAsync(loginResult.User);
 
-                    telemetry.TrackMetric("Account_Login_PasswordChangeRequired", (DateTime.UtcNow - startTime).TotalMilliseconds);
+                    var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                    Logger.Info($"Account_Login_PasswordChangeRequired completed in {duration}ms");
                     return Json(new AjaxResponse
                     {
                         TargetUrl = Url.Action(
@@ -271,7 +271,8 @@ namespace DispatcherWeb.Web.Controllers
                 var signInResult = await _signInManager.SignInOrTwoFactorAsync(loginResult, loginModel.RememberMe);
                 if (signInResult.RequiresTwoFactor)
                 {
-                    telemetry.TrackMetric("Account_Login_TwoFactorRequired", (DateTime.UtcNow - startTime).TotalMilliseconds);
+                    var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                    Logger.Info($"Account_Login_TwoFactorRequired completed in {duration}ms");
                     return Json(new AjaxResponse
                     {
                         TargetUrl = Url.Action(
@@ -288,13 +289,14 @@ namespace DispatcherWeb.Web.Controllers
 
                 await UnitOfWorkManager.Current.SaveChangesAsync();
 
-                telemetry.TrackMetric("Account_Login_Success", (DateTime.UtcNow - startTime).TotalMilliseconds);
+                var successDuration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                Logger.Info($"Account_Login_Success completed in {successDuration}ms");
                 return Json(new AjaxResponse { TargetUrl = returnUrl });
             }
             catch (Exception ex)
             {
-                telemetry.TrackException(ex);
-                telemetry.TrackMetric("Account_Login_Error", (DateTime.UtcNow - startTime).TotalMilliseconds);
+                var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                Logger.Error($"Account_Login_Error failed after {duration}ms", ex);
                 throw;
             }
         }
