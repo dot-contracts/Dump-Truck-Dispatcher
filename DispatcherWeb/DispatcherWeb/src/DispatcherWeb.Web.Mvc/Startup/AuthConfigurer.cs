@@ -115,19 +115,33 @@ namespace DispatcherWeb.Web.Startup
                 authenticationBuilder.AddJwtBearer(options =>
                 {
                     options.UseSecurityTokenValidators = true; //TODO: we need to fix the validation to use the new recommended .NET9 approach and set this line back to its default `false` value
-                    options.Authority = configuration["Authentication:JwtBearer:Issuer"];
-                    options.Audience = configuration["Authentication:JwtBearer:Audience"];
+                    
+                    // Defensive checks for configuration values
+                    var issuer = configuration["Authentication:JwtBearer:Issuer"];
+                    var audience = configuration["Authentication:JwtBearer:Audience"];
+                    var validateIssuer = configuration["Authentication:JwtBearer:ValidateIssuer"];
+                    
+                    if (!string.IsNullOrEmpty(issuer))
+                    {
+                        options.Authority = issuer;
+                    }
+                    
+                    if (!string.IsNullOrEmpty(audience))
+                    {
+                        options.Audience = audience;
+                    }
+                    
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
 
                         // Validate the JWT Issuer (iss) claim
-                        ValidateIssuer = bool.Parse(configuration["Authentication:JwtBearer:ValidateIssuer"] ?? "false"),
-                        ValidIssuer = configuration["Authentication:JwtBearer:Issuer"],
+                        ValidateIssuer = !string.IsNullOrEmpty(validateIssuer) && bool.Parse(validateIssuer),
+                        ValidIssuer = issuer,
 
                         // Validate the JWT Audience (aud) claim
-                        ValidateAudience = true,
-                        ValidAudience = configuration["Authentication:JwtBearer:Audience"],
+                        ValidateAudience = !string.IsNullOrEmpty(audience),
+                        ValidAudience = audience,
 
                         // Validate the token expiry
                         ValidateLifetime = true,
