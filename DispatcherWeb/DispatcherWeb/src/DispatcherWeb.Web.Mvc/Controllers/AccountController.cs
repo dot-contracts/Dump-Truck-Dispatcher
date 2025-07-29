@@ -88,22 +88,6 @@ namespace DispatcherWeb.Web.Controllers
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IRepository<OneTimeLogin, Guid> _oneTimeLoginRepository;
 
-        // Safe property to access Logger
-        private ILogger SafeLogger
-        {
-            get
-            {
-                try
-                {
-                    return Logger;
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            }
-        }
-
         // Safe property to access AbpSession
         private IAbpSession SafeAbpSession
         {
@@ -115,7 +99,7 @@ namespace DispatcherWeb.Web.Controllers
                 }
                 catch (Exception)
                 {
-                    SafeLogger?.Warn("AbpSession is not available");
+                    Logger?.Warn("AbpSession is not available");
                     return null;
                 }
             }
@@ -132,7 +116,7 @@ namespace DispatcherWeb.Web.Controllers
                 }
                 catch (Exception)
                 {
-                    SafeLogger?.Warn("UnitOfWorkManager is not available");
+                    Logger?.Warn("UnitOfWorkManager is not available");
                     return null;
                 }
             }
@@ -149,7 +133,7 @@ namespace DispatcherWeb.Web.Controllers
                 }
                 catch (Exception)
                 {
-                    SafeLogger?.Warn("CurrentUnitOfWork is not available");
+                    Logger?.Warn("CurrentUnitOfWork is not available");
                     return null;
                 }
             }
@@ -320,7 +304,7 @@ namespace DispatcherWeb.Web.Controllers
                     await _userManager.UpdateAsync(loginResult.User);
 
                     var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                    SafeLogger?.Info($"Account_Login_PasswordChangeRequired completed in {duration}ms");
+                    Logger?.Info($"Account_Login_PasswordChangeRequired completed in {duration}ms");
                     return Json(new AjaxResponse
                     {
                         TargetUrl = Url.Action(
@@ -340,7 +324,7 @@ namespace DispatcherWeb.Web.Controllers
                 if (signInResult.RequiresTwoFactor)
                 {
                     var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                    SafeLogger?.Info($"Account_Login_TwoFactorRequired completed in {duration}ms");
+                    Logger?.Info($"Account_Login_TwoFactorRequired completed in {duration}ms");
                     return Json(new AjaxResponse
                     {
                         TargetUrl = Url.Action(
@@ -362,13 +346,13 @@ namespace DispatcherWeb.Web.Controllers
                 }
 
                 var successDuration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                SafeLogger?.Info($"Account_Login_Success completed in {successDuration}ms");
+                Logger?.Info($"Account_Login_Success completed in {successDuration}ms");
                 return Json(new AjaxResponse { TargetUrl = returnUrl });
             }
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                SafeLogger?.Error($"Account_Login_Error failed after {duration}ms", ex);
+                Logger?.Error($"Account_Login_Error failed after {duration}ms", ex);
                 throw;
             }
         }
@@ -457,7 +441,7 @@ namespace DispatcherWeb.Web.Controllers
             }
             catch (Exception e)
             {
-                SafeLogger?.Error(e.ToString());
+                Logger?.Error(e.ToString());
                 ModelState.AddModelError("", "An error occurred");
                 UpdateViewBag();
                 return View("LightLogin", loginModel);
@@ -482,18 +466,18 @@ namespace DispatcherWeb.Web.Controllers
 
             if (!string.IsNullOrEmpty(returnUrl))
             {
-                SafeLogger?.Info("Were asked to redirect to returnUrl: " + returnUrl);
+                Logger?.Info("Were asked to redirect to returnUrl: " + returnUrl);
                 returnUrl = NormalizeReturnUrl(returnUrl);
-                SafeLogger?.Info("Redirecting to returnUrl: " + returnUrl);
+                Logger?.Info("Redirecting to returnUrl: " + returnUrl);
                 return Redirect(returnUrl);
             }
 
             if (!string.IsNullOrEmpty(logoutId))
             {
-                SafeLogger?.Info("LogoutId: " + logoutId);
+                Logger?.Info("LogoutId: " + logoutId);
                 var logoutContext = await interaction.GetLogoutContextAsync(logoutId);
-                SafeLogger?.Info("PostLogoutRedirectUri: " + logoutContext.PostLogoutRedirectUri);
-                SafeLogger?.Info("logoutContext: " + JsonConvert.SerializeObject(logoutContext));
+                Logger?.Info("PostLogoutRedirectUri: " + logoutContext.PostLogoutRedirectUri);
+                Logger?.Info("logoutContext: " + JsonConvert.SerializeObject(logoutContext));
                 if (!string.IsNullOrEmpty(logoutContext.PostLogoutRedirectUri))
                 {
                     return Redirect(logoutContext.PostLogoutRedirectUri);
