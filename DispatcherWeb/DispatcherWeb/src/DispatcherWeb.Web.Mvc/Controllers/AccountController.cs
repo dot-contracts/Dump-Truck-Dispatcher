@@ -16,6 +16,7 @@ using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
 using Abp.Encryption;
 using Abp.Extensions;
+using Abp.Logging;
 using Abp.MultiTenancy;
 using Abp.Net.Mail;
 using Abp.Notifications;
@@ -87,23 +88,6 @@ namespace DispatcherWeb.Web.Controllers
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IRepository<OneTimeLogin, Guid> _oneTimeLoginRepository;
 
-        // Safe property to access SettingManager
-        private ISettingManager SafeSettingManager
-        {
-            get
-            {
-                try
-                {
-                    return SettingManager;
-                }
-                catch (Exception)
-                {
-                    Logger?.Warn("SettingManager is not available");
-                    return null;
-                }
-            }
-        }
-
         // Safe property to access Logger
         private ILogger SafeLogger
         {
@@ -137,23 +121,6 @@ namespace DispatcherWeb.Web.Controllers
             }
         }
 
-        // Safe property to access Clock
-        private IClock SafeClock
-        {
-            get
-            {
-                try
-                {
-                    return Clock;
-                }
-                catch (Exception)
-                {
-                    SafeLogger?.Warn("Clock is not available");
-                    return null;
-                }
-            }
-        }
-
         // Safe property to access UnitOfWorkManager
         private IUnitOfWorkManager SafeUnitOfWorkManager
         {
@@ -172,13 +139,13 @@ namespace DispatcherWeb.Web.Controllers
         }
 
         // Safe property to access CurrentUnitOfWork
-        private IUnitOfWork SafeCurrentUnitOfWork
+        private IActiveUnitOfWork SafeCurrentUnitOfWork
         {
             get
             {
                 try
                 {
-                    return CurrentUnitOfWork;
+                    return UnitOfWorkManager?.Current;
                 }
                 catch (Exception)
                 {
@@ -339,7 +306,7 @@ namespace DispatcherWeb.Web.Controllers
 
                 var loginResult = await GetLoginResultAsync(loginModel.UsernameOrEmailAddress.Trim(), loginModel.Password, await GetTenancyNameOrNullAsync(), loginModel.ForceHostLogin);
 
-                loginResult.User.LastLoginTime = SafeClock?.Now ?? DateTime.UtcNow;
+                loginResult.User.LastLoginTime = Clock.Now;
 
                 if (!string.IsNullOrEmpty(ss) && ss.Equals("true", StringComparison.OrdinalIgnoreCase) && loginResult.Result == AbpLoginResultType.Success)
                 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Abp.AspNetCore.Mvc.Controllers;
+using Abp.Configuration;
 using Abp.Configuration.Startup;
 using Abp.IdentityFramework;
 using Abp.Timing;
