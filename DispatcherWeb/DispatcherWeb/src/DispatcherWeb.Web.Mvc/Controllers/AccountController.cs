@@ -87,6 +87,107 @@ namespace DispatcherWeb.Web.Controllers
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IRepository<OneTimeLogin, Guid> _oneTimeLoginRepository;
 
+        // Safe property to access SettingManager
+        private ISettingManager SafeSettingManager
+        {
+            get
+            {
+                try
+                {
+                    return SettingManager;
+                }
+                catch (Exception)
+                {
+                    Logger?.Warn("SettingManager is not available");
+                    return null;
+                }
+            }
+        }
+
+        // Safe property to access Logger
+        private ILogger SafeLogger
+        {
+            get
+            {
+                try
+                {
+                    return Logger;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+        }
+
+        // Safe property to access AbpSession
+        private IAbpSession SafeAbpSession
+        {
+            get
+            {
+                try
+                {
+                    return AbpSession;
+                }
+                catch (Exception)
+                {
+                    SafeLogger?.Warn("AbpSession is not available");
+                    return null;
+                }
+            }
+        }
+
+        // Safe property to access Clock
+        private IClock SafeClock
+        {
+            get
+            {
+                try
+                {
+                    return Clock;
+                }
+                catch (Exception)
+                {
+                    SafeLogger?.Warn("Clock is not available");
+                    return null;
+                }
+            }
+        }
+
+        // Safe property to access UnitOfWorkManager
+        private IUnitOfWorkManager SafeUnitOfWorkManager
+        {
+            get
+            {
+                try
+                {
+                    return UnitOfWorkManager;
+                }
+                catch (Exception)
+                {
+                    SafeLogger?.Warn("UnitOfWorkManager is not available");
+                    return null;
+                }
+            }
+        }
+
+        // Safe property to access CurrentUnitOfWork
+        private IUnitOfWork SafeCurrentUnitOfWork
+        {
+            get
+            {
+                try
+                {
+                    return CurrentUnitOfWork;
+                }
+                catch (Exception)
+                {
+                    SafeLogger?.Warn("CurrentUnitOfWork is not available");
+                    return null;
+                }
+            }
+        }
+
         public AccountController(
             UserManager userManager,
             IMultiTenancyConfig multiTenancyConfig,
@@ -162,8 +263,8 @@ namespace DispatcherWeb.Web.Controllers
             //    return View("LightLogin");
             //}
 
-            var tenantId = await AbpSession.GetTenantIdOrNullAsync();
-            if (AbpSession.UserId.HasValue && tenantId.HasValue && !returnUrl.IsNullOrEmpty())
+            var tenantId = await SafeAbpSession?.GetTenantIdOrNullAsync();
+            if (SafeAbpSession?.UserId.HasValue == true && tenantId.HasValue && !returnUrl.IsNullOrEmpty())
             {
                 // Prevent user from going "back" after they logged in to the driver app
                 if (returnUrl.Contains("driverapplicationclient"))
@@ -182,10 +283,10 @@ namespace DispatcherWeb.Web.Controllers
 
             if (!string.IsNullOrEmpty(ss)
                 && ss.Equals("true", StringComparison.OrdinalIgnoreCase)
-                && AbpSession.UserId > 0)
+                && SafeAbpSession?.UserId > 0)
             {
                 var updateUserSignInTokenOutput = await _sessionAppService.UpdateUserSignInToken();
-                returnUrl = AddSingleSignInParametersToReturnUrl(returnUrl, updateUserSignInTokenOutput.SignInToken, AbpSession.UserId.Value, tenantId);
+                returnUrl = AddSingleSignInParametersToReturnUrl(returnUrl, updateUserSignInTokenOutput.SignInToken, SafeAbpSession.UserId.Value, tenantId);
                 return Redirect(returnUrl);
             }
 
@@ -238,7 +339,7 @@ namespace DispatcherWeb.Web.Controllers
 
                 var loginResult = await GetLoginResultAsync(loginModel.UsernameOrEmailAddress.Trim(), loginModel.Password, await GetTenancyNameOrNullAsync(), loginModel.ForceHostLogin);
 
-                loginResult.User.LastLoginTime = Clock.Now;
+                loginResult.User.LastLoginTime = SafeClock?.Now ?? DateTime.UtcNow;
 
                 if (!string.IsNullOrEmpty(ss) && ss.Equals("true", StringComparison.OrdinalIgnoreCase) && loginResult.Result == AbpLoginResultType.Success)
                 {
@@ -252,14 +353,14 @@ namespace DispatcherWeb.Web.Controllers
                     await _userManager.UpdateAsync(loginResult.User);
 
                     var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                    Logger.Info($"Account_Login_PasswordChangeRequired completed in {duration}ms");
+                    SafeLogger?.Info($"Account_Login_PasswordChangeRequired completed in {duration}ms");
                     return Json(new AjaxResponse
                     {
                         TargetUrl = Url.Action(
                             "ResetPassword",
                             new ResetPasswordViewModel
                             {
-                                TenantId = await AbpSession.GetTenantIdOrNullAsync(),
+                                TenantId = await SafeAbpSession?.GetTenantIdOrNullAsync(),
                                 UserId = loginResult.User.Id,
                                 ResetCode = loginResult.User.PasswordResetCode,
                                 ReturnUrl = returnUrl,
@@ -272,7 +373,7 @@ namespace DispatcherWeb.Web.Controllers
                 if (signInResult.RequiresTwoFactor)
                 {
                     var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                    Logger.Info($"Account_Login_TwoFactorRequired completed in {duration}ms");
+                    SafeLogger?.Info($"Account_Login_TwoFactorRequired completed in {duration}ms");
                     return Json(new AjaxResponse
                     {
                         TargetUrl = Url.Action(
@@ -287,16 +388,20 @@ namespace DispatcherWeb.Web.Controllers
 
                 Debug.Assert(signInResult.Succeeded);
 
-                await UnitOfWorkManager.Current.SaveChangesAsync();
+                var unitOfWorkManager = SafeUnitOfWorkManager;
+                if (unitOfWorkManager?.Current != null)
+                {
+                    await unitOfWorkManager.Current.SaveChangesAsync();
+                }
 
                 var successDuration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                Logger.Info($"Account_Login_Success completed in {successDuration}ms");
+                SafeLogger?.Info($"Account_Login_Success completed in {successDuration}ms");
                 return Json(new AjaxResponse { TargetUrl = returnUrl });
             }
             catch (Exception ex)
             {
                 var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                Logger.Error($"Account_Login_Error failed after {duration}ms", ex);
+                SafeLogger?.Error($"Account_Login_Error failed after {duration}ms", ex);
                 throw;
             }
         }
@@ -368,7 +473,11 @@ namespace DispatcherWeb.Web.Controllers
 
                 Debug.Assert(signInResult.Succeeded);
 
-                await UnitOfWorkManager.Current.SaveChangesAsync();
+                var unitOfWorkManager = SafeUnitOfWorkManager;
+                if (unitOfWorkManager?.Current != null)
+                {
+                    await unitOfWorkManager.Current.SaveChangesAsync();
+                }
 
                 //return Json(new AjaxResponse { TargetUrl = returnUrl });
                 return Redirect(returnUrl);
@@ -381,7 +490,7 @@ namespace DispatcherWeb.Web.Controllers
             }
             catch (Exception e)
             {
-                Logger.Error(e.ToString());
+                SafeLogger?.Error(e.ToString());
                 ModelState.AddModelError("", "An error occurred");
                 UpdateViewBag();
                 return View("LightLogin", loginModel);
@@ -398,7 +507,7 @@ namespace DispatcherWeb.Web.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> Logout([FromServices] IIdentityServerInteractionService interaction, string returnUrl = "", string logoutId = "")
         {
-            if (await AbpSession.GetTenantIdOrNullAsync() == null)
+            if (await SafeAbpSession?.GetTenantIdOrNullAsync() == null)
             {
                 _startupConfiguration.MultiTenancy.IsEnabled = _appConfiguration.IsMultitenancyEnabled();
             }
@@ -406,18 +515,18 @@ namespace DispatcherWeb.Web.Controllers
 
             if (!string.IsNullOrEmpty(returnUrl))
             {
-                Logger.Info("Were asked to redirect to returnUrl: " + returnUrl);
+                SafeLogger?.Info("Were asked to redirect to returnUrl: " + returnUrl);
                 returnUrl = NormalizeReturnUrl(returnUrl);
-                Logger.Info("Redirecting to returnUrl: " + returnUrl);
+                SafeLogger?.Info("Redirecting to returnUrl: " + returnUrl);
                 return Redirect(returnUrl);
             }
 
             if (!string.IsNullOrEmpty(logoutId))
             {
-                Logger.Info("LogoutId: " + logoutId);
+                SafeLogger?.Info("LogoutId: " + logoutId);
                 var logoutContext = await interaction.GetLogoutContextAsync(logoutId);
-                Logger.Info("PostLogoutRedirectUri: " + logoutContext.PostLogoutRedirectUri);
-                Logger.Info("logoutContext: " + JsonConvert.SerializeObject(logoutContext));
+                SafeLogger?.Info("PostLogoutRedirectUri: " + logoutContext.PostLogoutRedirectUri);
+                SafeLogger?.Info("logoutContext: " + JsonConvert.SerializeObject(logoutContext));
                 if (!string.IsNullOrEmpty(logoutContext.PostLogoutRedirectUri))
                 {
                     return Redirect(logoutContext.PostLogoutRedirectUri);
@@ -594,7 +703,7 @@ namespace DispatcherWeb.Web.Controllers
         private async Task<bool> IsRememberBrowserEnabledAsync()
         {
             // Defensive check for SettingManager
-            if (SettingManager == null)
+            if (SafeSettingManager == null)
             {
                 Logger?.Warn("SettingManager is null in IsRememberBrowserEnabledAsync");
                 return false;
@@ -602,7 +711,7 @@ namespace DispatcherWeb.Web.Controllers
 
             try
             {
-                return await SettingManager.GetSettingValueAsync<bool>(AbpZeroSettingNames.UserManagement.TwoFactorLogin.IsRememberBrowserEnabled);
+                return await SafeSettingManager.GetSettingValueAsync<bool>(AbpZeroSettingNames.UserManagement.TwoFactorLogin.IsRememberBrowserEnabled);
             }
             catch (Exception ex)
             {
@@ -681,9 +790,9 @@ namespace DispatcherWeb.Web.Controllers
                 bool isEmailConfirmationRequiredForLogin = false;
                 try
                 {
-                    if (SettingManager != null)
+                    if (SafeSettingManager != null)
                     {
-                        isEmailConfirmationRequiredForLogin = await SettingManager.GetSettingValueAsync<bool>(AbpZeroSettingNames.UserManagement.IsEmailConfirmationRequiredForLogin);
+                        isEmailConfirmationRequiredForLogin = await SafeSettingManager.GetSettingValueAsync<bool>(AbpZeroSettingNames.UserManagement.IsEmailConfirmationRequiredForLogin);
                     }
                     else
                     {
@@ -784,7 +893,7 @@ namespace DispatcherWeb.Web.Controllers
             }
 
             // Defensive check for SettingManager
-            if (SettingManager == null)
+            if (SafeSettingManager == null)
             {
                 Logger?.Warn("SettingManager is null in UseCaptchaOnRegistration");
                 return false;
@@ -792,7 +901,7 @@ namespace DispatcherWeb.Web.Controllers
 
             try
             {
-                return await SettingManager.GetSettingValueAsync<bool>(AppSettings.UserManagement.UseCaptchaOnRegistration);
+                return await SafeSettingManager.GetSettingValueAsync<bool>(AppSettings.UserManagement.UseCaptchaOnRegistration);
             }
             catch (Exception ex)
             {
@@ -804,7 +913,7 @@ namespace DispatcherWeb.Web.Controllers
         private async Task CheckSelfRegistrationIsEnabled()
         {
             // Defensive check for SettingManager
-            if (SettingManager == null)
+            if (SafeSettingManager == null)
             {
                 Logger?.Warn("SettingManager is null in CheckSelfRegistrationIsEnabled");
                 throw new UserFriendlyException(L("SelfUserRegistrationIsDisabledMessage_Detail"));
@@ -824,7 +933,7 @@ namespace DispatcherWeb.Web.Controllers
             }
 
             // Defensive check for SettingManager
-            if (SettingManager == null)
+            if (SafeSettingManager == null)
             {
                 Logger?.Warn("SettingManager is null in IsSelfRegistrationEnabled");
                 return false;
@@ -833,13 +942,13 @@ namespace DispatcherWeb.Web.Controllers
             try
             {
                 // Additional null check before calling the method
-                if (SettingManager == null)
+                if (SafeSettingManager == null)
                 {
                     Logger?.Warn("SettingManager is still null after initial check");
                     return false;
                 }
 
-                return await SettingManager.GetSettingValueAsync<bool>(AppSettings.UserManagement.AllowSelfRegistration);
+                return await SafeSettingManager.GetSettingValueAsync<bool>(AppSettings.UserManagement.AllowSelfRegistration);
             }
             catch (Exception ex)
             {
@@ -856,7 +965,7 @@ namespace DispatcherWeb.Web.Controllers
             }
 
             // Defensive check for SettingManager
-            if (SettingManager == null)
+            if (SafeSettingManager == null)
             {
                 Logger?.Warn("SettingManager is null in IsTenantSelfRegistrationEnabled");
                 return false;
@@ -865,13 +974,13 @@ namespace DispatcherWeb.Web.Controllers
             try
             {
                 // Additional null check before calling the method
-                if (SettingManager == null)
+                if (SafeSettingManager == null)
                 {
                     Logger?.Warn("SettingManager is still null after initial check");
                     return false;
                 }
 
-                return await SettingManager.GetSettingValueAsync<bool>(AppSettings.TenantManagement.AllowSelfRegistration);
+                return await SafeSettingManager.GetSettingValueAsync<bool>(AppSettings.TenantManagement.AllowSelfRegistration);
             }
             catch (Exception ex)
             {
