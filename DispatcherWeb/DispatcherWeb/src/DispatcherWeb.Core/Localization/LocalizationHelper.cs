@@ -25,12 +25,27 @@ namespace DispatcherWeb.Localization
                     throw new AbpException("Must set LocalizationSourceName before, in order to get LocalizationSource");
                 }
 
-                if (_localizationSource == null || _localizationSource.Name != LocalizationSourceName)
+                // Defensive check for LocalizationManager
+                if (LocalizationManager == null || LocalizationManager == NullLocalizationManager.Instance)
                 {
-                    _localizationSource = LocalizationManager.GetSource(LocalizationSourceName);
+                    // Return a fallback localization source
+                    return new NullLocalizationSource(LocalizationSourceName);
                 }
 
-                return _localizationSource;
+                try
+                {
+                    if (_localizationSource == null || _localizationSource.Name != LocalizationSourceName)
+                    {
+                        _localizationSource = LocalizationManager.GetSource(LocalizationSourceName);
+                    }
+
+                    return _localizationSource;
+                }
+                catch (Exception)
+                {
+                    // Return a fallback localization source if there's an error
+                    return new NullLocalizationSource(LocalizationSourceName);
+                }
             }
         }
 
@@ -51,7 +66,15 @@ namespace DispatcherWeb.Localization
         //     Localized string
         public virtual string L(string name)
         {
-            return LocalizationSource.GetString(name);
+            try
+            {
+                return LocalizationSource.GetString(name);
+            }
+            catch (Exception)
+            {
+                // Return the key name as fallback
+                return name;
+            }
         }
 
         //
@@ -70,7 +93,15 @@ namespace DispatcherWeb.Localization
         //     Localized string
         public virtual string L(string name, params object[] args)
         {
-            return LocalizationSource.GetString(name, args);
+            try
+            {
+                return LocalizationSource.GetString(name, args);
+            }
+            catch (Exception)
+            {
+                // Return the key name as fallback
+                return name;
+            }
         }
 
         //
@@ -88,7 +119,15 @@ namespace DispatcherWeb.Localization
         //     Localized string
         public virtual string L(string name, CultureInfo culture)
         {
-            return LocalizationSource.GetString(name, culture);
+            try
+            {
+                return LocalizationSource.GetString(name, culture);
+            }
+            catch (Exception)
+            {
+                // Return the key name as fallback
+                return name;
+            }
         }
 
         //
@@ -110,7 +149,15 @@ namespace DispatcherWeb.Localization
         //     Localized string
         public virtual string L(string name, CultureInfo culture, params object[] args)
         {
-            return LocalizationSource.GetString(name, culture, args);
+            try
+            {
+                return LocalizationSource.GetString(name, culture, args);
+            }
+            catch (Exception)
+            {
+                // Return the key name as fallback
+                return name;
+            }
         }
     }
 }

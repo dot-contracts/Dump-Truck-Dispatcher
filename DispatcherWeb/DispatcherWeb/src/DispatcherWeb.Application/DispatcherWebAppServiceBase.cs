@@ -81,12 +81,44 @@ namespace DispatcherWeb
 
         protected async Task<string> GetTimezone()
         {
-            return await SettingManager.GetSettingValueAsync(TimingSettingNames.TimeZone);
+            try
+            {
+                if (SettingManager != null)
+                {
+                    return await SettingManager.GetSettingValueAsync(TimingSettingNames.TimeZone);
+                }
+                else
+                {
+                    // Return a default timezone if SettingManager is not available
+                    return "UTC";
+                }
+            }
+            catch (Exception)
+            {
+                // Return a default timezone if there's an error
+                return "UTC";
+            }
         }
 
         protected async Task<string> GetTimezone(int? tenantId, long userId)
         {
-            return await SettingManager.GetSettingValueForUserAsync(TimingSettingNames.TimeZone, tenantId, userId);
+            try
+            {
+                if (SettingManager != null)
+                {
+                    return await SettingManager.GetSettingValueForUserAsync(TimingSettingNames.TimeZone, tenantId, userId);
+                }
+                else
+                {
+                    // Return a default timezone if SettingManager is not available
+                    return "UTC";
+                }
+            }
+            catch (Exception)
+            {
+                // Return a default timezone if there's an error
+                return "UTC";
+            }
         }
 
         protected async Task<DateTime> GetToday()
@@ -133,15 +165,32 @@ namespace DispatcherWeb
 
         protected async Task CheckUseShiftSettingCorrespondsInput(Shift? shift)
         {
-            if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts))
+            try
             {
-                if (!shift.HasValue)
+                bool useShifts = false;
+                if (SettingManager != null)
                 {
-                    throw new ArgumentException("UseShifts is turned on but there are no shifts in the input.");
+                    useShifts = await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts);
+                }
+
+                if (useShifts)
+                {
+                    if (!shift.HasValue)
+                    {
+                        throw new ArgumentException("UseShifts is turned on but there are no shifts in the input.");
+                    }
+                }
+                else
+                {
+                    if (shift.HasValue)
+                    {
+                        throw new ArgumentException("UseShifts is turned off but there are shifts in the input.");
+                    }
                 }
             }
-            else
+            catch (Exception)
             {
+                // If SettingManager is not available, assume shifts are not used
                 if (shift.HasValue)
                 {
                     throw new ArgumentException("UseShifts is turned off but there are shifts in the input.");
@@ -151,15 +200,32 @@ namespace DispatcherWeb
 
         protected async Task CheckUseShiftSettingCorrespondsInput(Shift[] shifts)
         {
-            if (await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts))
+            try
             {
-                if (shifts.IsNullOrEmpty())
+                bool useShifts = false;
+                if (SettingManager != null)
                 {
-                    throw new ArgumentException("UseShifts is turned on but there are no shifts in the input.");
+                    useShifts = await SettingManager.GetSettingValueAsync<bool>(AppSettings.General.UseShifts);
+                }
+
+                if (useShifts)
+                {
+                    if (shifts.IsNullOrEmpty())
+                    {
+                        throw new ArgumentException("UseShifts is turned on but there are no shifts in the input.");
+                    }
+                }
+                else
+                {
+                    if (!shifts.IsNullOrEmpty())
+                    {
+                        throw new ArgumentException("UseShifts is turned off but there are shifts in the input.");
+                    }
                 }
             }
-            else
+            catch (Exception)
             {
+                // If SettingManager is not available, assume shifts are not used
                 if (!shifts.IsNullOrEmpty())
                 {
                     throw new ArgumentException("UseShifts is turned off but there are shifts in the input.");

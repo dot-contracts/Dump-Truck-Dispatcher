@@ -591,9 +591,24 @@ namespace DispatcherWeb.Web.Controllers
             throw new UserFriendlyException(L("InvalidSecurityCode"));
         }
 
-        private Task<bool> IsRememberBrowserEnabledAsync()
+        private async Task<bool> IsRememberBrowserEnabledAsync()
         {
-            return SettingManager.GetSettingValueAsync<bool>(AbpZeroSettingNames.UserManagement.TwoFactorLogin.IsRememberBrowserEnabled);
+            // Defensive check for SettingManager
+            if (SettingManager == null)
+            {
+                Logger?.Warn("SettingManager is null in IsRememberBrowserEnabledAsync");
+                return false;
+            }
+
+            try
+            {
+                return await SettingManager.GetSettingValueAsync<bool>(AbpZeroSettingNames.UserManagement.TwoFactorLogin.IsRememberBrowserEnabled);
+            }
+            catch (Exception ex)
+            {
+                Logger?.Error($"Failed to get remember browser setting: {ex.Message}", ex);
+                return false;
+            }
         }
 
         #endregion
@@ -663,7 +678,22 @@ namespace DispatcherWeb.Web.Controllers
                 );
 
                 //Getting tenant-specific settings
-                var isEmailConfirmationRequiredForLogin = await SettingManager.GetSettingValueAsync<bool>(AbpZeroSettingNames.UserManagement.IsEmailConfirmationRequiredForLogin);
+                bool isEmailConfirmationRequiredForLogin = false;
+                try
+                {
+                    if (SettingManager != null)
+                    {
+                        isEmailConfirmationRequiredForLogin = await SettingManager.GetSettingValueAsync<bool>(AbpZeroSettingNames.UserManagement.IsEmailConfirmationRequiredForLogin);
+                    }
+                    else
+                    {
+                        Logger?.Warn("SettingManager is null in Register method");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger?.Error($"Failed to get email confirmation setting: {ex.Message}", ex);
+                }
 
                 if (model.IsExternalLogin)
                 {
