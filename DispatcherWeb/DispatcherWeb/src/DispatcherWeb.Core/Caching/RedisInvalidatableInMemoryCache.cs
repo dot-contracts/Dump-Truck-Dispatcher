@@ -182,21 +182,21 @@ namespace DispatcherWeb.Caching
 
                 try
                 {
-                    var generatedValue = await factory(key);
-                    if (IsDefaultValue(generatedValue))
-                    {
-                        return generatedValue;
-                    }
-
-                    try
-                    {
-                        await SetAsync(key, generatedValue);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error($"Failed to set cached value for key '{key}': {ex.Message}", ex);
-                    }
+                var generatedValue = await factory(key);
+                if (IsDefaultValue(generatedValue))
+                {
                     return generatedValue;
+                }
+
+                try
+                {
+                    await SetAsync(key, generatedValue);
+                }
+                catch (Exception ex)
+                {
+                        Logger.Error($"Failed to set cached value for key '{key}': {ex.Message}", ex);
+                }
+                return generatedValue;
                 }
                 catch (Exception ex)
                 {

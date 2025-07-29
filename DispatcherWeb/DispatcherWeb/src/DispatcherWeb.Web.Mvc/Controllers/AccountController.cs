@@ -802,6 +802,13 @@ namespace DispatcherWeb.Web.Controllers
 
             try
             {
+                // Additional null check before calling the method
+                if (SettingManager == null)
+                {
+                    Logger?.Warn("SettingManager is still null after initial check");
+                    return false;
+                }
+
                 return await SettingManager.GetSettingValueAsync<bool>(AppSettings.UserManagement.AllowSelfRegistration);
             }
             catch (Exception ex)
@@ -827,6 +834,13 @@ namespace DispatcherWeb.Web.Controllers
 
             try
             {
+                // Additional null check before calling the method
+                if (SettingManager == null)
+                {
+                    Logger?.Warn("SettingManager is still null after initial check");
+                    return false;
+                }
+
                 return await SettingManager.GetSettingValueAsync<bool>(AppSettings.TenantManagement.AllowSelfRegistration);
             }
             catch (Exception ex)

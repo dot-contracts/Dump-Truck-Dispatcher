@@ -94,9 +94,15 @@ namespace DispatcherWeb.Web.Startup
                 services.AddSingleton<ITelemetryInitializer, AbpTelemetryInitializer>();
             }
 
+            // Comment out Azure Blob Storage data protection to fix Azurite connection issue
+            // services.AddDataProtection()
+            //         .SetApplicationName(_appConfiguration["Authentication:DataProtectionApplicationName"] ?? "DispatcherWeb")
+            //         .PersistKeysToAzureBlobStorage(GetDataProtectionBlobClient());
+
+            // Use file system for data protection instead
             services.AddDataProtection()
                     .SetApplicationName(_appConfiguration["Authentication:DataProtectionApplicationName"] ?? "DispatcherWeb")
-                    .PersistKeysToAzureBlobStorage(GetDataProtectionBlobClient());
+                    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "DataProtection")));
 
             services.AddSingleton<InterceptorConfiguration>(provider =>
             {
