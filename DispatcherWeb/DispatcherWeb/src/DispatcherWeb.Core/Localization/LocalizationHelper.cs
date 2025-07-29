@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using Abp;
 using Abp.Dependency;
 using Abp.Localization;
@@ -28,8 +29,8 @@ namespace DispatcherWeb.Localization
                 // Defensive check for LocalizationManager
                 if (LocalizationManager == null || LocalizationManager == NullLocalizationManager.Instance)
                 {
-                    // Return a fallback localization source
-                    return new NullLocalizationSource(LocalizationSourceName);
+                    // Return null instead of NullLocalizationSource since it's not accessible
+                    return null;
                 }
 
                 try
@@ -43,8 +44,8 @@ namespace DispatcherWeb.Localization
                 }
                 catch (Exception)
                 {
-                    // Return a fallback localization source if there's an error
-                    return new NullLocalizationSource(LocalizationSourceName);
+                    // Return null if there's an error
+                    return null;
                 }
             }
         }
@@ -68,7 +69,16 @@ namespace DispatcherWeb.Localization
         {
             try
             {
-                return LocalizationSource.GetString(name);
+                var source = LocalizationSource;
+                if (source != null)
+                {
+                    return source.GetString(name);
+                }
+                else
+                {
+                    // Return the key name as fallback
+                    return name;
+                }
             }
             catch (Exception)
             {
@@ -95,7 +105,16 @@ namespace DispatcherWeb.Localization
         {
             try
             {
-                return LocalizationSource.GetString(name, args);
+                var source = LocalizationSource;
+                if (source != null)
+                {
+                    return source.GetString(name, args);
+                }
+                else
+                {
+                    // Return the key name as fallback
+                    return name;
+                }
             }
             catch (Exception)
             {
@@ -121,7 +140,16 @@ namespace DispatcherWeb.Localization
         {
             try
             {
-                return LocalizationSource.GetString(name, culture);
+                var source = LocalizationSource;
+                if (source != null)
+                {
+                    return source.GetString(name, culture);
+                }
+                else
+                {
+                    // Return the key name as fallback
+                    return name;
+                }
             }
             catch (Exception)
             {
@@ -151,7 +179,16 @@ namespace DispatcherWeb.Localization
         {
             try
             {
-                return LocalizationSource.GetString(name, culture, args);
+                var source = LocalizationSource;
+                if (source != null)
+                {
+                    return source.GetString(name, culture, args);
+                }
+                else
+                {
+                    // Return the key name as fallback
+                    return name;
+                }
             }
             catch (Exception)
             {
