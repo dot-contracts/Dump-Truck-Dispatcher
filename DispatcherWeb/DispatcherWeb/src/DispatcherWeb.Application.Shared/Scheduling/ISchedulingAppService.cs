@@ -26,6 +26,8 @@ namespace DispatcherWeb.Scheduling
 
         Task SetOrderLineIsComplete(SetOrderLineIsCompleteInput input);
 
+        Task SetOrderLineIsCompleteBatch(SetOrderLineIsCompleteBatchInput input);
+
         Task SetLeaseHaulerRequestAsAccepted(SetLeaseHaulerRequestAsAcceptedInput input);
 
         Task<SetOrderOfficeIdInput> GetOrderOfficeIdForEdit(EntityDto input);

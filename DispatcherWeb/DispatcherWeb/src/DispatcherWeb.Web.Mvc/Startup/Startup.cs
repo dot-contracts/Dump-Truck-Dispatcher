@@ -275,7 +275,7 @@ namespace DispatcherWeb.Web.Startup
             });
 
             //Configure Abp and Dependency Injection
-            return services.AddAbp<DispatcherWebWebMvcModule>(options =>
+            var abpServiceProvider = services.AddAbp<DispatcherWebWebMvcModule>(options =>
             {
                 //Configure Log4Net logging
                 options.IocManager.IocContainer.AddFacility<LoggingFacility>(
@@ -290,10 +290,66 @@ namespace DispatcherWeb.Web.Startup
                 options.PlugInSources.AddFolder(Path.Combine(_hostingEnvironment.WebRootPath, "Plugins"),
                     SearchOption.AllDirectories);
             });
+
+            // Ensure ABP services are properly initialized
+            try
+            {
+                using (var scope = abpServiceProvider.CreateScope())
+                {
+                    // Test core ABP services to ensure they're properly registered
+                    var settingManager = scope.ServiceProvider.GetService<Abp.Configuration.ISettingManager>();
+                    var logger = scope.ServiceProvider.GetService<Abp.Logging.ILogger>();
+                    var session = scope.ServiceProvider.GetService<Abp.Runtime.Session.IAbpSession>();
+                    
+                    if (settingManager == null)
+                    {
+                        throw new InvalidOperationException("SettingManager is not properly registered");
+                    }
+                    if (logger == null)
+                    {
+                        throw new InvalidOperationException("Logger is not properly registered");
+                    }
+                    if (session == null)
+                    {
+                        throw new InvalidOperationException("AbpSession is not properly registered");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't fail startup - let the application try to run
+                Console.WriteLine($"ABP service initialization warning: {ex.Message}");
+            }
+
+            return abpServiceProvider;
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            // Verify ABP services are available at startup
+            try
+            {
+                using (var scope = app.ApplicationServices.CreateScope())
+                {
+                    var settingManager = scope.ServiceProvider.GetService<Abp.Configuration.ISettingManager>();
+                    var logger = scope.ServiceProvider.GetService<Abp.Logging.ILogger>();
+                    var session = scope.ServiceProvider.GetService<Abp.Runtime.Session.IAbpSession>();
+                    
+                    if (settingManager != null && logger != null && session != null)
+                    {
+                        logger.Info("ABP services successfully initialized");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Warning: Some ABP services are not available");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ABP service verification failed: {ex.Message}");
+            }
+
             var policyCollection = new HeaderPolicyCollection()
                 .AddContentSecurityPolicy(builder =>
                 //.AddContentSecurityPolicyReportOnly(builder => // report-only
@@ -442,6 +498,12 @@ namespace DispatcherWeb.Web.Startup
                 && !_appConfiguration.GetValue<bool>("App:DisableAppInsights"))
             {
                 app.UseMiddleware<ThreadPoolMonitoringMiddleware>();
+            }
+
+            if (!_appConfiguration.GetValue<bool>("App:DisablePerformanceMonitoringMiddleware")
+                && !_appConfiguration.GetValue<bool>("App:DisableAppInsights"))
+            {
+                app.UseMiddleware<PerformanceMonitoringMiddleware>();
             }
 
             app.UseGetScriptsResponsePerUserCache();

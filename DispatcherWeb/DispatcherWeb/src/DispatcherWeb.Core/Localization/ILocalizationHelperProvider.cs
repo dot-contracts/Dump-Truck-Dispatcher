@@ -1,4 +1,6 @@
-﻿namespace DispatcherWeb.Localization
+﻿using DispatcherWeb.Core.Localization;
+
+namespace DispatcherWeb.Localization
 {
     public interface ILocalizationHelperProvider
     {

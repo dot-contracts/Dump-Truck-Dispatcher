@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Globalization;
 using Abp;
-using Abp.Dependency;
 using Abp.Localization;
 using Abp.Localization.Sources;
 
-namespace DispatcherWeb.Localization
+namespace DispatcherWeb.Core.Localization
 {
-    public class LocalizationHelper : ISingletonDependency
+    public class LocalizationHelper
     {
         private ILocalizationSource _localizationSource;
 
-        public LocalizationHelper()
-        {
-            LocalizationManager = NullLocalizationManager.Instance;
-            LocalizationSourceName = DispatcherWebConsts.LocalizationSourceName;
-        }
+        public ILocalizationManager LocalizationManager { get; set; }
+
+        public string LocalizationSourceName { get; set; }
 
         protected ILocalizationSource LocalizationSource
         {
@@ -26,175 +23,33 @@ namespace DispatcherWeb.Localization
                     throw new AbpException("Must set LocalizationSourceName before, in order to get LocalizationSource");
                 }
 
-                // Defensive check for LocalizationManager
-                if (LocalizationManager == null || LocalizationManager == NullLocalizationManager.Instance)
+                if (_localizationSource == null || _localizationSource.Name != LocalizationSourceName)
                 {
-                    // Return null instead of NullLocalizationSource since it's not accessible
-                    return null;
+                    _localizationSource = LocalizationManager.GetSource(LocalizationSourceName);
                 }
 
-                try
-                {
-                    if (_localizationSource == null || _localizationSource.Name != LocalizationSourceName)
-                    {
-                        _localizationSource = LocalizationManager.GetSource(LocalizationSourceName);
-                    }
-
-                    return _localizationSource;
-                }
-                catch (Exception)
-                {
-                    // Return null if there's an error
-                    return null;
-                }
+                return _localizationSource;
             }
         }
 
-        protected string LocalizationSourceName { get; set; }
-
-        public ILocalizationManager LocalizationManager { get; set; }
-
-
-        //
-        // Summary:
-        //     Gets localized string for given key name and current language.
-        //
-        // Parameters:
-        //   name:
-        //     Key name
-        //
-        // Returns:
-        //     Localized string
         public virtual string L(string name)
         {
-            try
-            {
-                var source = LocalizationSource;
-                if (source != null)
-                {
-                    return source.GetString(name);
-                }
-                else
-                {
-                    // Return the key name as fallback
-                    return name;
-                }
-            }
-            catch (Exception)
-            {
-                // Return the key name as fallback
-                return name;
-            }
+            return LocalizationSource.GetString(name);
         }
 
-        //
-        // Summary:
-        //     Gets localized string for given key name and current language with formatting
-        //     strings.
-        //
-        // Parameters:
-        //   name:
-        //     Key name
-        //
-        //   args:
-        //     Format arguments
-        //
-        // Returns:
-        //     Localized string
         public virtual string L(string name, params object[] args)
         {
-            try
-            {
-                var source = LocalizationSource;
-                if (source != null)
-                {
-                    return source.GetString(name, args);
-                }
-                else
-                {
-                    // Return the key name as fallback
-                    return name;
-                }
-            }
-            catch (Exception)
-            {
-                // Return the key name as fallback
-                return name;
-            }
+            return LocalizationSource.GetString(name, args);
         }
 
-        //
-        // Summary:
-        //     Gets localized string for given key name and specified culture information.
-        //
-        // Parameters:
-        //   name:
-        //     Key name
-        //
-        //   culture:
-        //     culture information
-        //
-        // Returns:
-        //     Localized string
         public virtual string L(string name, CultureInfo culture)
         {
-            try
-            {
-                var source = LocalizationSource;
-                if (source != null)
-                {
-                    return source.GetString(name, culture);
-                }
-                else
-                {
-                    // Return the key name as fallback
-                    return name;
-                }
-            }
-            catch (Exception)
-            {
-                // Return the key name as fallback
-                return name;
-            }
+            return LocalizationSource.GetString(name, culture);
         }
 
-        //
-        // Summary:
-        //     Gets localized string for given key name and current language with formatting
-        //     strings.
-        //
-        // Parameters:
-        //   name:
-        //     Key name
-        //
-        //   culture:
-        //     culture information
-        //
-        //   args:
-        //     Format arguments
-        //
-        // Returns:
-        //     Localized string
         public virtual string L(string name, CultureInfo culture, params object[] args)
         {
-            try
-            {
-                var source = LocalizationSource;
-                if (source != null)
-                {
-                    return source.GetString(name, culture, args);
-                }
-                else
-                {
-                    // Return the key name as fallback
-                    return name;
-                }
-            }
-            catch (Exception)
-            {
-                // Return the key name as fallback
-                return name;
-            }
+            return LocalizationSource.GetString(name, culture, args);
         }
     }
 }

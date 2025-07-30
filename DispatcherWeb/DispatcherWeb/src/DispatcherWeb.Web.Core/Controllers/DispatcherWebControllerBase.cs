@@ -21,23 +21,6 @@ namespace DispatcherWeb.Web.Controllers
             LocalizationSourceName = DispatcherWebConsts.LocalizationSourceName;
         }
 
-        // Safe property to access SettingManager
-        protected ISettingManager SafeSettingManager
-        {
-            get
-            {
-                try
-                {
-                    return SettingManager;
-                }
-                catch (Exception)
-                {
-                    Logger?.Warn("SettingManager is not available in base controller");
-                    return null;
-                }
-            }
-        }
-
         protected void CheckErrors(IdentityResult identityResult)
         {
             identityResult.CheckErrors(LocalizationManager);
@@ -64,17 +47,8 @@ namespace DispatcherWeb.Web.Controllers
         {
             try
             {
-                var settingManager = SafeSettingManager;
-                if (settingManager != null)
-                {
-                    var timeZone = await settingManager.GetSettingValueAsync(TimingSettingNames.TimeZone);
-                    return TimeExtensions.GetToday(timeZone);
-                }
-                else
-                {
-                    // Return UTC time if SettingManager is not available
-                    return TimeExtensions.GetToday("UTC");
-                }
+                var timeZone = await SettingManager.GetSettingValueAsync(TimingSettingNames.TimeZone);
+                return TimeExtensions.GetToday(timeZone);
             }
             catch (Exception)
             {
