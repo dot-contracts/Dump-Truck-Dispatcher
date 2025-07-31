@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Abp.AspNetCore;
 using Abp.AspNetCore.Configuration;
 using Abp.AspNetCore.Mvc.Antiforgery;
@@ -92,6 +93,9 @@ namespace DispatcherWeb.Web.Startup
                 services.AddApplicationInsightsTelemetry();
                 services.AddSnapshotCollector();
                 services.AddSingleton<ITelemetryInitializer, AbpTelemetryInitializer>();
+                
+                // Add thread pool monitoring service
+                services.AddHostedService<ThreadPoolMonitoringService>();
             }
 
             // Comment out Azure Blob Storage data protection to fix Azurite connection issue
@@ -148,6 +152,10 @@ namespace DispatcherWeb.Web.Startup
             }
 
             GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 3 });
+
+            // Configure thread pool for better performance
+            ThreadPool.SetMinThreads(Environment.ProcessorCount * 2, Environment.ProcessorCount * 2);
+            ThreadPool.SetMaxThreads(Environment.ProcessorCount * 4, Environment.ProcessorCount * 4);
 
             services.AddHsts(options =>
             {
@@ -494,16 +502,10 @@ namespace DispatcherWeb.Web.Startup
                 app.UseMiddleware<SignalRChatRedirectMiddleware>();
             }
 
-            if (!_appConfiguration.GetValue<bool>("App:DisableThreadPoolMonitoringMiddleware")
-                && !_appConfiguration.GetValue<bool>("App:DisableAppInsights"))
-            {
-                app.UseMiddleware<ThreadPoolMonitoringMiddleware>();
-            }
-
             if (!_appConfiguration.GetValue<bool>("App:DisablePerformanceMonitoringMiddleware")
                 && !_appConfiguration.GetValue<bool>("App:DisableAppInsights"))
             {
-                app.UseMiddleware<PerformanceMonitoringMiddleware>();
+                app.UseMiddleware<EnhancedPerformanceMonitoringMiddleware>();
             }
 
             app.UseGetScriptsResponsePerUserCache();

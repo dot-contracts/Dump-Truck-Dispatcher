@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using Shouldly;
 using Xunit;
+using System.Collections.Generic;
 
 namespace DispatcherWeb.Tests.Scheduling
 {
@@ -236,6 +237,80 @@ namespace DispatcherWeb.Tests.Scheduling
             // Assert
             var updatedDispatch = await UsingDbContextAsync(async context => await context.Dispatches.FindAsync(dispatchEntity.Id));
             updatedDispatch.Status.ShouldBe(DispatchStatus.Completed);
+        }
+
+        [Fact]
+        public async Task Test_SetOrderLineIsCompleteBatch_should_set_multiple_order_lines_complete()
+        {
+            // Arrange
+            var originalDate = DateTime.Today;
+            var orderEntity1 = await CreateOrder(originalDate);
+            var orderEntity2 = await CreateOrder(originalDate);
+            var orderLine1 = orderEntity1.OrderLines.First();
+            var orderLine2 = orderEntity2.OrderLines.First();
+            
+            var truckEntity1 = await CreateTruck();
+            var truckEntity2 = await CreateTruck();
+            var driver1 = await CreateDriver();
+            var driver2 = await CreateDriver();
+            
+            await CreateOrderLineTruck(truckEntity1.Id, driver1.Id, orderLine1.Id, 1m);
+            await CreateOrderLineTruck(truckEntity2.Id, driver2.Id, orderLine2.Id, 1m);
+
+            // Act
+            await _schedulingAppService.SetOrderLineIsCompleteBatch(new SetOrderLineIsCompleteBatchInput
+            {
+                OrderLineIds = new List<int> { orderLine1.Id, orderLine2.Id },
+                IsComplete = true,
+                IsCancelled = false,
+            });
+
+            // Assert
+            var updatedOrderLine1 = await UsingDbContextAsync(async context => await context.OrderLines.Where(ol => ol.Id == orderLine1.Id && !ol.IsDeleted).FirstAsync());
+            var updatedOrderLine2 = await UsingDbContextAsync(async context => await context.OrderLines.Where(ol => ol.Id == orderLine2.Id && !ol.IsDeleted).FirstAsync());
+            
+            updatedOrderLine1.IsComplete.ShouldBeTrue();
+            updatedOrderLine2.IsComplete.ShouldBeTrue();
+            
+            var orderLineTrucks1 = await UsingDbContextAsync(async context => await context.OrderLineTrucks.Where(olt => olt.OrderLineId == orderLine1.Id && !olt.IsDeleted).ToListAsync());
+            var orderLineTrucks2 = await UsingDbContextAsync(async context => await context.OrderLineTrucks.Where(olt => olt.OrderLineId == orderLine2.Id && !olt.IsDeleted).ToListAsync());
+            
+            orderLineTrucks1.Count.ShouldBe(1);
+            orderLineTrucks2.Count.ShouldBe(1);
+            orderLineTrucks1[0].IsDone.ShouldBeTrue();
+            orderLineTrucks2[0].IsDone.ShouldBeTrue();
+            orderLineTrucks1[0].Utilization.ShouldBe(0);
+            orderLineTrucks2[0].Utilization.ShouldBe(0);
+        }
+
+        [Fact]
+        public async Task Test_SetOrderLineIsCompleteBatch_should_throw_exception_for_empty_order_line_ids()
+        {
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                await _schedulingAppService.SetOrderLineIsCompleteBatch(new SetOrderLineIsCompleteBatchInput
+                {
+                    OrderLineIds = new List<int>(),
+                    IsComplete = true,
+                    IsCancelled = false,
+                });
+            });
+        }
+
+        [Fact]
+        public async Task Test_SetOrderLineIsCompleteBatch_should_throw_exception_for_null_order_line_ids()
+        {
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                await _schedulingAppService.SetOrderLineIsCompleteBatch(new SetOrderLineIsCompleteBatchInput
+                {
+                    OrderLineIds = null,
+                    IsComplete = true,
+                    IsCancelled = false,
+                });
+            });
         }
 
     }

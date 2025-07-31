@@ -1666,127 +1666,23 @@ namespace DispatcherWeb.Scheduling
                     throw new ArgumentException("OrderLineIds cannot be null or empty");
                 }
 
-                // Check permissions for all order lines
+                // Check permissions for all order lines upfront
                 foreach (var orderLineId in input.OrderLineIds)
                 {
                     await CheckOrderLineEditPermissions(AppPermissions.Pages_Schedule, AppPermissions.LeaseHaulerPortal_Schedule,
                         _orderLineRepository, orderLineId);
                 }
 
-                var leaseHaulerIdFilter = await GetLeaseHaulerIdFilterAsync(AppPermissions.Pages_Schedule, AppPermissions.LeaseHaulerPortal_Schedule);
-                var permissions = new
+                // Process each order line individually to preserve all business logic
+                foreach (var orderLineId in input.OrderLineIds)
                 {
-                    DispatcherSchedule = await IsGrantedAsync(AppPermissions.Pages_Schedule),
-                    LeaseHaulerSchedule = await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_Schedule),
-                };
-
-                if (input.IsCancelled)
-                {
-                    input.IsComplete = true;
-                }
-
-                // Batch cancel/end dispatches
-                if (input.IsComplete)
-                {
-                    foreach (var orderLineId in input.OrderLineIds)
+                    await SetOrderLineIsComplete(new SetOrderLineIsCompleteInput
                     {
-                        await _dispatchingAppService.CancelOrEndAllDispatches(new CancelOrEndAllDispatchesInput
-                        {
-                            OrderLineId = orderLineId,
-                        });
-                    }
+                        OrderLineId = orderLineId,
+                        IsComplete = input.IsComplete,
+                        IsCancelled = input.IsCancelled
+                    });
                 }
-
-                // Batch update order lines
-                var orderLines = await (await _orderLineRepository.GetQueryAsync())
-                    .Where(ol => input.OrderLineIds.Contains(ol.Id))
-                    .ToListAsync();
-
-                if (permissions.DispatcherSchedule)
-                {
-                    foreach (var orderLine in orderLines)
-                    {
-                        orderLine.IsComplete = input.IsComplete;
-                        orderLine.IsCancelled = input.IsComplete && input.IsCancelled;
-                    }
-                    _orderLineRepository.UpdateRange(orderLines);
-                }
-
-                // Batch get order line trucks
-                var orderLineTrucks = await (await _orderLineTruckRepository.GetQueryAsync())
-                    .Where(x => input.OrderLineIds.Contains(x.OrderLineId))
-                    .WhereIf(leaseHaulerIdFilter.HasValue, q => q.Truck.LeaseHaulerTruck.LeaseHaulerId == leaseHaulerIdFilter)
-                    .ToListAsync();
-
-                // Check truck edit permissions
-                await CheckTruckEditPermissions(AppPermissions.Pages_Schedule, AppPermissions.LeaseHaulerPortal_Schedule,
-                    _truckRepository, orderLineTrucks.Select(x => x.TruckId).ToArray());
-
-                if (input.IsComplete)
-                {
-                    if (input.IsCancelled)
-                    {
-                        // Batch get tickets and dispatches
-                        var tickets = await (await _ticketRepository.GetQueryAsync())
-                            .Where(x => input.OrderLineIds.Contains(x.OrderLineId))
-                            .Select(x => new
-                            {
-                                x.TruckId,
-                                x.OrderLineId,
-                            }).ToListAsync();
-
-                        var dispatches = await (await _dispatchRepository.GetQueryAsync())
-                            .Where(x => input.OrderLineIds.Contains(x.OrderLineId) && (x.Status == DispatchStatus.Loaded || x.Status == DispatchStatus.Completed))
-                            .Select(x => new
-                            {
-                                x.TruckId,
-                                x.OrderLineId,
-                                x.Status,
-                            }).ToListAsync();
-
-                        var trucksToDelete = new List<OrderLineTruck>();
-                        var trucksToUpdate = new List<OrderLineTruck>();
-
-                        foreach (var orderLineTruck in orderLineTrucks)
-                        {
-                            var hasTickets = tickets.Any(t => t.TruckId == orderLineTruck.TruckId && t.OrderLineId == orderLineTruck.OrderLineId);
-                            var hasDispatches = dispatches.Any(d => d.TruckId == orderLineTruck.TruckId && d.OrderLineId == orderLineTruck.OrderLineId);
-
-                            if (!hasTickets && !hasDispatches)
-                            {
-                                trucksToDelete.Add(orderLineTruck);
-                            }
-                            else
-                            {
-                                orderLineTruck.IsDone = true;
-                                orderLineTruck.Utilization = 0;
-                                trucksToUpdate.Add(orderLineTruck);
-                            }
-                        }
-
-                        // Batch delete and update
-                        if (trucksToDelete.Any())
-                        {
-                            _orderLineTruckRepository.DeleteRange(trucksToDelete);
-                        }
-                        if (trucksToUpdate.Any())
-                        {
-                            _orderLineTruckRepository.UpdateRange(trucksToUpdate);
-                        }
-                    }
-                    else
-                    {
-                        foreach (var orderLineTruck in orderLineTrucks)
-                        {
-                            orderLineTruck.IsDone = true;
-                            orderLineTruck.Utilization = 0;
-                        }
-                        _orderLineTruckRepository.UpdateRange(orderLineTrucks);
-                    }
-                }
-
-                // Single save operation for all changes
-                await CurrentUnitOfWork.SaveChangesAsync();
                 
                 // Track performance metric
                 var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
