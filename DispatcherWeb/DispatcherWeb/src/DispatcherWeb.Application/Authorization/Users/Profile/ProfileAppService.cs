@@ -443,7 +443,7 @@ namespace DispatcherWeb.Authorization.Users.Profile
             }
 
             var userIdentifier = await AbpSession.ToUserIdentifierAsync();
-            var user = await UserManager.GetUserByIdAsync(AbpSession.GetUserId());
+            var user = await UserManager.GetUserByIdAsync(await AbpSession.GetUserIdAsync());
 
             if (user.SignaturePictureId.HasValue)
             {

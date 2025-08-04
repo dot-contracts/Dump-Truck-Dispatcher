@@ -346,7 +346,7 @@ namespace DispatcherWeb.Authorization.Users
         [AbpAuthorize(AppPermissions.Pages_Administration_Users_Delete)]
         public async Task DeleteUser(EntityDto<long> input)
         {
-            if (input.Id == AbpSession.GetUserId())
+            if (input.Id == await AbpSession.GetUserIdAsync())
             {
                 throw new UserFriendlyException(L("YouCanNotDeleteOwnAccount"));
             }
@@ -436,7 +436,7 @@ namespace DispatcherWeb.Authorization.Users
             CheckErrors(await UserManager.UpdateAsync(user));
 
             //Update roles
-            var currentUser = await UserManager.GetUserByIdAsync(AbpSession.GetUserId());
+            var currentUser = await UserManager.GetUserByIdAsync(await AbpSession.GetUserIdAsync());
             if (!await UserManager.IsInRoleAsync(currentUser, StaticRoleNames.Tenants.Admin))
             {
                 //if current user is not Admin, do not allow to add or remove Admin role

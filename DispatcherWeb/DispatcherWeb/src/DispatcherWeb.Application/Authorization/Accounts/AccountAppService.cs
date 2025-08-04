@@ -208,7 +208,7 @@ namespace DispatcherWeb.Authorization.Accounts
         public virtual async Task<ImpersonateOutput> DelegatedImpersonate(DelegatedImpersonateInput input)
         {
             var userDelegation = await _userDelegationManager.GetAsync(input.UserDelegationId);
-            if (userDelegation.TargetUserId != AbpSession.GetUserId())
+            if (userDelegation.TargetUserId != await AbpSession.GetUserIdAsync())
             {
                 throw new UserFriendlyException("User delegation error.");
             }

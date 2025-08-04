@@ -94,8 +94,9 @@ namespace DispatcherWeb.Web.Startup
                 services.AddSnapshotCollector();
                 services.AddSingleton<ITelemetryInitializer, AbpTelemetryInitializer>();
                 
-                // Add thread pool monitoring service
+                // Add lightweight monitoring services
                 services.AddHostedService<ThreadPoolMonitoringService>();
+                services.AddHostedService<UnitOfWorkMonitoringService>();
             }
 
             // Comment out Azure Blob Storage data protection to fix Azurite connection issue
@@ -505,7 +506,7 @@ namespace DispatcherWeb.Web.Startup
             if (!_appConfiguration.GetValue<bool>("App:DisablePerformanceMonitoringMiddleware")
                 && !_appConfiguration.GetValue<bool>("App:DisableAppInsights"))
             {
-                app.UseMiddleware<EnhancedPerformanceMonitoringMiddleware>();
+                app.UseMiddleware<LightweightPerformanceMiddleware>();
             }
 
             app.UseGetScriptsResponsePerUserCache();

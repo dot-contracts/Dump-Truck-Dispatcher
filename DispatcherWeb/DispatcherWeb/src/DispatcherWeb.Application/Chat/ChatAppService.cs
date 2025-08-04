@@ -83,7 +83,7 @@ namespace DispatcherWeb.Chat
         [MessagingMethod]
         public async Task<ListResultDto<ChatMessageDto>> GetUserChatMessages(GetUserChatMessagesInput input)
         {
-            var userId = AbpSession.GetUserId();
+            var userId = await AbpSession.GetUserIdAsync();
             var messages = await (await _chatMessageRepository.GetQueryAsync())
                 .WhereIf(input.MinMessageId.HasValue, m => m.Id < input.MinMessageId.Value)
                 .Where(m => m.UserId == userId && m.TargetTenantId == input.TenantId && m.TargetUserId == input.UserId)

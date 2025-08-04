@@ -175,6 +175,13 @@ namespace DispatcherWeb.Orders
         public async Task<PagedResultDto<OrderDto>> GetOrders(GetOrdersInput input)
         {
             var query = (await _orderRepository.GetQueryAsync())
+                .Include(x => x.Office) // Prevent N+1 queries for Office.Name
+                .Include(x => x.Customer) // Prevent N+1 queries for Customer.Name
+                .Include(x => x.Quote) // Prevent N+1 queries for Quote.Name
+                .Include(x => x.CustomerContact) // Prevent N+1 queries for CustomerContact.Name
+                .Include(x => x.OrderLines) // Prevent N+1 queries for OrderLines
+                .Include(x => x.OrderEmails) // Prevent N+1 queries for OrderEmails
+                .ThenInclude(x => x.Email) // Prevent N+1 queries for Email.CalculatedDeliveryStatus
                 .WhereIf(input.StartDate.HasValue,
                          x => x.DeliveryDate >= input.StartDate)
                 .WhereIf(input.EndDate.HasValue,
@@ -198,6 +205,7 @@ namespace DispatcherWeb.Orders
 
             var totalCount = await query.CountAsync();
             var items = await query
+                .AsNoTracking() // Improve performance for read-only operations
                 .Select(x => new OrderDto
                 {
                     Id = x.Id,
@@ -2273,7 +2281,7 @@ namespace DispatcherWeb.Orders
         {
             if (await IsOrderDeleted(input))
             {
-                return new EntityDeletedException("Order", "This order has been deleted and can’t be edited");
+                return new EntityDeletedException("Order", "This order has been deleted and can't be edited");
             }
 
             return new Exception($"Order with id {input.Id} wasn't found and is not deleted");
@@ -2289,10 +2297,10 @@ namespace DispatcherWeb.Orders
 
             if (await IsOrderDeleted(new EntityDto(deletedOrderLine.OrderId)))
             {
-                return new EntityDeletedException("Order", "This order has been deleted and can’t be edited");
+                return new EntityDeletedException("Order", "This order has been deleted and can't be edited");
             }
 
-            return new EntityDeletedException("OrderLine", "This order line has been deleted and can’t be edited");
+            return new EntityDeletedException("OrderLine", "This order line has been deleted and can't be edited");
         }
 
         private async Task<bool> IsOrderDeleted(EntityDto input)

@@ -114,9 +114,9 @@ namespace DispatcherWeb.Notifications
                 return;
             }
 
-            if (userNotification.UserId != AbpSession.GetUserId())
+            if (userNotification.UserId != await AbpSession.GetUserIdAsync())
             {
-                throw new Exception(string.Format("Given user notification id ({0}) is not belong to the current user ({1})", input.Id, AbpSession.GetUserId()));
+                throw new Exception(string.Format("Given user notification id ({0}) is not belong to the current user ({1})", input.Id, await AbpSession.GetUserIdAsync()));
             }
 
             await _userNotificationManager.UpdateUserNotificationStateAsync(
@@ -182,7 +182,7 @@ namespace DispatcherWeb.Notifications
                 return;
             }
 
-            if (notification.UserId != AbpSession.GetUserId())
+            if (notification.UserId != await AbpSession.GetUserIdAsync())
             {
                 throw new UserFriendlyException(L("ThisNotificationDoesntBelongToYou"));
             }

@@ -121,6 +121,7 @@ namespace DispatcherWeb.Trucks
             var totalCount = await query.CountAsync();
 
             var items = await query
+                .AsNoTracking() // Improve performance for read-only operations
                 .Select(x => new TruckDto
                 {
                     Id = x.Id,
@@ -154,6 +155,11 @@ namespace DispatcherWeb.Trucks
         private async Task<IQueryable<Truck>> GetFilteredTruckQueryAsync(IGetTruckListFilter input, DateTime today)
         {
             return (await _truckRepository.GetQueryAsync())
+                .Include(x => x.Office) // Prevent N+1 queries for Office.Name
+                .Include(x => x.VehicleCategory) // Prevent N+1 queries for VehicleCategory.Name
+                .Include(x => x.DefaultDriver) // Prevent N+1 queries for DefaultDriver
+                .Include(x => x.LeaseHaulerTruck) // Prevent N+1 queries for LeaseHaulerTruck
+                .Include(x => x.PreventiveMaintenances) // Prevent N+1 queries for PreventiveMaintenances
                 .Where(x => x.OfficeId.HasValue && x.LeaseHaulerTruck.AlwaysShowOnSchedule != true)
                 .WhereIf(!input.TruckCode.IsNullOrEmpty(), x => x.TruckCode.StartsWith(input.TruckCode))
                 .WhereIf(input.OfficeId.HasValue, x => x.OfficeId == input.OfficeId)

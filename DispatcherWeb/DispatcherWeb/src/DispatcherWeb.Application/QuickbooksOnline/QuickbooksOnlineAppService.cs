@@ -109,22 +109,25 @@ namespace DispatcherWeb.QuickbooksOnline
         private async ThreadingTask StoreAccessTokens(string accessToken, string refreshToken, string accessTokenExpirationDate, string refreshTokenExpirationDate)
         {
             var isConnected = !string.IsNullOrEmpty(refreshToken);
-            await SettingManager.ChangeSettingForTenantAsync(AbpSession.GetTenantId(), AppSettings.Invoice.Quickbooks.IsConnected, isConnected.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture));
-            await SettingManager.ChangeSettingForTenantAsync(AbpSession.GetTenantId(), AppSettings.Invoice.Quickbooks.AccessToken, accessToken);
-            await SettingManager.ChangeSettingForTenantAsync(AbpSession.GetTenantId(), AppSettings.Invoice.Quickbooks.RefreshToken, refreshToken);
-            await SettingManager.ChangeSettingForTenantAsync(AbpSession.GetTenantId(), AppSettings.Invoice.Quickbooks.AccessTokenExpirationDate, accessTokenExpirationDate);
-            await SettingManager.ChangeSettingForTenantAsync(AbpSession.GetTenantId(), AppSettings.Invoice.Quickbooks.RefreshTokenExpirationDate, refreshTokenExpirationDate);
+            var tenantId = await AbpSession.GetTenantIdAsync(); // Use async version to prevent blocking
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.Invoice.Quickbooks.IsConnected, isConnected.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture));
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.Invoice.Quickbooks.AccessToken, accessToken);
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.Invoice.Quickbooks.RefreshToken, refreshToken);
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.Invoice.Quickbooks.AccessTokenExpirationDate, accessTokenExpirationDate);
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.Invoice.Quickbooks.RefreshTokenExpirationDate, refreshTokenExpirationDate);
         }
 
         private async ThreadingTask StoreRealmId(string realmId)
         {
             //realmId: The ID that identifies the specific QuickBooks company to which a connection is made
-            await SettingManager.ChangeSettingForTenantAsync(AbpSession.GetTenantId(), AppSettings.Invoice.Quickbooks.RealmId, realmId);
+            var tenantId = await AbpSession.GetTenantIdAsync(); // Use async version to prevent blocking
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.Invoice.Quickbooks.RealmId, realmId);
         }
 
         private async Task<string> StoreCsrfToken(string csrfToken)
         {
-            await SettingManager.ChangeSettingForTenantAsync(AbpSession.GetTenantId(), AppSettings.Invoice.Quickbooks.CsrfToken, csrfToken);
+            var tenantId = await AbpSession.GetTenantIdAsync(); // Use async version to prevent blocking
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.Invoice.Quickbooks.CsrfToken, csrfToken);
             return csrfToken;
         }
 
@@ -408,8 +411,9 @@ namespace DispatcherWeb.QuickbooksOnline
 
         public async ThreadingTask SetQuickbooksOnlineSettings(QuickbooksOnlineSettingsDto input)
         {
-            await SettingManager.ChangeSettingForTenantAsync(AbpSession.GetTenantId(), AppSettings.Invoice.Quickbooks.DefaultIncomeAccountId, input.DefaultIncomeAccountId);
-            await SettingManager.ChangeSettingForTenantAsync(AbpSession.GetTenantId(), AppSettings.Invoice.Quickbooks.DefaultIncomeAccountName, input.DefaultIncomeAccountName);
+            var tenantId = await AbpSession.GetTenantIdAsync(); // Use async version to prevent blocking
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.Invoice.Quickbooks.DefaultIncomeAccountId, input.DefaultIncomeAccountId);
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.Invoice.Quickbooks.DefaultIncomeAccountName, input.DefaultIncomeAccountName);
         }
 
         private async Task<QuickbooksOnlineSettingsDto> GetQuickbooksOnlineSettingsOrThrow()
