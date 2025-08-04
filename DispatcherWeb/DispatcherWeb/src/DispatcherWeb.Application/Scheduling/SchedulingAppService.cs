@@ -1666,22 +1666,157 @@ namespace DispatcherWeb.Scheduling
                     throw new ArgumentException("OrderLineIds cannot be null or empty");
                 }
 
-                // Check permissions for all order lines upfront
+                // Get lease hauler filter and permissions once
+                var leaseHaulerIdFilter = await GetLeaseHaulerIdFilterAsync(AppPermissions.Pages_Schedule, AppPermissions.LeaseHaulerPortal_Schedule);
+                var permissions = new
+                {
+                    DispatcherSchedule = await IsGrantedAsync(AppPermissions.Pages_Schedule),
+                    LeaseHaulerSchedule = await IsGrantedAsync(AppPermissions.LeaseHaulerPortal_Schedule),
+                };
+
+                // Batch permission checks for all order lines upfront
                 foreach (var orderLineId in input.OrderLineIds)
                 {
                     await CheckOrderLineEditPermissions(AppPermissions.Pages_Schedule, AppPermissions.LeaseHaulerPortal_Schedule,
                         _orderLineRepository, orderLineId);
                 }
 
-                // Process each order line individually to preserve all business logic
-                foreach (var orderLineId in input.OrderLineIds)
+                // Handle cancellation logic
+                if (input.IsCancelled)
                 {
-                    await SetOrderLineIsComplete(new SetOrderLineIsCompleteInput
+                    input.IsComplete = true;
+                }
+
+                // Single query to get all order lines with related data
+                var orderLineData = await (await _orderLineRepository.GetQueryAsync())
+                    .Where(ol => input.OrderLineIds.Contains(ol.Id))
+                    .Select(ol => new
                     {
-                        OrderLineId = orderLineId,
-                        IsComplete = input.IsComplete,
-                        IsCancelled = input.IsCancelled
-                    });
+                        OrderLine = ol,
+                        Order = ol.Order,
+                        OrderLineTrucks = ol.OrderLineTrucks
+                            .Where(olt => !leaseHaulerIdFilter.HasValue || olt.Truck.LeaseHaulerTruck.LeaseHaulerId == leaseHaulerIdFilter.Value)
+                    })
+                    .ToListAsync();
+
+                if (orderLineData.Count != input.OrderLineIds.Count)
+                {
+                    throw new UserFriendlyException("One or more order lines could not be found");
+                }
+
+                // Get all truck IDs for permission check
+                var allTruckIds = orderLineData.SelectMany(old => old.OrderLineTrucks.Select(olt => olt.TruckId)).Distinct().ToArray();
+                if (allTruckIds.Any())
+                {
+                    await CheckTruckEditPermissions(AppPermissions.Pages_Schedule, AppPermissions.LeaseHaulerPortal_Schedule,
+                        _truckRepository, allTruckIds);
+                }
+
+                var today = await GetToday();
+
+                // Handle dispatch cancellation/ending for completing order lines
+                if (input.IsComplete)
+                {
+                    foreach (var orderLineId in input.OrderLineIds)
+                    {
+                        // CancelOrEndAllDispatches is public and will have its own permissions check and LH filtering
+                        await _dispatchingAppService.CancelOrEndAllDispatches(new CancelOrEndAllDispatchesInput
+                        {
+                            OrderLineId = orderLineId,
+                        });
+                    }
+                }
+
+                // Process order line updates in batch
+                var orderLineUpdaters = new List<(IOrderLineUpdater updater, dynamic data)>();
+                
+                foreach (var old in orderLineData)
+                {
+                    var orderLineUpdater = _orderLineUpdaterFactory.Create(old.OrderLine.Id);
+                    
+                    if (permissions.DispatcherSchedule)
+                    {
+                        await orderLineUpdater.UpdateFieldAsync(x => x.IsComplete, input.IsComplete);
+                        await orderLineUpdater.UpdateFieldAsync(x => x.IsCancelled, input.IsComplete && input.IsCancelled);
+                    }
+                    
+                    orderLineUpdaters.Add((orderLineUpdater, old));
+                }
+
+                // Handle truck updates based on completion/cancellation status
+                if (input.IsComplete)
+                {
+                    if (input.IsCancelled)
+                    {
+                        // Get tickets and dispatches for all order lines in batch
+                        var tickets = await (await _ticketRepository.GetQueryAsync())
+                            .Where(x => input.OrderLineIds.Contains(x.OrderLineId))
+                            .Select(x => new { x.TruckId, x.OrderLineId })
+                            .ToListAsync();
+
+                        var dispatches = await (await _dispatchRepository.GetQueryAsync())
+                            .Where(x => input.OrderLineIds.Contains(x.OrderLineId) && 
+                                   (x.Status == DispatchStatus.Loaded || x.Status == DispatchStatus.Completed))
+                            .Select(x => new { x.TruckId, x.OrderLineId, x.Status })
+                            .ToListAsync();
+
+                        var trucksToDelete = new List<OrderLineTruck>();
+
+                        foreach (var old in orderLineData)
+                        {
+                            foreach (var orderLineTruck in old.OrderLineTrucks)
+                            {
+                                var hasTickets = tickets.Any(t => t.TruckId == orderLineTruck.TruckId && t.OrderLineId == old.OrderLine.Id);
+                                var hasDispatches = dispatches.Any(d => d.TruckId == orderLineTruck.TruckId && d.OrderLineId == old.OrderLine.Id);
+
+                                if (!hasTickets && !hasDispatches)
+                                {
+                                    trucksToDelete.Add(orderLineTruck);
+                                    // Mark for staggered time update if needed
+                                    if (old.Order.DeliveryDate >= today)
+                                    {
+                                        var updater = orderLineUpdaters.First(u => u.data.OrderLine.Id == old.OrderLine.Id).updater;
+                                        updater.UpdateStaggeredTimeOnTrucksOnSave();
+                                    }
+                                }
+                                else
+                                {
+                                    orderLineTruck.IsDone = true;
+                                    orderLineTruck.Utilization = 0;
+                                }
+                            }
+                        }
+
+                        // Batch delete trucks
+                        if (trucksToDelete.Any())
+                        {
+                            foreach (var truck in trucksToDelete)
+                            {
+                                await _orderLineTruckRepository.DeleteAsync(truck);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Mark all trucks as done for completed (non-cancelled) order lines
+                        foreach (var old in orderLineData)
+                        {
+                            foreach (var orderLineTruck in old.OrderLineTrucks)
+                            {
+                                orderLineTruck.IsDone = true;
+                                orderLineTruck.Utilization = 0;
+                            }
+                        }
+                    }
+                }
+
+                // Save all changes in proper order (deletions first, then updates)
+                await CurrentUnitOfWork.SaveChangesAsync(); // Save deleted OrderLineTrucks first
+                
+                // Save all order line updates
+                foreach (var (updater, _) in orderLineUpdaters)
+                {
+                    await updater.SaveChangesAsync();
                 }
                 
                 // Track performance metric
@@ -1691,9 +1826,10 @@ namespace DispatcherWeb.Scheduling
                 {
                     { "OrderLineCount", input.OrderLineIds.Count().ToString() },
                     { "IsComplete", input.IsComplete.ToString() },
-                    { "IsCancelled", input.IsCancelled.ToString() }
+                    { "IsCancelled", input.IsCancelled.ToString() },
+                    { "TruesBatch", "true" }
                 });
-                Logger.Info($"SetOrderLineIsCompleteBatch completed in {duration}ms for {input.OrderLineIds.Count()} order lines");
+                Logger.Info($"SetOrderLineIsCompleteBatch (TRUE BATCH) completed in {duration}ms for {input.OrderLineIds.Count()} order lines");
             }
             catch (Exception ex)
             {

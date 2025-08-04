@@ -40,7 +40,7 @@ namespace DispatcherWeb.Web.Chat.SignalR
             var chatClients = GetClients(clients);
             if (chatClients != null)
             {
-                await chatClients.SendAsync("getChatMessage", await GetChatMessageDto(message));
+                await chatClients.SendAsync("getChatMessage", await GetChatMessageDto(message).ConfigureAwait(false)).ConfigureAwait(false);
             }
         }
 

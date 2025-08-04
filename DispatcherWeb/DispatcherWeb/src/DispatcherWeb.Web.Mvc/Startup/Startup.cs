@@ -335,6 +335,16 @@ namespace DispatcherWeb.Web.Startup
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            // PHASE 1 FIX: Thread Pool Configuration for Performance
+            // This addresses the thread pool starvation causing 99% waiting time in production
+            System.Threading.ThreadPool.SetMinThreads(Environment.ProcessorCount * 2, Environment.ProcessorCount * 2);
+            System.Threading.ThreadPool.SetMaxThreads(Environment.ProcessorCount * 8, Environment.ProcessorCount * 8);
+            
+            // Log thread pool configuration for monitoring
+            System.Threading.ThreadPool.GetMinThreads(out var minWorkerThreads, out var minCompletionPortThreads);
+            System.Threading.ThreadPool.GetMaxThreads(out var maxWorkerThreads, out var maxCompletionPortThreads);
+            Console.WriteLine($"Thread Pool Configured - Min: {minWorkerThreads}/{minCompletionPortThreads}, Max: {maxWorkerThreads}/{maxCompletionPortThreads}");
+
             // Verify ABP services are available at startup
             try
             {
