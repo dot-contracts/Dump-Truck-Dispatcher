@@ -350,7 +350,7 @@ namespace DispatcherWeb.Web.Startup
             {
                 using (var scope = app.ApplicationServices.CreateScope())
                 {
-                    var settingManager = scope.ServiceProvider.GetService<Abp.Configuration.ISettingManager>();
+                    var settingManager = scope.ServiceProvider.Ghttps://github.com/dot-contracts/Dump-Truck-Dispatcher.gitetService<Abp.Configuration.ISettingManager>();
                     var logger = scope.ServiceProvider.GetService<Abp.Logging.ILogger>();
                     var session = scope.ServiceProvider.GetService<Abp.Runtime.Session.IAbpSession>();
                     

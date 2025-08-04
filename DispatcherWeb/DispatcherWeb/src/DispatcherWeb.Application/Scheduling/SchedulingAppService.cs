@@ -2715,6 +2715,7 @@ namespace DispatcherWeb.Scheduling
             var query = await GetScheduleQueryAsync(input);
 
             var items = await query
+                .Where(x => !x.IsComplete && !x.IsCancelled)
                 .Select(x => new
                 {
                     x.Id,

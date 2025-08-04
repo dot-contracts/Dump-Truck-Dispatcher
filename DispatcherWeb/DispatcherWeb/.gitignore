@@ -132,6 +132,15 @@ src/DispatcherWeb.Web.Mvc/wwwroot/metronic/**/*.min.*
 src/DispatcherWeb.Web.Mvc/package-lock.json
 src/DispatcherWeb.Web.Mvc/appsettings.Development.json
 
+# Environment variables and sensitive configuration files
+.env
+.env.local
+.env.production
+.env.staging
+.env.development
+*.env
+**/DataProtection/
+
 src/DispatcherWeb.Web.Public/wwwroot/lib
 src/DispatcherWeb.Web.Public/wwwroot/dist
 src/DispatcherWeb.Web.Public/wwwroot/Common/_Bundles
